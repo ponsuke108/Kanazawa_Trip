@@ -1,0 +1,18 @@
+# 担当者のレビューを自動で依頼する設定（設計書 v3 10章の持ち主）
+# 「@GitHubユーザー名」をそれぞれの担当者に書き換え、行頭の # を外すと有効になる。
+# ※ Rulesets で「Require review from Code Owners」をオンにすると、承認が必須になる。
+
+# 共通の土台
+# /src/App.tsx                 @ponsuke108
+# /src/components/common/      @ponsuke108
+# /src/styles/                 @ponsuke108
+# /src/lib/                    @ponsuke108
+
+# B：作成・投稿
+# /src/components/blocks/      @Bのユーザー名
+# /src/lib/blocks.ts           @Bのユーザー名
+
+# C：DB・API・型
+# /src/api/                    @Cのユーザー名
+# /src/types/                  @Cのユーザー名
+# /supabase/                   @Cのユーザー名

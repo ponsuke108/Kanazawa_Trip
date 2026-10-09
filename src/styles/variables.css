@@ -1,0 +1,57 @@
+/*
+ * 色・余白・文字サイズの共通の値（設計書 v3 1.3、9.1）
+ * 各画面のCSSでは色コードを直接書かず、必ずここの変数を使う。
+ * 値を変えるときはチームに相談してから。
+ */
+:root {
+  /* テーマカラー（仮。Q21で確定するまでの推奨案：加賀五彩の藍と金） */
+  --color-primary: #2b4c7e; /* 藍。白い背景の上の文字にも使える */
+  --color-primary-weak: #e8eef6; /* 藍の薄い背景 */
+  --color-accent: #b8892b; /* 金。白い背景の上の小さい文字には使わない（コントラスト不足）。アイコン・大きい文字・塗りに使う */
+  --color-accent-weak: #f6f1e7; /* 金の薄い背景（コメントブロックなど） */
+
+  /* 意味のある色 */
+  --color-like: #c8324b; /* いいね */
+  --color-danger: #b42318; /* 削除・エラー */
+  --color-danger-weak: #fdecea;
+
+  /* 文字と背景 */
+  --color-text: #1f2a37;
+  --color-text-sub: #4b5563;
+  --color-text-on-primary: #ffffff;
+  --color-bg: #ffffff;
+  --color-bg-page: #f7f8fa; /* PCで開いたときの列の外側 */
+  --color-bg-muted: #f1f4f8; /* 移動手段ラベルなど */
+  --color-border: #b8c2cf;
+  --color-border-weak: #e2e7ee;
+
+  /* 余白（4の倍数） */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* 文字サイズ */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-family: system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+
+  /* 形 */
+  --radius-card: 12px; /* カードの角丸（9.3） */
+  --radius-pill: 999px; /* ラベル */
+  --border-width: 1px;
+
+  /* レイアウト（8章） */
+  --layout-max-width: 480px; /* PCで開いたときの列の幅 */
+  --tap-min: 44px; /* 押せる場所の最小サイズ */
+  --bottom-tab-height: 60px;
+
+  /* アイコン（9.2） */
+  --icon-size: 20px;
+  --icon-size-tab: 24px;
+}
