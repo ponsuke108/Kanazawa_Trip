@@ -1,0 +1,22 @@
+/* 9.3 の通常のカード：四辺同じ1pxの枠線、角丸12px、白い背景 */
+.card {
+  padding: var(--space-5) var(--space-4);
+  border: var(--border-width) solid var(--color-border-weak);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+
+.id {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-sub);
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  margin: var(--space-1) 0 var(--space-3);
+}
+
+.text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-sub);
+}

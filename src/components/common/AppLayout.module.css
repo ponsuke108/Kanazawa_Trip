@@ -1,0 +1,13 @@
+/* スマホでは画面いっぱい、PCでは中央に幅480pxの列として表示する */
+.column {
+  max-width: var(--layout-max-width);
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--color-bg);
+}
+
+.main {
+  padding: var(--space-4);
+  /* 下部タブに隠れないように、タブの高さ＋iPhoneの下部の余白をあける */
+  padding-bottom: calc(var(--bottom-tab-height) + env(safe-area-inset-bottom) + var(--space-4));
+}
