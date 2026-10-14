@@ -28,3 +28,7 @@ dist-ssr
 .env.local
 .env.*
 !.env.example
+
+# Supabase CLI の作業用フォルダ
+supabase/.temp
+supabase/.branches
