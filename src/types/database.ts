@@ -25,6 +25,13 @@ export type Database = {
             foreignKeyName: 'likes_plan_id_fkey';
             columns: ['plan_id'];
             isOneToOne: false;
+            referencedRelation: 'plan_summaries';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'likes_plan_id_fkey';
+            columns: ['plan_id'];
+            isOneToOne: false;
             referencedRelation: 'plans';
             referencedColumns: ['id'];
           },
@@ -74,6 +81,13 @@ export type Database = {
             foreignKeyName: 'plan_blocks_plan_id_fkey';
             columns: ['plan_id'];
             isOneToOne: false;
+            referencedRelation: 'plan_summaries';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plan_blocks_plan_id_fkey';
+            columns: ['plan_id'];
+            isOneToOne: false;
             referencedRelation: 'plans';
             referencedColumns: ['id'];
           },
@@ -101,6 +115,13 @@ export type Database = {
           tag_id?: number;
         };
         Relationships: [
+          {
+            foreignKeyName: 'plan_tags_plan_id_fkey';
+            columns: ['plan_id'];
+            isOneToOne: false;
+            referencedRelation: 'plan_summaries';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'plan_tags_plan_id_fkey';
             columns: ['plan_id'];
@@ -150,6 +171,13 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'plans_source_plan_id_fkey';
+            columns: ['source_plan_id'];
+            isOneToOne: false;
+            referencedRelation: 'plan_summaries';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'plans_source_plan_id_fkey';
             columns: ['source_plan_id'];
@@ -252,10 +280,74 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      plan_summaries: {
+        Row: {
+          author_name: string | null;
+          cover_image_path: string | null;
+          created_at: string | null;
+          has_minor_spot: boolean | null;
+          id: string | null;
+          like_count: number | null;
+          published_at: string | null;
+          source_plan_id: string | null;
+          spot_count: number | null;
+          spot_names: string[] | null;
+          status: string | null;
+          tag_ids: number[] | null;
+          title: string | null;
+          updated_at: string | null;
+          user_id: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [
+          {
+            foreignKeyName: 'plans_source_plan_id_fkey';
+            columns: ['source_plan_id'];
+            isOneToOne: false;
+            referencedRelation: 'plan_summaries';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plans_source_plan_id_fkey';
+            columns: ['source_plan_id'];
+            isOneToOne: false;
+            referencedRelation: 'plans';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plans_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Functions: {
-      [_ in never]: never;
+      save_plan: { Args: { p_plan: Json }; Returns: string };
+      search_plans: {
+        Args: { p_page?: number; p_page_size?: number; p_tag_ids?: number[] };
+        Returns: {
+          author_name: string;
+          cover_image_path: string;
+          created_at: string;
+          has_minor_spot: boolean;
+          id: string;
+          like_count: number;
+          match_count: number;
+          published_at: string;
+          source_plan_id: string;
+          spot_count: number;
+          spot_names: string[];
+          status: string;
+          tag_ids: number[];
+          title: string;
+          total_count: number;
+          updated_at: string;
+          user_id: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
