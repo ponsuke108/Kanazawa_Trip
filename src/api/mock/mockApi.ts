@@ -2,6 +2,7 @@
 // 保存した内容は画面を再読み込みするまで覚えておく。ログイン状態だけは localStorage に保つ
 import { areaIndex } from '@/constants/areas';
 import { ApiError } from '@/api/errors';
+import { validatePlan } from '@/lib/blocks';
 import {
   MOCK_TARO,
   mockLikes,
@@ -229,10 +230,10 @@ function ownPlan(planId: string, user: AuthUser): StoredPlan {
   return plan;
 }
 
-// 保存前の確認。I-08 で validatePlan を使うように差し替える
-let validateBeforeSave: (input: SavePlanInput) => void = () => {};
-export function setMockValidator(fn: (input: SavePlanInput) => void): void {
-  validateBeforeSave = fn;
+// 保存前の確認（BR-06）。save_plan と同じく最初の検証コードで失敗させる
+function validateBeforeSave(input: SavePlanInput): void {
+  const issues = validatePlan(input, input.status === 'published' ? 'publish' : 'draft');
+  if (issues.length > 0) throw new ApiError('VALIDATION', issues[0].code, [issues[0]]);
 }
 
 // ---- 関数（10.3） ----
