@@ -1,35 +1,52 @@
 # 旅ノート金沢（Kanazawa_Trip）
 
-金沢の観光プランをブロックで組み立てて共有する、スマホ向けWebアプリ（MVP）。
+金沢の観光プランを、スポット・移動手段・コメントのブロックで組み立てて共有する、スマホ向けのWebアプリ（MVP）。
 
-- 仕様：[`docs/機能要件_画面遷移_MVP.md`](docs/機能要件_画面遷移_MVP.md)
-- 設計：[`docs/技術選定_API設計_v3.md`](docs/技術選定_API設計_v3.md)
-- AI（Claude）向けのルール：[`CLAUDE.md`](CLAUDE.md)
+- 要件定義書：[`docs/requirements.md`](docs/requirements.md)（要件の唯一の正）
+- 実装引き継ぎ：[`docs/handoff.md`](docs/handoff.md)
+- AI 向けのルール：[`CLAUDE.md`](CLAUDE.md)
 
-## 自分のパソコンで動かす
+## 起動方法
 
-Node.js 22 以上が必要です。
+Node.js（`.nvmrc` のバージョン）と npm が必要です。
 
 ```bash
 git clone https://github.com/ponsuke108/Kanazawa_Trip.git
 cd Kanazawa_Trip
 npm install
-cp .env.example .env.local   # 中身に Supabase の URL と公開用キーを書く
+cp .env.example .env.local   # Windows の PowerShell では Copy-Item .env.example .env.local
 npm run dev
 ```
 
-`.env.local` はコミットしないでください（`.gitignore` 済み）。
+表示された `http://localhost:5173` をブラウザで開きます。
 
-## 作業の流れ
+## 環境変数
 
-1. `git switch main && git pull` で最新にする
-2. `git switch -c 担当/内容` でブランチを作る（例：`a/search-page`）
-3. 作業してコミットし、`git push -u origin ブランチ名`
-4. GitHub でプルリクエストを作る。自動チェック（CI）が通り、1人が承認したら main に取り込む
-5. main に取り込まれると Vercel が自動で本番に公開する
+`.env.local` に書きます（コミットしない）。Vercel では管理画面の Settings → Environment Variables に登録します。
 
-プルリクエストを出す前に、手元でも次が通ることを確認してください。
+| 変数                     | 内容                                                          |
+| ------------------------ | ------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`      | Supabase の Project URL                                       |
+| `VITE_SUPABASE_ANON_KEY` | Supabase の公開用キー（publishable key / anon key）           |
+| `VITE_USE_MOCK`          | `true` ならモックのデータで動く。`false` なら Supabase を使う |
 
-```bash
-npm run typecheck && npm run lint && npm run format:check && npm run build
-```
+管理者用のキー（secret key / service_role）はどこにも書かないでください。
+
+## モックと本物の切り替え
+
+- `VITE_USE_MOCK=true`：Supabase に接続せず、`src/api/mock/` のデータ（要件定義書 9.7）で動きます。どのメールアドレスとパスワードでも「テスト太郎」としてログインします。保存した内容は再読み込みすると消えます。
+- `VITE_USE_MOCK=false`：Supabase の本物のデータで動きます。`VITE_SUPABASE_URL` と `VITE_SUPABASE_ANON_KEY` が必要です。
+
+値を変えたら、開発サーバーを再起動してください（Vercel では再デプロイ）。
+
+## コマンド
+
+| コマンド               | 内容                                       |
+| ---------------------- | ------------------------------------------ |
+| `npm run dev`          | 開発サーバー                               |
+| `npm run build`        | 本番ビルド                                 |
+| `npm run lint`         | ESLint                                     |
+| `npm run typecheck`    | 型チェック                                 |
+| `npm test`             | テスト（Vitest）                           |
+| `npm run format`       | Prettier で整形                            |
+| `npm run import-spots` | スポットCSVからSQLを作る（要件定義書 9.6） |
