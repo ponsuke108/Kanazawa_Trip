@@ -4,6 +4,7 @@
 
 - 仕様：[`docs/機能要件_画面遷移_MVP.md`](docs/機能要件_画面遷移_MVP.md)
 - 設計：[`docs/技術選定_API設計_v3.md`](docs/技術選定_API設計_v3.md)
+- 開発環境のセットアップ（初めての人はここから）：[`docs/開発環境セットアップ.md`](docs/開発環境セットアップ.md)
 - AI（Claude）向けのルール：[`CLAUDE.md`](CLAUDE.md)
 
 ## 自分のパソコンで動かす
