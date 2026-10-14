@@ -1,0 +1,21 @@
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: calc(var(--space-1) / 2) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.published {
+  background: var(--color-primary-weak);
+  color: var(--color-primary);
+}
+
+.draft {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-sub);
+}

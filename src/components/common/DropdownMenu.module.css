@@ -1,0 +1,33 @@
+.wrap {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  z-index: var(--z-header);
+  min-width: 180px;
+  padding: var(--space-1) 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.danger {
+  color: var(--color-danger);
+}
