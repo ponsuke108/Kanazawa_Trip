@@ -1,0 +1,121 @@
+.filters {
+  position: sticky;
+  top: calc(var(--space-4) * -1);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: calc(var(--space-4) * -1) calc(var(--space-4) * -1) var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.search,
+.select {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--font-size-md);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.select {
+  flex: 1;
+}
+
+.toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  font-size: var(--font-size-sm);
+}
+
+.toggle input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-primary);
+}
+
+.group {
+  margin-bottom: var(--space-4);
+}
+
+.areaHeading {
+  padding: var(--space-2) 0;
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  text-align: left;
+}
+
+.item:disabled {
+  cursor: not-allowed;
+  background: var(--color-bg);
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.name {
+  font-weight: 700;
+}
+
+.label {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-weak);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.description {
+  overflow: hidden;
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note {
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+}
+
+.empty {
+  padding: var(--space-5) 0;
+  color: var(--color-text-sub);
+  text-align: center;
+}
