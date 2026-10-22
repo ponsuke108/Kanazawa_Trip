@@ -1,0 +1,45 @@
+/* 強調：四辺の枠線の色を変える（7.4） */
+.issues {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.issuesTitle {
+  color: var(--color-danger);
+  font-size: var(--font-size-md);
+}
+
+.issueList {
+  display: flex;
+  flex-direction: column;
+}
+
+.issue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.issueText {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.alert {
+  flex-shrink: 0;
+  color: var(--color-danger);
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}

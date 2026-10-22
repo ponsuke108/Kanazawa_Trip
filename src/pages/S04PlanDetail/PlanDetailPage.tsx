@@ -18,7 +18,7 @@ import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
 import { ActionIcons, StateIcons } from '@/lib/icons';
 import { LikeButton } from '@/pages/S04PlanDetail/LikeButton';
-import { PlanHeading } from '@/pages/S04PlanDetail/PlanHeading';
+import { PlanHeading } from '@/components/common/PlanHeading';
 import styles from './PlanDetailPage.module.css';
 
 // S-04 プラン詳細（6.4、F-05、F-07、F-16、F-24、BR-07〜BR-09、BR-16）

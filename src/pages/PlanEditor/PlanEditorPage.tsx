@@ -45,7 +45,8 @@ export function PlanEditorPage() {
   const goStep = (next: Step) => {
     const p = new URLSearchParams(params);
     p.set('step', next);
-    setParams(p);
+    // ステップの切り替えは履歴を置き換える。公開後にブラウザの戻るで作成画面に戻らないようにするため（6.4 S-09）
+    setParams(p, { replace: true });
   };
 
   const onBack = () => {
