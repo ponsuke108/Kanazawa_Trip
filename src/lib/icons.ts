@@ -53,6 +53,8 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
+import { createElement, type ReactElement } from 'react';
+import type { LucideProps } from 'lucide-react';
 import type { PlanStatus, TransportMode } from '@/types/models';
 
 export type { LucideIcon };
@@ -98,6 +100,11 @@ const TAG_ICONS: Record<string, LucideIcon> = {
 // 対応表にない slug は汎用のタグアイコン
 export function getTagIcon(slug: string): LucideIcon {
   return TAG_ICONS[slug] ?? Tag;
+}
+
+// タグのアイコンを描く（描画中にコンポーネントを決める書き方を避けるため、要素を返す）
+export function renderTagIcon(slug: string, props: LucideProps): ReactElement {
+  return createElement(getTagIcon(slug), props);
 }
 
 // プラン

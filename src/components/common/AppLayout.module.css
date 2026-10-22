@@ -1,0 +1,26 @@
+.column {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--color-bg);
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+.withTabBar {
+  padding-bottom: calc(var(--tabbar-height) + var(--space-6) + env(safe-area-inset-bottom));
+}
+
+/* 下部ボタン（BottomActionBar）の高さの分をあける */
+.withBottomBar {
+  padding-bottom: calc(
+    var(--tap-min) + var(--space-4) * 2 + var(--space-6) + env(safe-area-inset-bottom)
+  );
+}
+
+.withTabBar.withBottomBar {
+  padding-bottom: calc(
+    var(--tabbar-height) + var(--tap-min) + var(--space-4) * 2 + var(--space-6) +
+      env(safe-area-inset-bottom)
+  );
+}

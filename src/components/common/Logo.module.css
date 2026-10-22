@@ -1,0 +1,14 @@
+.logo {
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.lg {
+  font-size: var(--font-size-xl);
+}
+
+.sm {
+  font-size: var(--font-size-md);
+}
