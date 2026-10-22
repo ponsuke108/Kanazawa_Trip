@@ -7,7 +7,7 @@ import prettier from 'eslint-config-prettier';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'src/types/database.ts']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -22,14 +22,16 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      // 画面から Supabase を直接呼ばない（必ず src/api/ を通す）
+      '@typescript-eslint/no-explicit-any': 'error',
+      // 要件定義書 12.1：@supabase/supabase-js は lib/supabase.ts と api/ からだけ使う
       'no-restricted-imports': [
         'error',
         {
           paths: [
             {
               name: '@supabase/supabase-js',
-              message: 'Supabase は src/api/ と src/lib/supabase.ts からだけ使ってください。',
+              message:
+                'Supabase は src/lib/supabase.ts と src/api/ からだけ使ってください（要件定義書 12.1）。',
             },
           ],
         },
@@ -37,7 +39,24 @@ export default defineConfig([
     },
   },
   {
-    files: ['src/api/**', 'src/lib/supabase.ts', 'src/hooks/**'],
+    // 要件定義書 12.1：export default を使わない（設定ファイルは除く）
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ExportDefaultDeclaration',
+          message: 'export default は使わず、名前付きで書き出してください（要件定義書 12.1）。',
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/lib/supabase.ts', 'src/api/**/*.{ts,tsx}'],
     rules: { 'no-restricted-imports': 'off' },
+  },
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: { globals: globals.node },
   },
 ]);
