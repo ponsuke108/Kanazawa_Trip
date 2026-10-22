@@ -71,11 +71,13 @@
 }
 
 .route {
+  display: -webkit-box;
   color: var(--color-text-sub);
   font-size: var(--font-size-sm);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .meta {
