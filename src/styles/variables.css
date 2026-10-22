@@ -1,0 +1,49 @@
+/* デザイントークン（要件定義書 7.2）。色・余白・文字サイズ・角丸はここの変数だけを使う */
+:root {
+  /* 色（K15：加賀五彩の藍と金） */
+  --color-primary: #2b4c7e;
+  --color-primary-weak: #e8eef6;
+  --color-accent: #b8892b;
+  --color-text: #1f2a37;
+  --color-text-sub: #5b6675;
+  --color-border: #d5dce4;
+  --color-bg: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-comment-bg: #f6f1e7;
+  --color-like: #d64545;
+  --color-danger: #c0392b;
+  --color-success: #2e7d4f;
+
+  /* 余白 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* 角丸（小さい部品 / カード / 丸いラベル） */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-full: 9999px;
+
+  /* 文字 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-family: system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+
+  /* 大きさ */
+  --tap-min: 44px;
+  --header-height: 56px;
+  --tabbar-height: 64px;
+
+  /* 重なり順 */
+  --z-header: 10;
+  --z-tabbar: 20;
+  --z-sheet: 30;
+  --z-dialog: 40;
+  --z-toast: 50;
+}
