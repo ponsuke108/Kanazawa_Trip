@@ -65,9 +65,9 @@ export async function getRanking({
   return rows.map((r) => toSummary(r, imageUrlOf));
 }
 
-// 1行で書く（型の推論のため）
+// 1行で書く（型の推論のため）。plans と profiles は likes 経由でもつながるので、外部キーを指定する
 const PLAN_DETAIL_COLUMNS =
-  'id, title, status, user_id, source_plan_id, published_at, updated_at, author:profiles(display_name), plan_blocks(id, position, block_type, spot_id, transport_mode, body, image_path, spot:spots(*)), plan_tags(tag:tags(*))';
+  'id, title, status, user_id, source_plan_id, published_at, updated_at, author:profiles!plans_user_id_fkey(display_name),plan_blocks(id, position, block_type, spot_id, transport_mode, body, image_path, spot:spots(*)), plan_tags(tag:tags(*))';
 
 // 見つからない・権限がないときは null（10.1）
 export async function getPlan(planId: string): Promise<PlanDetail | null> {
