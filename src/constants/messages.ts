@@ -1,5 +1,5 @@
 // 画面をまたいで使う文言（要件定義書 6.5、6.4、10.6）。各画面で書き換えない
-import type { ValidationCode } from '@/types/models';
+import type { TransportMode, ValidationCode } from '@/types/models';
 
 // 6.5 共通のメッセージ
 export const Messages = {
@@ -68,4 +68,12 @@ export const ValidationMessages: Record<
   COMMENT_TOO_LONG: { message: 'コメントは500文字以内で入力してください', step: 'blocks' },
   SAME_SPOT_ADJACENT: { message: '同じスポットが続いています', step: 'blocks' },
   TRANSPORT_INVALID: { message: '移動手段の設定に誤りがあります', step: 'blocks' },
+};
+
+// 移動手段の表示名
+export const TransportLabels: Record<TransportMode, string> = {
+  walk: '徒歩',
+  bus: 'バス',
+  bicycle: '自転車',
+  car: '車',
 };

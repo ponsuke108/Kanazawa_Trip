@@ -1,0 +1,18 @@
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ドラッグ中は移動手段ブロックを出さないので、カードの間をあける */
+.dragging {
+  gap: var(--space-3);
+}
+
+.item {
+  position: relative;
+}
+
+.active {
+  z-index: var(--z-header);
+  opacity: 0.9;
+}
