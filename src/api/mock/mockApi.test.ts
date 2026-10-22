@@ -67,3 +67,36 @@ describe('モックの並び順（9.7）', () => {
     await expect(mockApi.getTags()).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
   });
 });
+
+describe('モックの保存（BR-06）', () => {
+  beforeEach(() => {
+    resetMockState();
+    mockApi.signInAsTaro();
+  });
+
+  it('スポット1つでは公開できず、VALIDATION になる', async () => {
+    await expect(
+      mockApi.savePlan({
+        id: null,
+        title: 'テスト',
+        status: 'published',
+        sourcePlanId: null,
+        tagIds: [1],
+        blocks: [{ type: 'spot', spotId: 1, transportMode: null, imagePath: null }],
+      }),
+    ).rejects.toMatchObject({ code: 'VALIDATION', issues: [{ code: 'SPOTS_TOO_FEW' }] });
+  });
+
+  it('下書きならスポット1つでも保存でき、本人のマイページに出る', async () => {
+    const { id } = await mockApi.savePlan({
+      id: null,
+      title: '',
+      status: 'draft',
+      sourcePlanId: null,
+      tagIds: [],
+      blocks: [{ type: 'spot', spotId: 1, transportMode: null, imagePath: null }],
+    });
+    const mine = await mockApi.getMyPlans();
+    expect(mine[0].id).toBe(id);
+  });
+});
