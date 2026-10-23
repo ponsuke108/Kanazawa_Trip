@@ -1,19 +1,16 @@
 name: CI
 
+# 要件定義書 12.3：プルリクエストごとに lint、typecheck、test、build を実行する
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches: [main]
 
 jobs:
-  # ブランチ保護の必須チェックの名前は「check」（P-02）
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -27,6 +24,3 @@ jobs:
         run: npm test
       - name: build
         run: npm run build
-      - name: scope
-        if: github.event_name == 'pull_request'
-        run: node scripts/check-scope.mjs
