@@ -2,9 +2,11 @@ Closes #
 
 ## 対象
 
-<!-- 画面ID・機能ID・業務ルール。例：S-04、F-24、BR-08 -->
+<!-- Issue、画面ID・機能ID・業務ルール。例：I-12、S-04、F-24、BR-08 -->
 
-## やったこと
+## やったこと（変更の要約）
+
+## 確認してほしい点
 
 ## スマホ幅のスクリーンショット
 
@@ -12,8 +14,11 @@ Closes #
 
 ## 確認したこと
 
-- [ ] `npm run lint`、`npm run typecheck`、`npm test`、`npm run build`、`node scripts/check-scope.mjs` が通る
+- [ ] `npm run lint`、`npm run typecheck`、`npm test`、`npm run build` が通る
 - [ ] 読み込み中、0件、エラーの表示がある
 - [ ] 幅375pxで崩れていない
 - [ ] 絵文字がなく、アイコンは要件定義書 7.3 の対応どおり
 - [ ] 共通部品と variables.css の変数を使っている
+- [ ] 生成AIで作った画像を載せていない
+
+<!-- このプルリクエストは、作った人以外が確認して取り込む（要件定義書 12.3） -->

@@ -1,5 +1,5 @@
 // 画面と src/api/ の間で受け渡すデータの形（要件定義書 10.7）
-// 全員が必ずこの型を使う。変更は要件定義書 12.2 の contract の手順で行う
+// 画面と api の受け渡しには必ずこの型を使う。形を変える場合は要件定義書 12.2 の手順に従う
 
 export type TransportMode = 'walk' | 'bus' | 'bicycle' | 'car';
 export type PlanStatus = 'draft' | 'published';
