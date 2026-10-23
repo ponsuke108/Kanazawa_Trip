@@ -27,3 +27,47 @@
   color: var(--color-primary);
   font-weight: 600;
 }
+
+/* タグのアイコンの色。対応表にないタグは文字と同じ色のまま */
+.icon {
+  display: inline-flex;
+}
+
+.icon[data-tag='food'] {
+  color: var(--color-tag-food);
+}
+.icon[data-tag='scenery'] {
+  color: var(--color-tag-scenery);
+}
+.icon[data-tag='history'] {
+  color: var(--color-tag-history);
+}
+.icon[data-tag='photo'] {
+  color: var(--color-tag-photo);
+}
+.icon[data-tag='relaxed'] {
+  color: var(--color-tag-relaxed);
+}
+.icon[data-tag='quick'] {
+  color: var(--color-tag-quick);
+}
+.icon[data-tag='budget'] {
+  color: var(--color-tag-budget);
+}
+.icon[data-tag='cozy'] {
+  color: var(--color-tag-cozy);
+}
+.icon[data-tag='sunny'] {
+  color: var(--color-tag-sunny);
+}
+.icon[data-tag='cloudy'] {
+  color: var(--color-tag-cloudy);
+}
+
+/* 曇りは雲を塗って、色のない灰色のアイコンと見分けやすくする */
+.icon[data-tag='cloudy'] svg {
+  fill: var(--color-tag-cloudy-fill);
+}
+.icon[data-tag='rainy'] {
+  color: var(--color-tag-rainy);
+}

@@ -11,7 +11,10 @@ type Props = {
 export function TagChip({ tag, selected = false, onToggle }: Props) {
   const content = (
     <>
-      {renderTagIcon(tag.slug, { size: 16, 'aria-hidden': true })}
+      {/* アイコンだけをタグごとの色にする（色は TagChip.module.css） */}
+      <span className={styles.icon} data-tag={tag.slug}>
+        {renderTagIcon(tag.slug, { size: 16, 'aria-hidden': true })}
+      </span>
       {tag.name}
     </>
   );
