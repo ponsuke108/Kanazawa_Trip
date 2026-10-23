@@ -1,0 +1,122 @@
+/* 写真のカード：すりガラスの縁、写真の下に暗いぼかしを敷いて白い文字を読みやすくする */
+.tile {
+  position: relative;
+  border: 1px solid rgb(255 255 255 / 0.45);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgb(20 12 30 / 0.35);
+}
+
+.link {
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 4;
+  color: #fff;
+  text-decoration: none;
+}
+
+.large .link {
+  aspect-ratio: 16 / 10;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  background-color: #5a4a6e;
+  background-position: center;
+  background-size: cover;
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 写真がまだないとき：夕暮れ色の地に、最初のスポット名を大きく薄く */
+.placeholder {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-3) var(--space-3) 0 0;
+  background:
+    radial-gradient(70% 60% at 80% 20%, rgb(255 200 140 / 0.35), transparent 70%),
+    linear-gradient(160deg, #6d6296, #3d3352 70%);
+  color: rgb(255 255 255 / 0.28);
+  font-family: var(--mincho);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  writing-mode: vertical-rl;
+}
+
+.large .placeholder {
+  font-size: 40px;
+}
+
+.caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-6) var(--space-3) var(--space-3);
+  background: linear-gradient(to top, rgb(20 14 26 / 0.82), rgb(20 14 26 / 0.45) 60%, transparent);
+}
+
+.title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-family: var(--mincho);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  line-height: 1.4;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 0.5);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.large .title {
+  font-size: 26px;
+  letter-spacing: 0.04em;
+}
+
+.meta {
+  color: rgb(255 255 255 / 0.88);
+  font-size: var(--font-size-xs);
+}
+
+.status {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: 1px var(--space-2);
+  border: 1px solid rgb(255 255 255 / 0.5);
+  border-radius: var(--radius-full);
+  background: rgb(30 22 40 / 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.action {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  color: #fff;
+}
+
+.action button {
+  border-radius: var(--radius-full);
+  background: rgb(30 22 40 / 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+}

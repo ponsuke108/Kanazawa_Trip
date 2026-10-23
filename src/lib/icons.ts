@@ -42,6 +42,7 @@ import {
   Search,
   SearchX,
   Send,
+  Snowflake,
   Sun,
   Tag,
   Timer,
@@ -154,4 +155,5 @@ export const StateIcons = {
   trophy: Trophy,
   spot: MapPin,
   heart: Heart,
+  snow: Snowflake, // マイページの飾り（S-11）
 } satisfies Record<string, LucideIcon>;

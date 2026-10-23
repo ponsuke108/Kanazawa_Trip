@@ -1,23 +1,298 @@
+/* 雪の茶屋街のマイページ（参考の画像に合わせた案）。背景は SnowScene、上に白い文字とすりガラスの部品を重ねる */
+.theme {
+  --mincho:
+    'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'BIZ UDPMincho', 'Noto Serif JP',
+    'Noto Serif CJK JP', serif;
+  --glass: rgb(255 255 255 / 0.86);
+  --glass-dark: rgb(255 255 255 / 0.16);
+  --glass-line: rgb(255 255 255 / 0.5);
+  --ink: #2e2a3d;
+  --ink-sub: #4a4560;
+  --accent: #3f3b78;
+
+  /* 外側のレイアウト（AppLayout）の地を透明にして、後ろの雪景色を見せる */
+  --color-bg: transparent;
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  background: #241f33;
+  color: #fff;
+}
+
+/* ヘッダー：背景の上に、文字だけ白く。下にスクロールしたときは薄いすりガラス */
+.theme header {
+  border-bottom: none;
+  background: rgb(36 31 51 / 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+}
+
+.theme header a,
+.theme header button,
+.theme header h1 {
+  color: #fff;
+  font-family: var(--mincho);
+  letter-spacing: 0.04em;
+}
+
+/* 下のタブバー：明るいすりガラス、選んでいるタブは角丸の枠 */
+.theme nav {
+  border-top: 1px solid var(--glass-line);
+  background: rgb(250 247 252 / 0.8);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.theme nav a {
+  color: var(--ink-sub);
+}
+
+.theme nav a[aria-current='page'] {
+  margin: var(--space-1);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  color: var(--accent);
+}
+
 .main {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-4) calc(var(--space-6) * 3);
 }
 
-.list {
+/* ---- 名前とあいさつ ---- */
+.profile {
+  position: relative;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 3px solid #fff;
+  border-radius: var(--radius-full);
+  background: linear-gradient(160deg, #e8e0f2, #b8acd3);
+  color: var(--accent);
+  font-family: var(--mincho);
+  font-size: 28px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgb(20 12 30 / 0.3);
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--mincho);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 8px rgb(20 12 30 / 0.45);
+  white-space: nowrap;
+}
+
+/* 吹き出し：名前の右上に少し重ねる */
+.bubble {
+  position: absolute;
+  top: -6px;
+  right: 0;
+  padding: 2px var(--space-2);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  rotate: 6deg;
+  box-shadow: 0 3px 8px rgb(20 12 30 / 0.25);
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 10px;
+  border: 6px solid transparent;
+  border-top-color: #fff;
+  border-bottom: 0;
+}
+
+/* ---- 検索の入口（押すと S-02 へ） ---- */
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--glass-line);
+  border-radius: 16px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--ink);
+  font-size: var(--font-size-md);
+  text-align: left;
+  box-shadow: 0 6px 18px rgb(20 12 30 / 0.2);
+}
+
+/* ---- タブ：小さなすりガラスの札 ---- */
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius-full);
+  background: var(--glass-dark);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.tab[aria-selected='true'] {
+  background: #fff;
+  color: var(--ink);
+}
+
+.count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: rgb(0 0 0 / 0.12);
+  font-size: var(--font-size-xs);
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- 写真の格子：1枚目は大きく、ほかは2列 ---- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
 }
 
-.liked {
-  color: var(--color-like);
+.wide {
+  grid-column: 1 / -1;
 }
 
-/* 0件のときは、点線の枠で「ここにプランが入る」場所を見せる */
-.panel {
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+.skeleton {
+  aspect-ratio: 5 / 4;
+  border: 1px solid var(--glass-line);
+  border-radius: 16px;
+  background: var(--glass-dark);
+}
+
+.skeleton.wide {
+  aspect-ratio: 16 / 10;
+}
+
+.liked {
+  color: #ff8fa3;
+}
+
+/* ---- すりガラスの箱（0件・エラー） ---- */
+.glass {
+  border: 1px solid var(--glass-line);
+  border-radius: 18px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--ink);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+}
+
+.emptyTitle {
+  font-family: var(--mincho);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+.emptyText {
+  color: var(--ink-sub);
+  font-size: var(--font-size-sm);
+}
+
+/* ---- 浮かぶボタンとステッカー：下のタブバーの上に固定 ---- */
+.floating {
+  position: fixed;
+  bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + var(--space-3));
+  left: 50%;
+  z-index: var(--z-tabbar);
+  display: flex;
+  justify-content: center;
+  width: min(100%, 480px);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.create {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: 0 var(--space-6);
+  border: 1px solid rgb(255 255 255 / 0.9);
+  border-radius: var(--radius-full);
+  background: linear-gradient(180deg, #ffffff, #efe8f6);
+  color: var(--ink);
+  font-family: var(--mincho);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  box-shadow:
+    0 0 0 4px rgb(255 255 255 / 0.25),
+    0 10px 24px rgb(20 12 30 / 0.4);
+  pointer-events: auto;
+}
+
+.create:active {
+  translate: 0 1px;
+}
+
+/* 食べ歩きのステッカー：白い縁取り、少し傾けて貼ったように。押すと「食事」タグの検索へ */
+.sticker {
+  position: absolute;
+  right: var(--space-3);
+  bottom: 4px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 64px;
+  height: 64px;
+  border: 3px solid #fff;
+  border-radius: var(--radius-full);
+  background: #c2462b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  rotate: 10deg;
+  box-shadow: 0 6px 14px rgb(20 12 30 / 0.4);
+  pointer-events: auto;
 }

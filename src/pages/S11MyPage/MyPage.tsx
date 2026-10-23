@@ -1,28 +1,27 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { signOut } from '@/api/auth';
 import { unlikePlan } from '@/api/likes';
 import { deletePlan, getLikedPlans, getMyPlans, unpublishPlan } from '@/api/plans';
-import { queryKeys } from '@/api/queryKeys';
+import { queryKeys, STALE_TIME } from '@/api/queryKeys';
+import { getTags } from '@/api/tags';
 import { AppLayout } from '@/components/common/AppLayout';
 import { Button } from '@/components/common/Button';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { DropdownMenu, type MenuItem } from '@/components/common/DropdownMenu';
-import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { IconButton } from '@/components/common/IconButton';
 import { PageHeader } from '@/components/common/PageHeader';
-import { PlanCard } from '@/components/common/PlanCard';
-import { PlanCardSkeletonList } from '@/components/common/PlanCardSkeleton';
-import { SegmentedControl } from '@/components/common/SegmentedControl';
 import { useToast } from '@/components/common/useToast';
 import { Messages, Toasts, UiMessages } from '@/constants/messages';
 import { useAuth, useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, StateIcons } from '@/lib/icons';
+import { ActionIcons, renderTagIcon } from '@/lib/icons';
+import { tagsQuery } from '@/lib/tagParams';
 import type { PlanSummary } from '@/types/models';
-import { ProfileHero } from './ProfileHero';
+import { PlanTile } from './PlanTile';
+import { SnowScene } from './SnowScene';
 import styles from './MyPage.module.css';
 
 type Tab = 'mine' | 'liked';
@@ -31,6 +30,13 @@ const TABS: Array<{ value: Tab; label: string }> = [
   { value: 'mine', label: '自分のプラン' },
   { value: 'liked', label: 'いいねしたプラン' },
 ];
+
+// 時間に合わせたあいさつ
+function greeting(hour: number): string {
+  if (hour >= 5 && hour < 11) return 'おはようございます';
+  if (hour >= 11 && hour < 17) return 'こんにちは';
+  return 'こんばんは';
+}
 
 type Confirm = { kind: 'unpublish' | 'delete'; plan: PlanSummary } | null;
 
@@ -52,7 +58,11 @@ export function MyPage() {
   const liked = useQuery({
     queryKey: queryKeys.plans.liked,
     queryFn: getLikedPlans,
-    enabled: tab === 'liked',
+  });
+  const tags = useQuery({
+    queryKey: queryKeys.tags,
+    queryFn: getTags,
+    staleTime: STALE_TIME.never,
   });
 
   const invalidatePlans = () => queryClient.invalidateQueries({ queryKey: queryKeys.plans.all });
@@ -122,101 +132,152 @@ export function MyPage() {
   };
 
   const current = tab === 'mine' ? mine : liked;
-  const published = mine.data?.filter((p) => p.status === 'published');
-  const stats = [
-    { label: '公開中', value: published?.length ?? null },
-    { label: '下書き', value: mine.data ? mine.data.length - (published?.length ?? 0) : null },
-    {
-      label: 'もらったいいね',
-      value: published ? published.reduce((sum, p) => sum + p.likeCount, 0) : null,
-    },
-  ];
+  const foodTag = tags.data?.find((t) => t.slug === 'food');
+  const Search = ActionIcons.search;
+  const Create = ActionIcons.create;
+  const initial = Array.from(user.displayName)[0] ?? '';
+  const counts: Record<Tab, number | undefined> = {
+    mine: mine.data?.length,
+    liked: liked.data?.length,
+  };
+  // 下書きは編集画面へ、公開中は詳細へ（6.4 S-11）
+  const hrefOf = (plan: PlanSummary) =>
+    tab === 'mine' && plan.status === 'draft'
+      ? `/plans/${plan.id}/edit?step=blocks`
+      : `/plans/${plan.id}`;
+  const actionOf = (plan: PlanSummary) =>
+    tab === 'mine' ? (
+      <DropdownMenu items={menuFor(plan)} />
+    ) : (
+      <IconButton
+        icon={ActionIcons.like}
+        label="いいねを取り消す"
+        filled
+        className={styles.liked}
+        disabled={unlike.isPending}
+        onClick={() => unlike.mutate(plan.id)}
+      />
+    );
 
   return (
-    <AppLayout showTabBar>
-      <PageHeader
-        title="マイページ"
-        showSiteName
-        right={
-          <Button
-            variant="ghost"
-            icon={ActionIcons.logout}
-            loading={logout.isPending}
-            onClick={() => logout.mutate()}
-          >
-            ログアウト
-          </Button>
-        }
-      />
-      <main className={styles.main}>
-        <ProfileHero displayName={user.displayName} stats={stats} />
-        <SegmentedControl
-          options={TABS}
-          value={tab}
-          onChange={(v) => setParams({ tab: v }, { replace: true })}
-          label="表示するプラン"
+    <div className={styles.theme}>
+      <SnowScene />
+      <AppLayout showTabBar>
+        <PageHeader
+          title="マイページ"
+          showSiteName
+          right={
+            <Button
+              variant="ghost"
+              icon={ActionIcons.logout}
+              loading={logout.isPending}
+              onClick={() => logout.mutate()}
+            >
+              ログアウト
+            </Button>
+          }
         />
+        <main className={styles.main}>
+          <section className={styles.profile} aria-labelledby="mypage-name">
+            <span className={styles.avatar} aria-hidden="true">
+              {initial}
+            </span>
+            <h1 id="mypage-name" className={styles.name}>
+              {user.displayName}さん
+            </h1>
+            <span className={styles.bubble}>{greeting(new Date().getHours())}</span>
+          </section>
 
-        {current.isPending ? (
-          <PlanCardSkeletonList count={3} />
-        ) : current.isError ? (
-          <ErrorState message={errorMessage(current.error)} onRetry={() => current.refetch()} />
-        ) : current.data.length === 0 ? (
-          <div className={styles.panel}>
-            {tab === 'mine' ? (
-              <EmptyState
-                icon={StateIcons.empty}
-                title={UiMessages.noPlans}
-                action={
-                  <Button icon={ActionIcons.create} onClick={() => navigate('/plans/new')}>
-                    プランを作る
-                  </Button>
+          <button type="button" className={styles.search} onClick={() => navigate('/search')}>
+            <Search size={20} aria-hidden="true" />
+            探す
+          </button>
+
+          <div className={styles.tabs} role="tablist" aria-label="表示するプラン">
+            {TABS.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.value}
+                className={styles.tab}
+                onClick={() =>
+                  setParams(
+                    (prev) => {
+                      prev.set('tab', t.value);
+                      return prev;
+                    },
+                    { replace: true },
+                  )
                 }
-              />
-            ) : (
-              <EmptyState
-                icon={StateIcons.heart}
-                title={UiMessages.noLikedPlans}
-                action={
-                  <Button icon={ActionIcons.search} onClick={() => navigate('/search')}>
-                    プランを探す
-                  </Button>
-                }
-              />
-            )}
-          </div>
-        ) : (
-          <ol className={styles.list}>
-            {current.data.map((plan) => (
-              <li key={plan.id}>
-                {tab === 'mine' ? (
-                  <PlanCard
-                    plan={plan}
-                    showStatus
-                    // 下書きは編集画面へ、公開中は詳細へ（6.4 S-11）
-                    to={plan.status === 'draft' ? `/plans/${plan.id}/edit?step=blocks` : undefined}
-                    menu={<DropdownMenu items={menuFor(plan)} />}
-                  />
-                ) : (
-                  <PlanCard
-                    plan={plan}
-                    trailing={
-                      <IconButton
-                        icon={ActionIcons.like}
-                        label="いいねを取り消す"
-                        filled
-                        className={styles.liked}
-                        disabled={unlike.isPending}
-                        onClick={() => unlike.mutate(plan.id)}
-                      />
-                    }
-                  />
-                )}
-              </li>
+              >
+                {t.label}
+                <span className={styles.count}>{counts[t.value] ?? '–'}</span>
+              </button>
             ))}
-          </ol>
-        )}
-      </main>
+          </div>
+
+          {current.isPending ? (
+            <div className={styles.grid} aria-busy="true" aria-label="読み込み中">
+              <span className={`${styles.skeleton} ${styles.wide}`} />
+              <span className={styles.skeleton} />
+              <span className={styles.skeleton} />
+            </div>
+          ) : current.isError ? (
+            <div className={styles.glass}>
+              <ErrorState message={errorMessage(current.error)} onRetry={() => current.refetch()} />
+            </div>
+          ) : current.data.length === 0 ? (
+            <div className={`${styles.glass} ${styles.empty}`}>
+              <p className={styles.emptyTitle}>
+                {tab === 'mine' ? UiMessages.noPlans : UiMessages.noLikedPlans}
+              </p>
+              <p className={styles.emptyText}>
+                {tab === 'mine'
+                  ? '金沢のスポットを組み合わせて、旅の計画を作りましょう。'
+                  : '気になるプランにいいねすると、ここにまとまります。'}
+              </p>
+              {tab === 'liked' && (
+                <Button icon={ActionIcons.search} onClick={() => navigate('/search')}>
+                  プランを探す
+                </Button>
+              )}
+            </div>
+          ) : (
+            <ol className={styles.grid}>
+              {current.data.map((plan, i) => {
+                // 1枚目は大きく。残りが奇数のときは、最後の1枚も横いっぱいにする
+                const wide =
+                  i === 0 || (i === current.data.length - 1 && current.data.length % 2 === 0);
+                return (
+                  <li key={plan.id} className={wide ? styles.wide : undefined}>
+                    <PlanTile
+                      plan={plan}
+                      to={hrefOf(plan)}
+                      size={wide ? 'large' : 'small'}
+                      status={tab === 'mine'}
+                      action={actionOf(plan)}
+                    />
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </main>
+
+        <div className={styles.floating}>
+          <button type="button" className={styles.create} onClick={() => navigate('/plans/new')}>
+            <Create size={22} aria-hidden="true" />
+            プランを作る
+          </button>
+          {foodTag && (
+            <Link className={styles.sticker} to={`/search/results${tagsQuery([foodTag.id])}`}>
+              {renderTagIcon('food', { size: 22, 'aria-hidden': true })}
+              食べ歩き
+            </Link>
+          )}
+        </div>
+      </AppLayout>
 
       <ConfirmDialog
         open={confirm?.kind === 'unpublish'}
@@ -237,6 +298,6 @@ export function MyPage() {
         onConfirm={() => confirm && remove.mutate(confirm.plan.id)}
         onCancel={() => setConfirm(null)}
       />
-    </AppLayout>
+    </div>
   );
 }
