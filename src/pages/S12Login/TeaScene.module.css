@@ -1,0 +1,250 @@
+/* ログイン・登録のあいだの、お抹茶を点てる絵（要件定義書 7.7）。
+   お茶が満ちる → 茶筅で点てて泡が立つ → 茶筅を上げる → 湯気が立つ、の順に動く */
+.overlay {
+  /* 絵の大きさは茶碗の幅を基準にする */
+  --bowl: calc(var(--tap-min) * 3.6);
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  background:
+    radial-gradient(60% 40% at 50% 55%, var(--color-snow-lantern), transparent 70%),
+    var(--color-snow-page);
+  animation: fade 0.3s ease-out both;
+}
+
+.stage {
+  position: relative;
+  width: var(--bowl);
+  height: calc(var(--bowl) * 1.25);
+}
+
+/* 茶碗：高台（足）、下が丸い胴、楕円の口 */
+.foot {
+  position: absolute;
+  bottom: calc(var(--bowl) * -0.06);
+  left: 35%;
+  width: 30%;
+  height: calc(var(--bowl) * 0.08);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  background: var(--color-snow-wood-dark);
+}
+
+.bowl {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--bowl);
+  height: calc(var(--bowl) * 0.5);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-snow-chawan),
+    var(--color-snow-wood) 45%,
+    var(--color-snow-wood-dark)
+  );
+  box-shadow: var(--shadow-snow-raised);
+}
+
+.rim {
+  position: absolute;
+  bottom: calc(var(--bowl) * 0.5 - var(--bowl) * 0.12);
+  left: 0;
+  width: var(--bowl);
+  height: calc(var(--bowl) * 0.24);
+  overflow: hidden;
+  border: 4px solid var(--color-snow-chawan-rim);
+  border-radius: 50%;
+  background: var(--color-snow-wood-dark);
+}
+
+/* お茶：口の中に、奥から広がるように満ちる */
+.tea,
+.foam {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.tea {
+  background: radial-gradient(
+    circle at 50% 60%,
+    var(--color-snow-matcha-foam),
+    var(--color-snow-matcha) 70%
+  );
+  animation: fill 0.9s ease-out both;
+}
+
+/* 泡：茶筅で点てるうちに、細かい泡が浮いてくる */
+.foam {
+  background:
+    radial-gradient(2px 2px at 20% 40%, var(--color-surface) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 38% 62%, var(--color-surface) 50%, transparent 51%),
+    radial-gradient(2px 2px at 55% 35%, var(--color-surface) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 70% 58%, var(--color-surface) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 45%, var(--color-surface) 50%, transparent 51%),
+    var(--color-snow-matcha-foam);
+  opacity: 0;
+  animation: foam 1s 0.9s ease-in both;
+}
+
+/* 茶筅：上から下りてきて、手で振るように左右に動き、上がっていく */
+.chasen {
+  position: absolute;
+  top: calc(var(--bowl) * 0.1);
+  left: calc(50% - var(--bowl) * 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(var(--bowl) * 0.3);
+  transform-origin: 50% 0;
+  animation:
+    dip 0.5s 0.5s ease-out both,
+    whisk 0.16s 1s ease-in-out 6 alternate,
+    lift 0.45s 1.95s ease-in both;
+}
+
+.handle {
+  width: 26%;
+  height: calc(var(--bowl) * 0.3);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: linear-gradient(90deg, var(--color-snow-bamboo), var(--color-snow-chawan-rim));
+}
+
+.tines {
+  width: 100%;
+  height: calc(var(--bowl) * 0.34);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-snow-bamboo) 0 2px,
+    transparent 2px 3.5px
+  );
+  clip-path: polygon(38% 0, 62% 0, 100% 85%, 88% 100%, 12% 100%, 0 85%);
+}
+
+/* 湯気：茶筅を上げたあと、3すじ立ちのぼる */
+.steam {
+  position: absolute;
+  bottom: calc(var(--bowl) * 0.62);
+  width: 6px;
+  height: calc(var(--bowl) * 0.34);
+  border-radius: var(--radius-full);
+  background: var(--color-snow-flake);
+  filter: blur(3px);
+  opacity: 0;
+}
+
+.done .steam {
+  animation: steam 1.4s ease-out infinite;
+}
+
+.steam1 {
+  left: 35%;
+}
+
+.steam2 {
+  left: 50%;
+}
+
+.steam3 {
+  left: 64%;
+}
+
+.done .steam2 {
+  animation-delay: 0.25s;
+}
+
+.done .steam3 {
+  animation-delay: 0.5s;
+}
+
+.label {
+  color: var(--color-surface);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.12em;
+  text-shadow: var(--shadow-snow-text);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fill {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes foam {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dip {
+  from {
+    opacity: 0;
+    translate: 0 calc(var(--bowl) * -0.4);
+  }
+}
+
+@keyframes whisk {
+  from {
+    transform: translateX(calc(var(--bowl) * -0.08)) rotate(-6deg);
+  }
+
+  to {
+    transform: translateX(calc(var(--bowl) * 0.08)) rotate(6deg);
+  }
+}
+
+@keyframes lift {
+  to {
+    opacity: 0;
+    translate: 0 calc(var(--bowl) * -0.5);
+  }
+}
+
+@keyframes steam {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scaleY(0.6);
+  }
+
+  40% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(calc(var(--bowl) * -0.25)) scaleY(1.1) translateX(4px);
+  }
+}
+
+/* 動きを減らす設定の人には、点て終えたお茶を止めたまま見せる */
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .tea,
+  .foam,
+  .chasen,
+  .done .steam {
+    animation: none;
+  }
+
+  .foam {
+    opacity: 1;
+  }
+
+  .chasen {
+    display: none;
+  }
+}

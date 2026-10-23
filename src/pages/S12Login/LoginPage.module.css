@@ -1,20 +1,158 @@
+/* S-12 ログイン・登録の雪の茶屋街の見た目（要件定義書 7.7）。背景は SnowScene。
+   その上に白い明朝のロゴと、すりガラスの入力の箱を重ねる */
+.theme {
+  /* 外側のレイアウト（AppLayout）の地を透明にして、後ろの雪景色を見せる */
+  --color-bg: transparent;
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  background: var(--color-snow-page);
+  color: var(--color-surface);
+}
+
+/* ヘッダー：薄いすりガラスに、白い明朝の見出し */
+.theme header {
+  border-bottom: none;
+  background: var(--color-snow-bar);
+  backdrop-filter: blur(var(--blur-snow));
+  -webkit-backdrop-filter: blur(var(--blur-snow));
+}
+
+.theme header h1 {
+  color: var(--color-surface);
+  font-family: var(--font-family-mincho);
+  letter-spacing: 0.04em;
+}
+
 .main {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  padding: var(--space-5) var(--space-4);
+  padding: var(--space-5) var(--space-4) var(--space-6);
 }
 
+/* ---- 題字：縦書きのサイト名と落款、左にひとこと（右から左へ読む） ---- */
 .logo {
+  /* Logo 部品は --color-primary の色で書かれるので、ここだけ白にする */
+  --color-primary: var(--color-surface);
+
   display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
   justify-content: center;
-  padding: var(--space-4) 0;
+  gap: var(--space-5);
+  padding: var(--space-3) 0 0;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.title > span:not(.seal) {
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-2xl);
+  letter-spacing: 0.24em;
+  text-shadow: var(--shadow-snow-text);
+  writing-mode: vertical-rl;
+}
+
+.mark {
+  color: var(--color-surface);
+  opacity: 0.85;
+}
+
+/* 落款：朱の四角に白抜きの「金沢」。少し傾けて押したように */
+.seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--tap-min) - var(--space-2));
+  height: calc(var(--tap-min) - var(--space-2));
+  border-radius: calc(var(--radius-sm) / 2);
+  background: var(--color-snow-sticker);
+  color: var(--color-surface);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.1;
+  writing-mode: vertical-rl;
+  rotate: -5deg;
+  box-shadow: var(--shadow-snow-soft);
+}
+
+/* ひとこと：縦書き2行。サイト名より少し下げて始める */
+.lead {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: var(--space-2);
+  padding-top: calc(var(--space-6) + var(--space-5));
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.16em;
+  text-shadow: var(--shadow-snow-text);
+}
+
+.lead > span {
+  writing-mode: vertical-rl;
+}
+
+.lead > span + span {
+  padding-top: var(--space-5);
+}
+
+/* ---- すりガラスの箱：切り替えと入力欄。中の共通部品の色を箱の中だけ変える ---- */
+.card {
+  --color-primary: var(--color-snow-accent);
+  --color-primary-weak: var(--color-snow-avatar);
+  --color-text: var(--color-snow-ink);
+  --color-text-sub: var(--color-snow-ink-sub);
+  /* すりガラスの上でも 4.5:1 を保つため、誤りの赤を少し濃くする */
+  --color-danger: var(--color-snow-danger);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-4);
+  border: 1px solid var(--color-snow-glass-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-snow-glass);
+  backdrop-filter: blur(var(--blur-snow));
+  -webkit-backdrop-filter: blur(var(--blur-snow));
+  color: var(--color-snow-ink);
+  box-shadow: var(--shadow-snow-raised);
+}
+
+.card [role='tablist'] {
+  border-radius: var(--radius-full);
+}
+
+.card [role='tab'] {
+  border-radius: var(--radius-full);
+}
+
+.card [role='tab'][aria-selected='true'] {
+  color: var(--color-snow-ink);
+  box-shadow: var(--shadow-snow-soft);
 }
 
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+/* 送るボタン：明朝で少し大きく */
+.form button[type='submit'] {
+  min-height: calc(var(--tap-min) + var(--space-1));
+  border-radius: var(--radius-full);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.08em;
+  box-shadow: var(--shadow-snow-soft);
 }
 
 .formError {
@@ -26,8 +164,168 @@
   font-size: var(--font-size-sm);
 }
 
+/* 案内：箱の下に、背景の上の白い文字で */
 .notice {
-  color: var(--color-text-sub);
+  color: var(--color-surface);
   font-size: var(--font-size-sm);
   text-align: center;
+  text-wrap: balance;
+  text-shadow: var(--shadow-snow-text);
+}
+
+/* ---- 動き（7.7）。ずっと動くのは背景の雪だけ。ほかは開いたときと操作したときに一度だけ動く。
+   入力の箱は動かさず、開いてすぐ入力できるようにする ---- */
+
+/* 開いたとき：雪の結晶がひとつ、左右に揺れながら落ちてくる */
+.mark {
+  animation: drift 1.6s ease-out both;
+}
+
+/* サイト名を、筆で書くように上から下へ現す */
+.title > span:not(.seal) {
+  animation: write 1.3s 0.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) both;
+}
+
+/* ひとことも1行ずつ、右の行から */
+.lead > span {
+  animation: write 0.9s 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) both;
+}
+
+.lead > span + span {
+  animation-delay: 2.1s;
+}
+
+/* 書き終えたら落款を押す */
+.seal {
+  animation: stamp 0.35s 1.8s ease-out both;
+}
+
+/* 切り替えたとき：入力欄をさっと入れ替える */
+.form {
+  animation: fade 0.2s ease-out;
+}
+
+/* 入力の誤り：そっと出す */
+.form [id$='-error'] {
+  animation: fade 0.3s ease-out both;
+}
+
+/* 送れなかったとき：首を振るように、だんだん小さく揺らす */
+.shakeA {
+  animation: shakeA 0.45s ease-out;
+}
+
+.shakeB {
+  animation: shakeB 0.45s ease-out;
+}
+
+/* 押したとき：ボタンが少し沈む */
+.form button[type='submit'] {
+  transition: transform 0.12s ease-out;
+}
+
+.form button[type='submit']:active {
+  transform: translateY(1px);
+}
+
+@keyframes drift {
+  0% {
+    opacity: 0;
+    transform: translate(-14px, -48px) rotate(-40deg);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translate(9px, -30px) rotate(0deg);
+  }
+
+  60% {
+    transform: translate(-5px, -12px) rotate(35deg);
+  }
+
+  85% {
+    transform: translate(2px, -3px) rotate(52deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(60deg);
+  }
+}
+
+@keyframes write {
+  from {
+    clip-path: inset(-10% -30% 100% -30%);
+  }
+
+  to {
+    clip-path: inset(-10% -30% -10% -30%);
+  }
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    scale: 1.5;
+  }
+
+  70% {
+    opacity: 1;
+    scale: 0.94;
+  }
+
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes shakeA {
+  20% {
+    transform: translateX(-7px);
+  }
+
+  45% {
+    transform: translateX(5px);
+  }
+
+  70% {
+    transform: translateX(-2px);
+  }
+}
+
+@keyframes shakeB {
+  20% {
+    transform: translateX(-7px);
+  }
+
+  45% {
+    transform: translateX(5px);
+  }
+
+  70% {
+    transform: translateX(-2px);
+  }
+}
+
+/* 動きを減らす設定の人には、最初から止まった状態で見せる */
+@media (prefers-reduced-motion: reduce) {
+  .mark,
+  .title > span:not(.seal),
+  .lead > span,
+  .seal,
+  .form,
+  .form [id$='-error'],
+  .shakeA,
+  .shakeB {
+    animation: none;
+  }
+
+  .form button[type='submit'] {
+    transition: none;
+  }
 }

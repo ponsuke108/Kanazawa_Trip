@@ -23,7 +23,7 @@ import { ActionIcons, renderTagIcon, StateIcons } from '@/lib/icons';
 import { tagsQuery } from '@/lib/tagParams';
 import type { PlanSummary } from '@/types/models';
 import { PlanTile } from './PlanTile';
-import { SnowScene } from './SnowScene';
+import { SnowScene } from '@/components/common/SnowScene';
 import styles from './MyPage.module.css';
 
 type Tab = 'mine' | 'liked';
