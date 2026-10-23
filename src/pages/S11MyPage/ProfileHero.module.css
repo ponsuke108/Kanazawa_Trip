@@ -1,0 +1,178 @@
+/* 藍の帯。色はすべて variables.css のトークンから作る */
+.hero {
+  --hero-ink: var(--color-surface);
+  --hero-ink-sub: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  --hero-tile: color-mix(in srgb, var(--color-surface) 10%, transparent);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(
+      120% 90% at 100% 0%,
+      color-mix(in srgb, var(--color-surface) 16%, transparent),
+      transparent 55%
+    ),
+    linear-gradient(
+      160deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 72%, var(--color-text))
+    );
+  color: var(--hero-ink);
+  overflow: hidden;
+}
+
+.eyebrow {
+  color: var(--hero-ink-sub);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.name {
+  font-size: calc(var(--font-size-xl) * 1.25);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+
+.honorific {
+  margin-left: var(--space-1);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--hero-ink-sub);
+}
+
+/* 旅の記録：3つの数字を同じ大きさのタイルで並べる */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: var(--space-1) 0 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--hero-tile);
+}
+
+.stat dt {
+  color: var(--hero-ink-sub);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.stat dd {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- 路線のアニメーション ---- */
+.route {
+  position: relative;
+  height: var(--space-5);
+  margin: var(--space-2) var(--space-2) 0;
+}
+
+.track {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 2px;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(
+    to right,
+    var(--hero-ink-sub) 0 var(--space-1),
+    transparent var(--space-1) var(--space-2)
+  );
+}
+
+.station {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--hero-ink);
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  transform: translate(-50%, -50%);
+}
+
+.station[data-i='0'] {
+  left: 0;
+}
+.station[data-i='1'] {
+  left: 33.333%;
+}
+.station[data-i='2'] {
+  left: 66.667%;
+}
+.station[data-i='3'] {
+  left: 100%;
+}
+
+/* 旅人：金色の点が駅で少し止まりながら進み、終点で消えて始発に戻る */
+.traveler {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-accent) 30%, transparent);
+  transform: translate(-50%, -50%);
+  animation: travel 9s ease-in-out infinite;
+}
+
+@keyframes travel {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  5% {
+    left: 0;
+    opacity: 1;
+  }
+  22%,
+  32% {
+    left: 33.333%;
+  }
+  49%,
+  59% {
+    left: 66.667%;
+  }
+  76% {
+    left: 100%;
+  }
+  90% {
+    left: 100%;
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+/* 動きを減らす設定の人には止めて表示する */
+@media (prefers-reduced-motion: reduce) {
+  .traveler {
+    left: 33.333%;
+    animation: none;
+  }
+}

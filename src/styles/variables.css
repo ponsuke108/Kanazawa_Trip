@@ -47,7 +47,11 @@
   --font-size-md: 16px;
   --font-size-lg: 18px;
   --font-size-xl: 22px;
-  --font-family: system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  /* Windows の system-ui は細い游ゴシックUIになり読みにくいため、端末ごとに読みやすい書体を先に指定する。
+     Mac・iPhone はヒラギノ角ゴ、Windows は BIZ UDPゴシック（なければメイリオ）、Android は Noto Sans */
+  --font-family:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, 'Noto Sans JP',
+    'Noto Sans CJK JP', sans-serif;
 
   /* 大きさ */
   --tap-min: 44px;

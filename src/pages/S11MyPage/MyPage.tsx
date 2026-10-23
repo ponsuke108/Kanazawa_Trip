@@ -22,6 +22,7 @@ import { useAuth, useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
 import { ActionIcons, StateIcons } from '@/lib/icons';
 import type { PlanSummary } from '@/types/models';
+import { ProfileHero } from './ProfileHero';
 import styles from './MyPage.module.css';
 
 type Tab = 'mine' | 'liked';
@@ -47,7 +48,6 @@ export function MyPage() {
   const mine = useQuery({
     queryKey: queryKeys.plans.mine,
     queryFn: getMyPlans,
-    enabled: tab === 'mine',
   });
   const liked = useQuery({
     queryKey: queryKeys.plans.liked,
@@ -122,6 +122,15 @@ export function MyPage() {
   };
 
   const current = tab === 'mine' ? mine : liked;
+  const published = mine.data?.filter((p) => p.status === 'published');
+  const stats = [
+    { label: '公開中', value: published?.length ?? null },
+    { label: '下書き', value: mine.data ? mine.data.length - (published?.length ?? 0) : null },
+    {
+      label: 'もらったいいね',
+      value: published ? published.reduce((sum, p) => sum + p.likeCount, 0) : null,
+    },
+  ];
 
   return (
     <AppLayout showTabBar>
@@ -140,7 +149,7 @@ export function MyPage() {
         }
       />
       <main className={styles.main}>
-        <p className={styles.user}>{user.displayName}さん</p>
+        <ProfileHero displayName={user.displayName} stats={stats} />
         <SegmentedControl
           options={TABS}
           value={tab}
@@ -153,27 +162,29 @@ export function MyPage() {
         ) : current.isError ? (
           <ErrorState message={errorMessage(current.error)} onRetry={() => current.refetch()} />
         ) : current.data.length === 0 ? (
-          tab === 'mine' ? (
-            <EmptyState
-              icon={StateIcons.empty}
-              title={UiMessages.noPlans}
-              action={
-                <Button icon={ActionIcons.create} onClick={() => navigate('/plans/new')}>
-                  プランを作る
-                </Button>
-              }
-            />
-          ) : (
-            <EmptyState
-              icon={StateIcons.heart}
-              title={UiMessages.noLikedPlans}
-              action={
-                <Button icon={ActionIcons.search} onClick={() => navigate('/search')}>
-                  プランを探す
-                </Button>
-              }
-            />
-          )
+          <div className={styles.panel}>
+            {tab === 'mine' ? (
+              <EmptyState
+                icon={StateIcons.empty}
+                title={UiMessages.noPlans}
+                action={
+                  <Button icon={ActionIcons.create} onClick={() => navigate('/plans/new')}>
+                    プランを作る
+                  </Button>
+                }
+              />
+            ) : (
+              <EmptyState
+                icon={StateIcons.heart}
+                title={UiMessages.noLikedPlans}
+                action={
+                  <Button icon={ActionIcons.search} onClick={() => navigate('/search')}>
+                    プランを探す
+                  </Button>
+                }
+              />
+            )}
+          </div>
         ) : (
           <ol className={styles.list}>
             {current.data.map((plan) => (
