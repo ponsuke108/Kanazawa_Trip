@@ -14,6 +14,20 @@
   --color-danger: #c0392b;
   --color-success: #2e7d4f;
 
+  /* タグのアイコンの色（TagChip）。背景に対してコントラスト比3:1以上 */
+  --color-tag-food: #c4553a;
+  --color-tag-scenery: #3f7d4e;
+  --color-tag-history: #2b4c7e;
+  --color-tag-photo: #a0457a;
+  --color-tag-relaxed: #2f8a7e;
+  --color-tag-quick: #6b5ca5;
+  --color-tag-budget: #a17a1f;
+  --color-tag-cozy: #8a5a2b;
+  --color-tag-sunny: #c86a00;
+  --color-tag-cloudy: #5e6f82;
+  --color-tag-cloudy-fill: #cfd8e2;
+  --color-tag-rainy: #2f7fc1;
+
   /* 余白 */
   --space-1: 4px;
   --space-2: 8px;
