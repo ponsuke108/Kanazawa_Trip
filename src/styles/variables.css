@@ -28,6 +28,44 @@
   --color-tag-cloudy-fill: #cfd8e2;
   --color-tag-rainy: #2f7fc1;
 
+  /* マイページ（S-11）の雪の茶屋街の見た目（要件定義書 7.2、7.7） */
+  --color-snow-sky-1: #2c2e5c; /* 夕暮れの空（上） */
+  --color-snow-sky-2: #4c4c86;
+  --color-snow-sky-3: #8577ab;
+  --color-snow-sky-4: #a48f9f;
+  --color-snow-sky-5: #6d5148;
+  --color-snow-sky-6: #3a2a24; /* 町家の足もと */
+  --color-snow-page: #241f33; /* 列の外側 */
+  --color-snow-wood: #5a3a2c; /* 町家の壁 */
+  --color-snow-wood-dark: #2b1b15;
+  --color-snow-lattice: rgb(25 14 10 / 0.75); /* 木の格子 */
+  --color-snow-lantern: rgb(255 190 120 / 0.35); /* 提灯の灯り */
+  --color-snow-flake: rgb(255 255 255 / 0.55); /* 雪の結晶の飾り */
+  --color-snow-glass: rgb(255 255 255 / 0.86); /* 明るいすりガラス */
+  --color-snow-glass-dark: rgb(255 255 255 / 0.16); /* 暗い地の上のすりガラス */
+  --color-snow-glass-line: rgb(255 255 255 / 0.5); /* すりガラスの縁 */
+  --color-snow-bar: rgb(36 31 51 / 0.25); /* ヘッダーのすりガラス */
+  --color-snow-tabbar: rgb(250 247 252 / 0.8); /* 下部タブのすりガラス */
+  --color-snow-ink: #2e2a3d; /* すりガラスの上の文字 */
+  --color-snow-ink-sub: #4a4560;
+  --color-snow-accent: #3f3b78; /* 選択中の下部タブ、顔の文字 */
+  --color-snow-avatar: #d9cfe8; /* 顔の地 */
+  --color-snow-photo: #5a4a6e; /* 写真の読み込み前 */
+  --color-snow-placeholder: #4d4470; /* 写真がないプランの札 */
+  --color-snow-placeholder-text: rgb(255 255 255 / 0.28);
+  --color-snow-caption: rgb(20 14 26 / 0.82); /* 写真の上の文字の下敷き */
+  --color-snow-chip: rgb(30 22 40 / 0.45); /* 写真の上のラベルとボタン */
+  --color-snow-like: #ff8fa3; /* 暗い地の上のいいね済みのハート */
+  --color-snow-sticker: #c2462b; /* 食べ歩きのステッカー */
+  --shadow-snow-raised: 0 8px 24px rgb(20 12 30 / 0.35); /* 写真のカード、浮かぶボタン */
+  --shadow-snow-soft: 0 6px 16px rgb(20 12 30 / 0.3); /* 顔、検索の入口 */
+  --shadow-snow-text: 0 2px 8px rgb(20 12 30 / 0.45); /* 暗い地の上の白い文字 */
+  --blur-snow: 12px; /* すりガラスのぼかし */
+  --radius-lg: 16px; /* 写真のカード、すりガラスの箱 */
+  --font-size-2xl: 28px; /* 名前、大きい写真のタイトル */
+  --font-family-mincho:
+    'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'BIZ UDPMincho', 'Noto Serif JP', serif; /* 見出しの明朝（Webフォントは読み込まない） */
+
   /* 余白 */
   --space-1: 4px;
   --space-2: 8px;
@@ -47,7 +85,11 @@
   --font-size-md: 16px;
   --font-size-lg: 18px;
   --font-size-xl: 22px;
-  --font-family: system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  /* Windows の system-ui は細い游ゴシックUIになり読みにくいため、端末ごとに読みやすい書体を先に指定する（要件定義書 7.2）。
+     Mac・iPhone はヒラギノ角ゴ、Windows は BIZ UDPゴシック（なければメイリオ）、Android は Noto Sans。Webフォントは読み込まない */
+  --font-family:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, 'Noto Sans JP',
+    'Noto Sans CJK JP', sans-serif;
 
   /* 大きさ */
   --tap-min: 44px;

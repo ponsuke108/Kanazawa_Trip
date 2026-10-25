@@ -1,0 +1,109 @@
+/* S-11 の写真のカード（要件定義書 7.7）：すりガラスの縁、写真の下に暗い下敷きを敷いて白い文字を読みやすくする */
+.tile {
+  position: relative;
+  border: 1px solid var(--color-snow-glass-line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-snow-raised);
+}
+
+.link {
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 4;
+  color: var(--color-surface);
+  text-decoration: none;
+}
+
+.large .link {
+  aspect-ratio: 16 / 10;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-snow-photo);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 写真がまだないとき：夕暮れ色の地に、最初のスポット名を縦書きで大きく薄く */
+.placeholder {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-3) var(--space-3) 0 0;
+  background:
+    radial-gradient(70% 60% at 80% 20%, var(--color-snow-lantern), transparent 70%),
+    linear-gradient(160deg, var(--color-snow-sky-3), var(--color-snow-placeholder) 70%);
+  color: var(--color-snow-placeholder-text);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  writing-mode: vertical-rl;
+}
+
+.caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-1) / 2);
+  padding: var(--space-6) var(--space-3) var(--space-3);
+  background: linear-gradient(to top, var(--color-snow-caption), transparent);
+}
+
+.title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  line-height: 1.4;
+  text-shadow: var(--shadow-snow-text);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.large .title {
+  font-size: var(--font-size-2xl);
+  letter-spacing: 0.04em;
+}
+
+.meta {
+  font-size: var(--font-size-xs);
+}
+
+.status {
+  /* マイページでは --color-bg を透明にしているので、下書きのラベルの地を白に戻す */
+  --color-bg: var(--color-surface);
+
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+}
+
+.action {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  color: var(--color-surface);
+}
+
+.action button {
+  border-radius: var(--radius-full);
+  background: var(--color-snow-chip);
+  backdrop-filter: blur(var(--blur-snow));
+  -webkit-backdrop-filter: blur(var(--blur-snow));
+  color: var(--color-surface);
+}
