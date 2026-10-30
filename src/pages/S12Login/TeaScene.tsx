@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { ActionIcons } from '@/lib/icons';
 import styles from './TeaScene.module.css';
 
 export type TeaState = 'brewing' | 'done';
@@ -8,9 +10,24 @@ const LABEL: Record<TeaState, string> = {
 };
 
 // ログイン・登録のあいだに出す、金沢の大樋焼の茶碗でお抹茶を一服点て、金箔を浮かべる絵（7.7、I-23）。画像は使わず CSS だけで描く
-export function TeaScene({ state }: { state: TeaState }) {
+// 画面のどこをタップしても、「スキップ」ボタンを押しても、Esc キーでも、スキップできる
+export function TeaScene({ state, onSkip }: { state: TeaState; onSkip: () => void }) {
+  const skipButton = useRef<HTMLButtonElement>(null);
+  const Next = ActionIcons.next;
+
+  // 出たらすぐ「スキップ」にカーソルを置き、キーボードの Enter でもスキップできるようにする
+  useEffect(() => {
+    skipButton.current?.focus();
+  }, []);
+
   return (
-    <div className={`${styles.overlay} ${styles[state]}`}>
+    <div
+      className={`${styles.overlay} ${styles[state]}`}
+      onClick={onSkip}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onSkip();
+      }}
+    >
       <div className={styles.stage} aria-hidden="true">
         <span className={`${styles.steam} ${styles.steam1}`} />
         <span className={`${styles.steam} ${styles.steam2}`} />
@@ -33,6 +50,10 @@ export function TeaScene({ state }: { state: TeaState }) {
       <p className={styles.label} role="status">
         {LABEL[state]}
       </p>
+      <button ref={skipButton} type="button" className={styles.skip} onClick={onSkip}>
+        スキップ
+        <Next size={16} aria-hidden="true" />
+      </button>
     </div>
   );
 }

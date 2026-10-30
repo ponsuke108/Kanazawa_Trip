@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { signIn, signUp } from '@/api/auth';
@@ -28,11 +28,20 @@ const MODES: Array<{ value: Mode; label: string }> = [
   { value: 'signup', label: '新規登録' },
 ];
 
-// お茶を点てる絵の長さ（7.7）。ログインがすぐ終わっても、ここまでは見せる
+// お茶を点てる絵の長さ（7.7）。スキップしなければ、ログインがすぐ終わってもここまでは見せる
 const BREW_MS = 3700;
 const SERVE_MS = 800;
 
-const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+// 待つ。skip に入れた関数を呼ぶと、待つのをやめてすぐ進む（お茶の絵をタップしてスキップするとき）
+function skippableWait(ms: number, skip: { current: () => void }): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const timer = setTimeout(resolve, ms);
+    skip.current = () => {
+      clearTimeout(timer);
+      resolve();
+    };
+  });
+}
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // 入力欄の名前（form の中で探して、カーソルを移すのに使う）
@@ -80,6 +89,13 @@ export function LoginPage() {
   const [failed, setFailed] = useState(0);
   const [tea, setTea] = useState<TeaState | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  // お茶の絵をスキップしたか。スキップしたら、ログインが終わりしだいすぐ次の画面へ移る（7.7）
+  const skipped = useRef(false);
+  const skipWait = useRef<() => void>(() => {});
+  const skipTea = () => {
+    skipped.current = true;
+    skipWait.current();
+  };
 
   // 直しはじめたら、その欄の誤りの文を消す
   const edit = (name: FieldName, set: (v: string) => void) => (value: string) => {
@@ -113,17 +129,20 @@ export function LoginPage() {
 
     setSubmitting(true);
     setTea('brewing');
+    skipped.current = false;
     const still = reducedMotion();
-    const brewed = wait(still ? 0 : BREW_MS);
+    const brewed = skippableWait(still ? 0 : BREW_MS, skipWait);
     try {
       const user =
         mode === 'login'
           ? await signIn({ email: email.trim(), password })
           : await signUp({ email: email.trim(), password, displayName: displayName.trim() });
-      // 点て終えて、湯気が立つのを少し見せてから移る
+      // 点て終えて、湯気が立つのを少し見せてから移る。スキップしたときは見せずにすぐ移る
       await brewed;
-      setTea('done');
-      await wait(still ? 0 : SERVE_MS);
+      if (!skipped.current) {
+        setTea('done');
+        await skippableWait(still ? 0 : SERVE_MS, skipWait);
+      }
       queryClient.clear();
       toast.show({
         type: 'success',
@@ -251,7 +270,7 @@ export function LoginPage() {
           </div>
           <p className={styles.notice}>{AuthMessages.forgotPassword}</p>
         </main>
-        {tea && <TeaScene state={tea} />}
+        {tea && <TeaScene state={tea} onSkip={skipTea} />}
       </AppLayout>
     </div>
   );

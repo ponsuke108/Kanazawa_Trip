@@ -239,6 +239,38 @@
   text-shadow: var(--shadow-snow-text);
 }
 
+/* スキップボタン：下のほうに控えめに。画面のどこをタップしてもスキップできる */
+.overlay {
+  cursor: pointer;
+}
+
+.skip {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom) + var(--space-6));
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-snow-glass-line);
+  border-radius: var(--radius-full);
+  background: var(--color-snow-glass-dark);
+  color: var(--color-surface);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.08em;
+  -webkit-tap-highlight-color: transparent;
+  transition: scale 0.12s ease-out;
+}
+
+.skip:active {
+  scale: 0.95;
+}
+
+.skip:focus-visible {
+  outline: 2px solid var(--color-surface);
+  outline-offset: 2px;
+}
+
 @keyframes fade {
   from {
     opacity: 0;
