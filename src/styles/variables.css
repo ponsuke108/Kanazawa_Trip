@@ -58,6 +58,8 @@
   --color-snow-like: #ff8fa3; /* 暗い地の上のいいね済みのハート */
   --color-snow-sticker: #c2462b; /* 食べ歩きのステッカー */
   --color-snow-danger: #a12d22; /* S-12 のすりガラスの上の、入力の誤り */
+  --color-snow-ring: rgb(63 59 120 / 0.2); /* S-12 の入力欄を押したときの光 */
+  --color-snow-danger-ring: rgb(161 45 34 / 0.18); /* S-12 の誤りのある入力欄を押したときの光 */
   --color-snow-chawan: #4a3a33; /* S-12 の茶碗 */
   --color-snow-chawan-rim: #cdbba4; /* S-12 の茶碗の口（白い釉薬） */
   --color-snow-matcha: #6e8a34; /* S-12 のお茶 */

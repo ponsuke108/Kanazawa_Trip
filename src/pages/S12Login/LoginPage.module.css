@@ -136,7 +136,6 @@
 
 .card [role='tab'][aria-selected='true'] {
   color: var(--color-snow-ink);
-  box-shadow: var(--shadow-snow-soft);
 }
 
 .form {
@@ -171,6 +170,115 @@
   text-align: center;
   text-wrap: balance;
   text-shadow: var(--shadow-snow-text);
+}
+
+/* ---- 手触り：押したときの反応 ---- */
+
+/* 押したときに出る、端末ごとの青い四角を消す（かわりに下の反応を付ける） */
+.card button,
+.card input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* キーボードで動かしている人には、いまどこにいるかを枠で見せる */
+.card button:focus-visible {
+  outline: 2px solid var(--color-snow-accent);
+  outline-offset: 2px;
+}
+
+/* 切り替え：白い札が、選んだ方へすべる */
+.card [role='tablist'] {
+  position: relative;
+  isolation: isolate;
+}
+
+.card [role='tablist']::before {
+  content: '';
+  position: absolute;
+  top: var(--space-1);
+  bottom: var(--space-1);
+  left: var(--space-1);
+  z-index: -1;
+  width: calc(50% - var(--space-1));
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-snow-soft);
+  transition: translate 0.38s cubic-bezier(0.3, 1.35, 0.5, 1);
+}
+
+.card [role='tablist']:has([role='tab']:last-child[aria-selected='true'])::before {
+  translate: 100% 0;
+}
+
+.card [role='tab'],
+.card [role='tab'][aria-selected='true'] {
+  background: transparent;
+  box-shadow: none;
+  transition: color 0.2s ease-out;
+}
+
+/* 入力欄：押すとふちが藍に変わり、まわりがふわっと光る */
+.card input {
+  transition:
+    border-color 0.2s ease-out,
+    box-shadow 0.2s ease-out;
+}
+
+.card input:focus {
+  border-color: var(--color-snow-accent);
+  box-shadow: 0 0 0 4px var(--color-snow-ring);
+}
+
+.card input[aria-invalid='true']:focus {
+  border-color: var(--color-snow-danger);
+  box-shadow: 0 0 0 4px var(--color-snow-danger-ring);
+}
+
+/* パスワード：右端に目のボタン。文字がボタンの下に入らないよう、右をあける */
+.password {
+  position: relative;
+}
+
+.password input {
+  padding-right: var(--tap-min);
+}
+
+.reveal {
+  position: absolute;
+  /* ラベル1行ぶん（文字の大きさ × 行の高さ）と、ラベルと入力欄のあいだを下げる */
+  top: calc(var(--font-size-sm) * 1.6 + var(--space-1));
+  right: 0;
+  color: var(--color-snow-ink-sub);
+  transition:
+    color 0.15s ease-out,
+    scale 0.12s ease-out;
+}
+
+.reveal:active {
+  scale: 0.88;
+}
+
+.reveal[aria-pressed='true'] {
+  color: var(--color-snow-accent);
+}
+
+/* 送るボタン：指を置くと少し浮き、押すと沈む */
+.form button[type='submit'] {
+  transition:
+    translate 0.15s ease-out,
+    box-shadow 0.15s ease-out;
+}
+
+@media (hover: hover) {
+  .form button[type='submit']:hover:not(:disabled) {
+    translate: 0 -1px;
+    box-shadow: var(--shadow-snow-raised);
+  }
+}
+
+.form button[type='submit']:active:not(:disabled) {
+  translate: 0 1px;
+  box-shadow: none;
 }
 
 /* ---- 動き（7.7）。ずっと動くのは背景の雪だけ。ほかは開いたときと操作したときに一度だけ動く。
@@ -217,15 +325,6 @@
 
 .shakeB {
   animation: shakeB 0.45s ease-out;
-}
-
-/* 押したとき：ボタンが少し沈む */
-.form button[type='submit'] {
-  transition: transform 0.12s ease-out;
-}
-
-.form button[type='submit']:active {
-  transform: translateY(1px);
 }
 
 @keyframes drift {
@@ -325,7 +424,11 @@
     animation: none;
   }
 
-  .form button[type='submit'] {
+  .form button[type='submit'],
+  .card input,
+  .card [role='tab'],
+  .card [role='tablist']::before,
+  .reveal {
     transition: none;
   }
 }
