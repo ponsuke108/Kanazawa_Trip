@@ -60,8 +60,11 @@
   --color-snow-danger: #a12d22; /* S-12 のすりガラスの上の、入力の誤り */
   --color-snow-ring: rgb(63 59 120 / 0.2); /* S-12 の入力欄を押したときの光 */
   --color-snow-danger-ring: rgb(161 45 34 / 0.18); /* S-12 の誤りのある入力欄を押したときの光 */
-  --color-snow-chawan: #4a3a33; /* S-12 の茶碗 */
-  --color-snow-chawan-rim: #cdbba4; /* S-12 の茶碗の口（白い釉薬） */
+  --color-snow-ohi: #9b5524; /* S-12 の茶碗（大樋焼の飴色の釉薬） */
+  --color-snow-ohi-dark: #4f2412; /* 茶碗の影と高台 */
+  --color-snow-ohi-rim: #c27a3a; /* 茶碗の口（釉薬が薄くかかったところ） */
+  --color-snow-gold: #d4a944; /* 金箔 */
+  --color-snow-gold-light: #f6e3a1; /* 金箔の光るところ */
   --color-snow-matcha: #6e8a34; /* S-12 のお茶 */
   --color-snow-matcha-foam: #b5c97a; /* S-12 のお茶の泡 */
   --color-snow-bamboo: #dcc89a; /* S-12 の茶筅 */

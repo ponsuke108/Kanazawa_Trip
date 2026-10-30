@@ -29,8 +29,8 @@ const MODES: Array<{ value: Mode; label: string }> = [
 ];
 
 // お茶を点てる絵の長さ（7.7）。ログインがすぐ終わっても、ここまでは見せる
-const BREW_MS = 2400;
-const SERVE_MS = 900;
+const BREW_MS = 3700;
+const SERVE_MS = 800;
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;

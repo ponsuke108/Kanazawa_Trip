@@ -1,5 +1,5 @@
 /* ログイン・登録のあいだの、お抹茶を点てる絵（要件定義書 7.7）。
-   お茶が満ちる → 茶筅で点てて泡が立つ → 茶筅を上げる → 湯気が立つ、の順に動く */
+   大樋焼の茶碗にお茶が満ちる → 茶筅で点てて泡が立つ → 茶筅を上げる → 金箔が舞い落ちる → 湯気が立つ、の順に動く */
 .overlay {
   /* 絵の大きさは茶碗の幅を基準にする */
   --bowl: calc(var(--tap-min) * 3.6);
@@ -24,15 +24,15 @@
   height: calc(var(--bowl) * 1.25);
 }
 
-/* 茶碗：高台（足）、下が丸い胴、楕円の口 */
+/* 茶碗：金沢の大樋焼（おおひやき）。飴色の釉薬の、手でつくったような少し不ぞろいな半筒形 */
 .foot {
   position: absolute;
   bottom: calc(var(--bowl) * -0.06);
-  left: 35%;
-  width: 30%;
+  left: 34%;
+  width: 32%;
   height: calc(var(--bowl) * 0.08);
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-  background: var(--color-snow-wood-dark);
+  border-radius: 0 0 var(--radius-sm) calc(var(--radius-sm) / 2);
+  background: var(--color-snow-ohi-dark);
 }
 
 .bowl {
@@ -40,27 +40,35 @@
   bottom: 0;
   left: 0;
   width: var(--bowl);
-  height: calc(var(--bowl) * 0.5);
-  border-radius: 0 0 50% 50% / 0 0 100% 100%;
-  background: linear-gradient(
-    90deg,
-    var(--color-snow-chawan),
-    var(--color-snow-wood) 45%,
-    var(--color-snow-wood-dark)
-  );
+  height: calc(var(--bowl) * 0.56);
+  border-radius: 4% 6% 44% 40% / 3% 4% 62% 56%;
+  background:
+    /* 釉薬が上から流れたすじ */
+    radial-gradient(6% 46% at 22% 18%, var(--color-snow-ohi-rim), transparent 72%),
+    radial-gradient(5% 36% at 47% 12%, var(--color-snow-ohi-rim), transparent 72%),
+    radial-gradient(6% 52% at 74% 20%, var(--color-snow-ohi-rim), transparent 72%),
+    linear-gradient(
+      90deg,
+      var(--color-snow-ohi-dark),
+      var(--color-snow-ohi) 38%,
+      var(--color-snow-ohi) 55%,
+      var(--color-snow-ohi-dark)
+    );
   box-shadow: var(--shadow-snow-raised);
 }
 
 .rim {
   position: absolute;
-  bottom: calc(var(--bowl) * 0.5 - var(--bowl) * 0.12);
+  bottom: calc(var(--bowl) * 0.44);
   left: 0;
   width: var(--bowl);
   height: calc(var(--bowl) * 0.24);
   overflow: hidden;
-  border: 4px solid var(--color-snow-chawan-rim);
-  border-radius: 50%;
-  background: var(--color-snow-wood-dark);
+  border-color: var(--color-snow-ohi-rim);
+  border-style: solid;
+  border-width: 4px 5px 3px 4px;
+  border-radius: 50% 48% 50% 52%;
+  background: var(--color-snow-ohi-dark);
 }
 
 /* お茶：口の中に、奥から広がるように満ちる */
@@ -77,7 +85,7 @@
     var(--color-snow-matcha-foam),
     var(--color-snow-matcha) 70%
   );
-  animation: fill 0.9s ease-out both;
+  animation: fill 0.7s ease-out both;
 }
 
 /* 泡：茶筅で点てるうちに、細かい泡が浮いてくる */
@@ -90,7 +98,7 @@
     radial-gradient(1.5px 1.5px at 84% 45%, var(--color-surface) 50%, transparent 51%),
     var(--color-snow-matcha-foam);
   opacity: 0;
-  animation: foam 1s 0.9s ease-in both;
+  animation: foam 0.9s 0.8s ease-in both;
 }
 
 /* 茶筅：上から下りてきて、手で振るように左右に動き、上がっていく */
@@ -104,16 +112,16 @@
   width: calc(var(--bowl) * 0.3);
   transform-origin: 50% 0;
   animation:
-    dip 0.5s 0.5s ease-out both,
-    whisk 0.16s 1s ease-in-out 6 alternate,
-    lift 0.45s 1.95s ease-in both;
+    dip 0.45s 0.35s ease-out both,
+    whisk 0.15s 0.8s ease-in-out 6 alternate,
+    lift 0.4s 1.7s ease-in both;
 }
 
 .handle {
   width: 26%;
   height: calc(var(--bowl) * 0.3);
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  background: linear-gradient(90deg, var(--color-snow-bamboo), var(--color-snow-chawan-rim));
+  background: linear-gradient(90deg, var(--color-snow-bamboo), var(--color-snow-ohi-rim));
 }
 
 .tines {
@@ -125,6 +133,66 @@
     transparent 2px 3.5px
   );
   clip-path: polygon(38% 0, 62% 0, 100% 85%, 88% 100%, 12% 100%, 0 85%);
+}
+
+/* 金箔：茶筅を上げたあと、4枚がひらひら舞い落ちて、泡の上にのる */
+.leaf {
+  --x: 0px;
+  --turn: 0deg;
+
+  position: absolute;
+  top: calc(var(--bowl) * 0.66);
+  width: calc(var(--bowl) * 0.11);
+  height: calc(var(--bowl) * 0.11);
+  background: linear-gradient(
+    135deg,
+    var(--color-snow-gold-light),
+    var(--color-snow-gold) 55%,
+    var(--color-snow-gold-light)
+  );
+  clip-path: polygon(8% 18%, 62% 0, 100% 34%, 86% 88%, 30% 100%, 0 62%);
+  opacity: 0;
+  /* 金がきらりと光るように、ふちを明るくにじませる */
+  filter: drop-shadow(0 0 2px var(--color-snow-gold-light));
+  animation: leaf 1.2s ease-in-out both;
+}
+
+.leaf1 {
+  --x: -8px;
+  --turn: 20deg;
+
+  left: 36%;
+  animation-delay: 1.9s;
+}
+
+.leaf2 {
+  --x: 10px;
+  --turn: -35deg;
+
+  left: 55%;
+  width: calc(var(--bowl) * 0.08);
+  height: calc(var(--bowl) * 0.08);
+  animation-delay: 2.1s;
+}
+
+.leaf3 {
+  --x: -12px;
+  --turn: 50deg;
+
+  left: 46%;
+  top: calc(var(--bowl) * 0.7);
+  animation-delay: 2.25s;
+}
+
+.leaf4 {
+  --x: 6px;
+  --turn: -10deg;
+
+  left: 62%;
+  top: calc(var(--bowl) * 0.69);
+  width: calc(var(--bowl) * 0.06);
+  height: calc(var(--bowl) * 0.06);
+  animation-delay: 2.4s;
 }
 
 /* 湯気：茶筅を上げたあと、3すじ立ちのぼる */
@@ -214,6 +282,38 @@
   }
 }
 
+@keyframes leaf {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x), calc(var(--bowl) * -0.62)) rotate(0deg) rotateX(60deg);
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  35% {
+    transform: translate(calc(var(--x) * -1.4), calc(var(--bowl) * -0.42)) rotate(var(--turn))
+      rotateX(-50deg);
+  }
+
+  60% {
+    transform: translate(var(--x), calc(var(--bowl) * -0.2)) rotate(calc(var(--turn) * -0.6))
+      rotateX(45deg);
+  }
+
+  82% {
+    transform: translate(calc(var(--x) * -0.4), calc(var(--bowl) * -0.05))
+      rotate(calc(var(--turn) * 0.5)) rotateX(-20deg);
+  }
+
+  100% {
+    opacity: 1;
+    /* 泡の上に寝かせる */
+    transform: translate(0, 0) rotate(var(--turn)) rotateX(48deg);
+  }
+}
+
 @keyframes steam {
   0% {
     opacity: 0;
@@ -236,12 +336,18 @@
   .tea,
   .foam,
   .chasen,
+  .leaf,
   .done .steam {
     animation: none;
   }
 
   .foam {
     opacity: 1;
+  }
+
+  .leaf {
+    opacity: 1;
+    transform: rotate(var(--turn)) rotateX(48deg);
   }
 
   .chasen {

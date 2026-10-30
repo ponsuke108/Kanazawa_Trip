@@ -3,11 +3,11 @@ import styles from './TeaScene.module.css';
 export type TeaState = 'brewing' | 'done';
 
 const LABEL: Record<TeaState, string> = {
-  brewing: 'お茶を点てています',
+  brewing: '加賀の一服を点てています',
   done: 'お待たせしました',
 };
 
-// ログイン・登録のあいだに出す、お抹茶を一服点てる絵（7.7、I-23）。画像は使わず CSS だけで描く
+// ログイン・登録のあいだに出す、金沢の大樋焼の茶碗でお抹茶を一服点て、金箔を浮かべる絵（7.7、I-23）。画像は使わず CSS だけで描く
 export function TeaScene({ state }: { state: TeaState }) {
   return (
     <div className={`${styles.overlay} ${styles[state]}`}>
@@ -25,6 +25,10 @@ export function TeaScene({ state }: { state: TeaState }) {
           <span className={styles.tea} />
           <span className={styles.foam} />
         </span>
+        <span className={`${styles.leaf} ${styles.leaf1}`} />
+        <span className={`${styles.leaf} ${styles.leaf2}`} />
+        <span className={`${styles.leaf} ${styles.leaf3}`} />
+        <span className={`${styles.leaf} ${styles.leaf4}`} />
       </div>
       <p className={styles.label} role="status">
         {LABEL[state]}
