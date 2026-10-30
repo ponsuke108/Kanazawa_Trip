@@ -6,4 +6,9 @@ export const DataSources: Array<{ label: string; name: string; url?: string }> =
     name: '金沢市観光公式サイト「金沢旅物語」（金沢市観光協会）',
     url: 'https://www.kanazawa-kankoukyoukai.or.jp/',
   },
+  {
+    label: 'スポットの名称・位置（一部）',
+    name: '金沢市オープンデータ「文化財一覧」「公園一覧」（金沢市、CC BY）を加工して作成',
+    url: 'https://catalog-data.city.kanazawa.ishikawa.jp/',
+  },
 ];
