@@ -44,6 +44,80 @@ export type Database = {
           },
         ];
       };
+      list_spots: {
+        Row: {
+          added_at: string;
+          list_id: string;
+          spot_id: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          added_at?: string;
+          list_id: string;
+          spot_id: number;
+        };
+        Update: {
+          added_at?: string;
+          list_id?: string;
+          spot_id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'list_spots_list_id_fkey';
+            columns: ['list_id'];
+            isOneToOne: false;
+            referencedRelation: 'lists';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'list_spots_spot_id_fkey';
+            columns: ['spot_id'];
+            isOneToOne: false;
+            referencedRelation: 'spot_summaries';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'list_spots_spot_id_fkey';
+            columns: ['spot_id'];
+            isOneToOne: false;
+            referencedRelation: 'spots';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      lists: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'lists_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       plan_blocks: {
         Row: {
           block_type: string;
@@ -143,6 +217,7 @@ export type Database = {
           created_at: string;
           id: string;
           published_at: string | null;
+          share_token: string | null;
           source_plan_id: string | null;
           status: string;
           title: string;
@@ -154,6 +229,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           published_at?: string | null;
+          share_token?: string | null;
           source_plan_id?: string | null;
           status?: string;
           title?: string;
@@ -164,6 +240,7 @@ export type Database = {
           created_at?: string;
           id?: string;
           published_at?: string | null;
+          share_token?: string | null;
           source_plan_id?: string | null;
           status?: string;
           title?: string;
@@ -215,43 +292,75 @@ export type Database = {
       };
       spots: {
         Row: {
-          area: string;
-          description: string;
+          address: string | null;
+          area: string | null;
+          cover_image_path: string | null;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
           google_place_id: string | null;
           id: number;
           is_active: boolean;
+          is_demo: boolean;
           lat: number;
           lng: number;
           name: string;
+          osm_ref: string | null;
+          place_kind: string | null;
           sort_order: number;
+          source: string;
           spot_type: string;
         };
         ComputedFields: never;
         Insert: {
-          area: string;
-          description: string;
+          address?: string | null;
+          area?: string | null;
+          cover_image_path?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
           google_place_id?: string | null;
           id: number;
           is_active?: boolean;
+          is_demo?: boolean;
           lat: number;
           lng: number;
           name: string;
+          osm_ref?: string | null;
+          place_kind?: string | null;
           sort_order?: number;
+          source?: string;
           spot_type: string;
         };
         Update: {
-          area?: string;
-          description?: string;
+          address?: string | null;
+          area?: string | null;
+          cover_image_path?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
           google_place_id?: string | null;
           id?: number;
           is_active?: boolean;
+          is_demo?: boolean;
           lat?: number;
           lng?: number;
           name?: string;
+          osm_ref?: string | null;
+          place_kind?: string | null;
           sort_order?: number;
+          source?: string;
           spot_type?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'spots_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       tags: {
         Row: {
@@ -323,9 +432,46 @@ export type Database = {
           },
         ];
       };
+      spot_summaries: {
+        Row: {
+          active_campaign_id: string | null;
+          address: string | null;
+          area: string | null;
+          description: string | null;
+          google_place_id: string | null;
+          id: number | null;
+          is_active: boolean | null;
+          is_demo: boolean | null;
+          lat: number | null;
+          latest_image_path: string | null;
+          lng: number | null;
+          name: string | null;
+          on_map: boolean | null;
+          place_kind: string | null;
+          post_count: number | null;
+          sort_order: number | null;
+          source: string | null;
+          spot_type: string | null;
+        };
+        ComputedFields: never;
+        Relationships: [];
+      };
     };
     Functions: {
+      distance_m: {
+        Args: { p_lat1: number; p_lat2: number; p_lng1: number; p_lng2: number };
+        Returns: number;
+      };
+      get_shared_plan: { Args: { p_token: string }; Returns: Json };
+      register_spot: {
+        Args: { p_candidate: Json };
+        Returns: { reused: boolean; spot_id: number }[];
+      };
       save_plan: { Args: { p_plan: Json }; Returns: string };
+      save_spot_post: {
+        Args: { p_post: Json };
+        Returns: { post_id: string; reward_id: string }[];
+      };
       search_plans: {
         Args: { p_page?: number; p_page_size?: number; p_tag_ids?: number[] };
         Returns: {

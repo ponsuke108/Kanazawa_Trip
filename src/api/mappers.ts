@@ -46,7 +46,8 @@ export function toSpot(r: SpotRow): Spot {
     lng: r.lng,
     placeId: r.google_place_id,
     spotType: r.spot_type as SpotType,
-    area: r.area,
+    // （v11）利用者の登録のスポットはエリアが空（BR-20）。Spot の area を null にできるようにするのは I-27
+    area: r.area ?? '',
     isActive: r.is_active,
   };
 }
@@ -55,7 +56,10 @@ export function toSpot(r: SpotRow): Spot {
 export function sortSpots(rows: SpotRow[]): Spot[] {
   return [...rows]
     .sort(
-      (a, b) => areaIndex(a.area) - areaIndex(b.area) || a.sort_order - b.sort_order || a.id - b.id,
+      (a, b) =>
+        areaIndex(a.area ?? '') - areaIndex(b.area ?? '') ||
+        a.sort_order - b.sort_order ||
+        a.id - b.id,
     )
     .map(toSpot);
 }

@@ -14,6 +14,14 @@ const spotRow = (id: number, area: string, sort = 0): SpotRow => ({
   area,
   is_active: true,
   sort_order: sort,
+  address: null,
+  cover_image_path: null,
+  created_at: '2026-11-04T00:00:00Z',
+  created_by: null,
+  is_demo: false,
+  osm_ref: null,
+  place_kind: null,
+  source: 'curated',
 });
 
 describe('mappers（10.1）', () => {
