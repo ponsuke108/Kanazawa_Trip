@@ -28,6 +28,14 @@
   --color-tag-cloudy-fill: #cfd8e2;
   --color-tag-rainy: #2f7fc1;
 
+  /* （v11）地図・キャンペーン・リスト（要件定義書 7.2） */
+  --color-pin-minor: #2b4c7e; /* 地図の定番以外のピン（藍） */
+  --color-pin-major: #8a94a3; /* 地図の定番のピン（灰） */
+  --color-pin-hub: #1f2a37; /* 地図の起点のピン（墨） */
+  --color-route-line: #b8892b; /* 経路順の地図の直線と番号のピン（金） */
+  --color-campaign: #c4553a; /* キャンペーンの札とラベル（朱） */
+  --color-list-highlight: #fff6e0; /* S-07 の「すべて」タブで、リストに保存したスポットの行の背景（薄い金） */
+
   /* マイページ（S-11）の雪の茶屋街の見た目（要件定義書 7.2、7.7） */
   --color-snow-sky-1: #2c2e5c; /* 夕暮れの空（上） */
   --color-snow-sky-2: #4c4c86;

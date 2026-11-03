@@ -1,0 +1,12 @@
+/* 地図（BR-24）。高さは呼ぶ側が height で決める */
+.wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-primary-weak);
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+}

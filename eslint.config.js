@@ -34,6 +34,38 @@ export default defineConfig([
                 'Supabase は src/lib/supabase.ts と src/api/ からだけ使ってください（要件定義書 12.1）。',
             },
           ],
+          // （v11）maplibre-gl は src/components/map/ の中だけで使う（要件定義書 8.1、11.1）。
+          // MapView を直接読み込むと地図を使わない画面にも maplibre-gl が入るので、画面からは LazyMapView を使う
+          patterns: [
+            {
+              group: ['maplibre-gl', 'maplibre-gl/*'],
+              message:
+                'maplibre-gl は src/components/map/ の中だけで使ってください（要件定義書 8.1）。',
+            },
+            {
+              group: ['@/components/map/MapView'],
+              message:
+                '地図は @/components/map/LazyMapView を使ってください（BR-24：地図を使う画面だけで読み込む）。',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // （v11）地図の部品の中だけは maplibre-gl を使える。Supabase の制限はそのまま
+    files: ['src/components/map/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@supabase/supabase-js',
+              message:
+                'Supabase は src/lib/supabase.ts と src/api/ からだけ使ってください（要件定義書 12.1）。',
+            },
+          ],
         },
       ],
     },

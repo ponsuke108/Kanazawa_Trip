@@ -77,3 +77,10 @@ export const TransportLabels: Record<TransportMode, string> = {
   bicycle: '自転車',
   car: '車',
 };
+
+// （v11）地図（BR-24、6.4 S-13）
+export const MapMessages = {
+  loadError: '地図を読み込めませんでした',
+  loading: '地図を読み込み中',
+  attribution: '場所の情報：© OpenStreetMap contributors',
+} as const;
