@@ -6,6 +6,7 @@ import {
   Bus,
   Camera,
   Car,
+  Check,
   ChevronDown,
   ChevronUp,
   CircleAlert,
@@ -42,9 +43,12 @@ import {
   Search,
   SearchX,
   Send,
+  ShieldCheck,
   Snowflake,
+  Store,
   Sun,
   Tag,
+  Ticket,
   Timer,
   Trash2,
   Trophy,
@@ -156,4 +160,12 @@ export const StateIcons = {
   spot: MapPin,
   heart: Heart,
   snow: Snowflake, // S-11 の飾り（要件定義書 7.3、7.7）
+} satisfies Record<string, LucideIcon>;
+
+// （v11）お店・管理者（要件定義書 7.3）。キャンペーン中のお店のピンの札は campaign
+export const ShopIcons = {
+  shop: Store,
+  admin: ShieldCheck,
+  campaign: Ticket,
+  approve: Check,
 } satisfies Record<string, LucideIcon>;

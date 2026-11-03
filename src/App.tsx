@@ -15,6 +15,7 @@ import { RankingPage } from '@/pages/S10Ranking/RankingPage';
 import { MyPage } from '@/pages/S11MyPage/MyPage';
 import { LoginPage } from '@/pages/S12Login/LoginPage';
 import { NotFoundPage } from '@/pages/NotFound/NotFoundPage';
+import { DevMapPage } from '@/pages/DevMap/DevMapPage';
 
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
 
@@ -39,6 +40,8 @@ const router = createBrowserRouter([
       { path: '/plans/:planId/edit', element: auth(<PlanEditorPage />) },
       { path: '/ranking', element: auth(<RankingPage />) },
       { path: '/mypage', element: auth(<MyPage />) },
+      // I-25 の地図の確認用。開発のときだけ。I-30（S-13 地図）で消す
+      ...(import.meta.env.DEV ? [{ path: '/dev/map', element: auth(<DevMapPage />) }] : []),
       { path: '*', element: auth(<NotFoundPage />) },
     ],
   },
