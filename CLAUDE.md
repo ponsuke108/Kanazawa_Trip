@@ -17,6 +17,10 @@
 - @supabase/supabase-js を画面のコードから直接使わない
 - スタイルは CSS Modules。色・余白・文字サイズは src/styles/variables.css の変数だけ
 - 業務ルールに関わる処理には BR 番号のコメントを付ける
+- （v11）maplibre-gl は src/components/map の中だけで使う。Google Maps の API（キーが要るもの）は使わない
+- （v11）Nominatim は src/api/places.ts の searchPlaces だけから呼ぶ。入力のたびに呼ばない（検索ボタンのときだけ）。利用条件は要件定義書 BR-19
+- （v11）利用者の種類（role）による出し分けは画面でも行うが、守るのはデータベースの RLS と RPC
+- （v11）docs/handoff.md の8章「v11 で変えてはいけない決定」を守る
 
 ## UIのルール
 - 絵文字は画面・データ・メッセージ・コメントのどこにも使わない

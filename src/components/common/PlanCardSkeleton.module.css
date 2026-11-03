@@ -52,3 +52,17 @@
     opacity: 0.5;
   }
 }
+
+/* 一覧のカード：タブレットは2列、PC は3列（7.8） */
+@media (min-width: 768px) {
+  .list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
