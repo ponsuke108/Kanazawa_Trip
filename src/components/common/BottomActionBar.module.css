@@ -22,3 +22,26 @@
   bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
   padding-bottom: var(--space-4);
 }
+
+/* タブレット：内容の幅（720px）に合わせる（7.8） */
+@media (min-width: 768px) {
+  .bar {
+    max-width: 720px;
+  }
+}
+
+/* PC：入力の画面の列（640px）に合わせる。下部タブはないので画面の一番下に出し、
+   左の縦のメニュー（幅220px）がある画面では、残りの幅の中央に出す（7.8） */
+@media (min-width: 1024px) {
+  .bar {
+    max-width: 640px;
+    border-right: 1px solid var(--color-border);
+    border-left: 1px solid var(--color-border);
+  }
+
+  .aboveTabBar {
+    bottom: 0;
+    left: calc(50% + 220px / 2);
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  }
+}

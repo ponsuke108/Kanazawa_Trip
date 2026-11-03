@@ -255,3 +255,44 @@
   box-shadow: var(--shadow-snow-raised);
   pointer-events: auto;
 }
+
+/* ---- タブレットと PC（7.8）：背景は画面いっぱい（SnowScene）、内容は中央 ---- */
+@media (min-width: 768px) {
+  /* 吹き出しが名前から離れないように、名前の幅に合わせる */
+  .profile {
+    align-self: flex-start;
+    padding-right: var(--space-6);
+  }
+
+  .floating {
+    width: min(100%, 720px);
+  }
+}
+
+@media (min-width: 1024px) {
+  /* 写真のカードは3列。1枚目を大きくする並べ方はスマホ・タブレットだけ */
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  /* 下部タブはないので画面の一番下に。左の縦のメニュー（幅220px）の分だけ右に寄せる */
+  .floating {
+    bottom: calc(env(safe-area-inset-bottom) + var(--space-5));
+    left: calc(50% + 220px / 2);
+    width: min(100% - 220px, 1200px);
+  }
+
+  /* 左の縦のメニュー：すりガラスの地に合わせる */
+  .theme nav {
+    border-top: none;
+    border-right: 1px solid var(--color-snow-glass-line);
+  }
+
+  .theme nav a[aria-current='page'] {
+    margin: 0;
+  }
+}

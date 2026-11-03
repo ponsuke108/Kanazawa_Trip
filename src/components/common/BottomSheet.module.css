@@ -36,3 +36,27 @@
   overflow-y: auto;
   padding: var(--space-4);
 }
+
+/* タブレット：内容の幅（720px）に合わせる（7.8） */
+@media (min-width: 768px) {
+  .sheet {
+    max-width: 720px;
+  }
+}
+
+/* PC：画面中央のダイアログにする（7.8）。
+   S-07 の PC の大きなダイアログ（幅960px、一覧と地図を左右に並べる）は、地図ができてから合わせる */
+@media (min-width: 1024px) {
+  .backdrop {
+    align-items: center;
+    padding: var(--space-6);
+  }
+
+  .sheet {
+    max-width: 640px;
+    max-height: 80dvh;
+    border-radius: var(--radius-md);
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+}

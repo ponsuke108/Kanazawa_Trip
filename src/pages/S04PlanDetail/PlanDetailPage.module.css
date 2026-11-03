@@ -16,3 +16,12 @@
   color: var(--color-text-sub);
   font-size: var(--font-size-sm);
 }
+
+/* PC：いまは中央に幅720pxの列。右に経路順の地図を並べる形（7.8）は、地図ができてから（I-33）合わせる */
+@media (min-width: 1024px) {
+  .main {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}

@@ -1,23 +1,14 @@
 import { Link, useLocation } from 'react-router';
-import { TabIcons, type LucideIcon } from '@/lib/icons';
+import { MainMenuItems, isMenuItemActive } from '@/components/common/mainMenu';
 import styles from './BottomTabBar.module.css';
 
-type Tab = { to: string; label: string; icon: LucideIcon; match: string | null };
-
-// 4つのタブ。ホームはない（6.1、K22）。「作る」は選択状態にしない
-const TABS: Tab[] = [
-  { to: '/search', label: '探す', icon: TabIcons.search, match: '/search' },
-  { to: '/plans/new', label: '作る', icon: TabIcons.create, match: null },
-  { to: '/ranking', label: 'ランキング', icon: TabIcons.ranking, match: '/ranking' },
-  { to: '/mypage', label: 'マイページ', icon: TabIcons.mypage, match: '/mypage' },
-];
-
+// 下部タブ。項目は mainMenu.ts（PC の左の縦のメニューと同じ）
 export function BottomTabBar() {
   const { pathname } = useLocation();
   return (
     <nav className={styles.bar} aria-label="メインメニュー">
-      {TABS.map(({ to, label, icon: Icon, match }) => {
-        const active = match !== null && (pathname === match || pathname.startsWith(`${match}/`));
+      {MainMenuItems.map(({ to, label, icon: Icon, match }) => {
+        const active = isMenuItemActive(match, pathname);
         return (
           <Link
             key={to}

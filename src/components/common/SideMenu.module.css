@@ -1,0 +1,64 @@
+/* PC の左の縦のメニュー（7.8）。幅は 220px（src/styles/breakpoints.ts の SideMenuWidth） */
+.menu {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .menu {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--z-tabbar);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    width: 220px;
+    padding: var(--space-5) var(--space-3);
+    border-right: 1px solid var(--color-border);
+    background: var(--color-surface);
+    overflow-y: auto;
+  }
+}
+
+.site {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  text-decoration: none;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-sub);
+  font-size: var(--font-size-md);
+  text-decoration: none;
+}
+
+.item:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.active {
+  background: var(--color-primary-weak);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.active:hover {
+  background: var(--color-primary-weak);
+  color: var(--color-primary);
+}

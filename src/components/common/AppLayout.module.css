@@ -24,3 +24,32 @@
       env(safe-area-inset-bottom)
   );
 }
+
+/* タブレット：中央に最大幅720pxの1列。下部タブのまま（7.8） */
+@media (min-width: 768px) {
+  .column {
+    max-width: 720px;
+  }
+}
+
+/* PC：内容の最大幅は1200px。下部タブはないので、その分の余白もいらない（7.8） */
+@media (min-width: 1024px) {
+  .column {
+    max-width: 1200px;
+  }
+
+  .withTabBar {
+    padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  }
+
+  .withTabBar.withBottomBar {
+    padding-bottom: calc(
+      var(--tap-min) + var(--space-4) * 2 + var(--space-6) + env(safe-area-inset-bottom)
+    );
+  }
+
+  /* 左の縦のメニュー（幅220px）の分だけ右に寄せる */
+  .withSideMenu {
+    padding-left: 220px;
+  }
+}
