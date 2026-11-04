@@ -31,3 +31,29 @@ export function isInKanazawa(lat: number, lng: number): boolean {
     lng <= KanazawaBounds.east
   );
 }
+
+type LatLng = { lat: number; lng: number };
+
+const EARTH_RADIUS_KM = 6371;
+
+// 2点間の直線距離（km、球面での距離。ハバーサインの式）。
+// データベースの関数 public.distance_m と同じ式（handoff 8.3）
+export function distanceKm(a: LatLng, b: LatLng): number {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const dLat = rad(b.lat - a.lat);
+  const dLng = rad(b.lng - a.lng);
+  const h =
+    Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
+}
+
+// 並び順に結んだ直線距離の合計（km。BR-22）
+export function totalDistanceKm(stops: LatLng[]): number {
+  let sum = 0;
+  for (let i = 1; i < stops.length; i += 1) {
+    const prev = stops[i - 1];
+    const cur = stops[i];
+    if (prev && cur) sum += distanceKm(prev, cur);
+  }
+  return sum;
+}

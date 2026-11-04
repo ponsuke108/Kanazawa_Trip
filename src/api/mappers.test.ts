@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { sortSpots, toBlocks, toSavePlanJson, toSummary, type SpotRow } from '@/api/mappers';
+import {
+  sortSpots,
+  toBlocks,
+  toListSummary,
+  toSavePlanJson,
+  toSharedPlan,
+  toSpotFromSummary,
+  toSummary,
+  type SpotRow,
+  type SpotSummaryRow,
+} from '@/api/mappers';
 import { toApiError } from '@/api/errors';
 
 const url = (p: string) => `https://example.supabase.co/storage/v1/object/public/plan-images/${p}`;
@@ -24,15 +34,132 @@ const spotRow = (id: number, area: string, sort = 0): SpotRow => ({
   source: 'curated',
 });
 
+const summaryRow = (id: number, area: string | null, sort = 0): SpotSummaryRow => ({
+  id,
+  name: `s${id}`,
+  description: area ? 'd' : null,
+  lat: 36.5,
+  lng: 136.6,
+  google_place_id: null,
+  spot_type: 'minor',
+  area,
+  is_active: true,
+  sort_order: sort,
+  source: area ? 'curated' : 'user',
+  address: null,
+  place_kind: null,
+  is_demo: false,
+  post_count: 0,
+  latest_image_path: null,
+  on_map: false,
+  active_campaign_id: null,
+});
+
 describe('mappers（10.1）', () => {
-  it('スポットはエリア（9.6 の順）、sort_order、id の順', () => {
+  it('スポットはエリア（9.6 の順）、sort_order、id の順。（v11）エリアが空のものは最後', () => {
     const rows = [
-      spotRow(3, 'その他'),
-      spotRow(2, '兼六園周辺', 1),
-      spotRow(1, '兼六園周辺', 2),
-      spotRow(4, '金沢駅周辺'),
+      summaryRow(100001, null),
+      summaryRow(3, 'その他'),
+      summaryRow(2, '兼六園周辺', 1),
+      summaryRow(1, '兼六園周辺', 2),
+      summaryRow(4, '金沢駅周辺'),
     ];
-    expect(sortSpots(rows).map((s) => s.id)).toEqual([4, 2, 1, 3]);
+    expect(sortSpots(rows, url).map((s) => s.id)).toEqual([4, 2, 1, 3, 100001]);
+  });
+
+  it('（v11）spot_summaries：写真のパスを URL にし、キャンペーン中かを返す', () => {
+    const spot = toSpotFromSummary(
+      {
+        ...summaryRow(8, '寺町・にし茶屋街周辺'),
+        post_count: 2,
+        latest_image_path: 'u/p.jpg',
+        active_campaign_id: 'c1',
+      },
+      url,
+    );
+    expect(spot).toMatchObject({
+      id: 8,
+      postCount: 2,
+      latestImageUrl: url('u/p.jpg'),
+      hasActiveCampaign: true,
+      source: 'curated',
+    });
+    const user = toSpotFromSummary(summaryRow(100001, null), url);
+    expect(user).toMatchObject({
+      area: null,
+      source: 'user',
+      latestImageUrl: null,
+      hasActiveCampaign: false,
+    });
+  });
+
+  it('（v11）リスト：スポットは入れた順、最初の3つの名前', () => {
+    const list = toListSummary({
+      id: 'l',
+      name: 'リスト',
+      updated_at: '2026-11-04T00:00:00Z',
+      list_spots: [
+        { spot_id: 5, added_at: '2026-11-03T00:00:00Z', spot: { name: '兼六園' } },
+        { spot_id: 1, added_at: '2026-11-01T00:00:00Z', spot: { name: '金沢駅' } },
+        { spot_id: 2, added_at: '2026-11-02T00:00:00Z', spot: { name: '近江町市場' } },
+        { spot_id: 8, added_at: '2026-11-04T00:00:00Z', spot: { name: 'にし茶屋街' } },
+      ],
+    });
+    expect(list.spotIds).toEqual([1, 2, 5, 8]);
+    expect(list.firstSpotNames).toEqual(['金沢駅', '近江町市場', '兼六園']);
+    expect(list.spotCount).toBe(4);
+  });
+
+  it('（v11）共有のプラン：作成者の id は空、ブロックは position の順', () => {
+    const plan = toSharedPlan(
+      {
+        id: 'p',
+        title: '共有',
+        status: 'draft',
+        published_at: null,
+        updated_at: '2026-11-04T00:00:00Z',
+        author_name: '太郎',
+        like_count: 0,
+        tags: [],
+        blocks: [
+          {
+            id: 'b',
+            position: 1,
+            block_type: 'comment',
+            transport_mode: null,
+            body: 'メモ',
+            image_path: null,
+            spot: null,
+          },
+          {
+            id: 'a',
+            position: 0,
+            block_type: 'spot',
+            transport_mode: null,
+            body: null,
+            image_path: null,
+            spot: {
+              id: 1,
+              name: '金沢駅',
+              description: 'd',
+              lat: 36.5,
+              lng: 136.6,
+              google_place_id: null,
+              spot_type: 'hub',
+              area: '金沢駅周辺',
+              is_active: true,
+              source: 'curated',
+              address: null,
+              place_kind: null,
+              is_demo: false,
+            },
+          },
+        ],
+      },
+      url,
+    );
+    expect(plan.author).toEqual({ id: '', displayName: '太郎' });
+    expect(plan.blocks.map((b) => b.id)).toEqual(['a', 'b']);
   });
 
   it('ブロックは position の順で、写真のパスを URL にする', () => {

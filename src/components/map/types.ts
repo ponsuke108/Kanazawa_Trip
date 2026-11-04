@@ -1,8 +1,7 @@
 import type { Spot } from '@/types/models';
 
-// MapView に渡すスポット（要件定義書 7.6 の spots: Spot[]）。
-// latestImageUrl と hasActiveCampaign は v11 で Spot に足す項目（11.3。型の追加は I-27）。
-// I-27 のあとは Spot をそのまま渡せる。それまでは無いものとして扱う
+// MapView に渡すスポット（要件定義書 7.6 の spots: Spot[]）。Spot をそのまま渡せる。
+// 地図に要る項目だけを取り出した形にしておき、テストでは一部だけで作れるようにする
 export type MapSpot = Pick<Spot, 'id' | 'name' | 'lat' | 'lng' | 'spotType'> & {
   latestImageUrl?: string | null; // 写真のピン。null なら縁の色だけの丸（BR-24）
   hasActiveCampaign?: boolean; // キャンペーン中なら札（Ticket）を付ける（BR-24）

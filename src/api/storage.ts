@@ -1,8 +1,8 @@
 import { USE_MOCK } from '@/api/config';
 import { ApiError } from '@/api/errors';
 import { mockApi } from '@/api/mock/mockApi';
-import { call, currentUserId, imageUrlOf } from '@/api/supabaseCall';
-import { getSupabase, PLAN_IMAGES_BUCKET } from '@/lib/supabase';
+import { call, currentUserId, imageUrlOf, spotImageUrlOf } from '@/api/supabaseCall';
+import { getSupabase, PLAN_IMAGES_BUCKET, SPOT_POST_IMAGES_BUCKET } from '@/lib/supabase';
 
 const MAX_SIDE = 1280; // BR-13：長辺1280px以下
 const QUALITY = 0.8; // BR-13：JPEG の品質
@@ -44,4 +44,18 @@ export async function uploadPlanImage(file: File): Promise<{ path: string; url: 
       .upload(path, blob, { contentType: 'image/jpeg', upsert: false }),
   );
   return { path, url: imageUrlOf(path) };
+}
+
+// （v11）BR-13：縮小・変換して spot-post-images/{ユーザーID}/{ランダムなID}.jpg へアップロードする（BR-21）
+export async function uploadSpotPostImage(file: File): Promise<{ path: string; url: string }> {
+  if (USE_MOCK) return mockApi.uploadSpotPostImage(file);
+  const userId = await currentUserId();
+  const blob = await resizeToJpeg(file);
+  const path = `${userId}/${crypto.randomUUID()}.jpg`;
+  await call(
+    getSupabase()
+      .storage.from(SPOT_POST_IMAGES_BUCKET)
+      .upload(path, blob, { contentType: 'image/jpeg', upsert: false }),
+  );
+  return { path, url: spotImageUrlOf(path) };
 }

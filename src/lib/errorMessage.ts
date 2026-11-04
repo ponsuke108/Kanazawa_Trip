@@ -15,6 +15,12 @@ export function errorMessage(e: unknown): string {
       return AuthMessages.invalidCredentials;
     case 'AUTH_EMAIL_TAKEN':
       return AuthMessages.emailTaken;
+    case 'OUT_OF_AREA':
+      return Messages.outOfArea;
+    case 'PLACE_SEARCH_DISABLED':
+      return Messages.placeSearchDisabled;
+    case 'PLACE_SEARCH_FAILED':
+      return Messages.placeSearchFailed;
     case 'VALIDATION':
       return e.issues[0]?.message ?? Messages.unknown;
     default:

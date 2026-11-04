@@ -12,7 +12,23 @@ export const Messages = {
   restoreConfirm: '前回の編集内容を復元しますか？',
   unpublishConfirm: 'このプランを非公開にします。検索やランキングに表示されなくなります。',
   deleteConfirm: 'このプランを削除します。元に戻せません。',
+  // （v11）
+  listDeleteConfirm: 'このリストを削除します。このリストから作ったプランは残ります。',
+  postDeleteConfirm: 'この投稿を削除します。元に戻せません。',
+  alreadyInList: 'リストに入っています',
+  placeSearchDisabled: '現在、場所の検索は利用できません',
+  placeSearchFailed: '場所の検索に失敗しました。時間をおいてもう一度お試しください',
+  outOfArea: '金沢市の中の場所だけ登録できます',
+  notViewable: 'このページは見られません',
+  photoNotice:
+    '人の顔がはっきり写った写真や、他の人が撮った写真は載せないでください。生成AIで作った画像は載せないでください',
+  straightDistance: '直線距離です。実際の道のりは「経路を見る」で確かめてください',
 } as const;
+
+// （v11）リストに入れたとき（6.5）
+export function addedToListMessage(listName: string): string {
+  return `リスト「${listName}」に入れました`;
+}
 
 // 6.4 のトースト
 export const Toasts = {

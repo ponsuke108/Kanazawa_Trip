@@ -22,3 +22,6 @@ export function getSupabase(): SupabaseClient<Database> {
 }
 
 export const PLAN_IMAGES_BUCKET = 'plan-images';
+// （v11）スポットの投稿の写真と、開発側の登録のスポットのチームの写真（9.4）
+export const SPOT_POST_IMAGES_BUCKET = 'spot-post-images';
+export const SPOT_COVERS_BUCKET = 'spot-covers';

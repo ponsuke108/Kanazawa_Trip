@@ -19,6 +19,7 @@ type Props = {
 };
 
 const ALL = 'all';
+const OTHER_AREA = 'その他';
 
 // S-07 スポット選択（6.4）。すべて読み込んでから画面内で絞り込む
 export function SpotPicker({ open, onClose, onSelect, disabledSpotId }: Props) {
@@ -38,11 +39,15 @@ export function SpotPicker({ open, onClose, onSelect, disabledSpotId }: Props) {
       (s) =>
         s.isActive &&
         (k === '' || s.name.includes(k)) &&
-        (area === ALL || s.area === area) &&
+        (area === ALL || (s.area ?? OTHER_AREA) === area) &&
         (!minorOnly || s.spotType === 'minor'),
     );
+    // （v11）利用者のスポットはエリアが空なので「その他」にまとめる（S-07 の作り直しは I-32）
     const map = new Map<string, Spot[]>();
-    for (const s of filtered) map.set(s.area, [...(map.get(s.area) ?? []), s]);
+    for (const s of filtered) {
+      const key = s.area ?? OTHER_AREA;
+      map.set(key, [...(map.get(key) ?? []), s]);
+    }
     return [...map.entries()].sort((a, b) => areaIndex(a[0]) - areaIndex(b[0]));
   }, [spots.data, keyword, area, minorOnly]);
 

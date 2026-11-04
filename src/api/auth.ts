@@ -10,7 +10,8 @@ async function toAuthUser(id: string, email: string | undefined): Promise<AuthUs
   const profile = await maybeOne(
     getSupabase().from('profiles').select('display_name').eq('id', id).maybeSingle(),
   );
-  return { id, email: email ?? '', displayName: profile?.display_name ?? '' };
+  // role（利用者の種類）は profiles に role を足す I-36 で読む。それまではすべて一般（BR-25）
+  return { id, email: email ?? '', displayName: profile?.display_name ?? '', role: 'user' };
 }
 
 // BR-14：登録するとすぐにログイン状態になる（メール確認はオフ）
