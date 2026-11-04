@@ -1,0 +1,102 @@
+/* 7.4 の通常のカード：四辺同じ1pxの枠線、角丸12px、白い背景、影なし */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  min-width: 0;
+}
+
+.spot {
+  width: 100%;
+  font-weight: 700;
+}
+
+.author {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.date {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-xs);
+}
+
+.menu {
+  flex-shrink: 0;
+  margin: calc(var(--space-2) * -1) calc(var(--space-2) * -1) 0 0;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.campaign,
+.hidden {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: calc(var(--space-1) / 2) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.campaign {
+  border: 1px solid var(--color-campaign);
+  color: var(--color-campaign);
+}
+
+.hidden {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-sub);
+}
+
+/* 写真は横に並べ、はみ出す分は横にずらして見る */
+.photos {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.photos li {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.photo {
+  display: block;
+  width: 200px;
+  height: 150px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  object-fit: cover;
+}
+
+.body {
+  font-size: var(--font-size-md);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

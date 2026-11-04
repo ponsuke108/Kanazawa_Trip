@@ -109,3 +109,13 @@ export async function deleteSpotPost(postId: string): Promise<void> {
   );
   if (data.length === 0) throw new ApiError('FORBIDDEN');
 }
+
+// 編集のとき、今ある写真の Storage のパスを、表示用の URL から戻す（SpotPost は URL だけを持つため）
+export function spotPostImagePaths(post: SpotPost): string[] {
+  if (USE_MOCK) return mockApi.spotPostImagePaths(post);
+  const marker = `/${SPOT_POST_IMAGES_BUCKET}/`;
+  return post.imageUrls.flatMap((url) => {
+    const i = url.indexOf(marker);
+    return i >= 0 ? [decodeURIComponent(url.slice(i + marker.length).split('?')[0] ?? '')] : [];
+  });
+}

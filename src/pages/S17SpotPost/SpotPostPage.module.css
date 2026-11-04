@@ -1,0 +1,110 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.counter {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-xs);
+}
+
+.over {
+  color: var(--color-danger);
+}
+
+.spotRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.spotName {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+/* 写真：2列に並べ、右上に削除 */
+.photos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.photoItem {
+  position: relative;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  object-fit: cover;
+}
+
+.photoDelete {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+}
+
+.notice {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.textarea:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* PC：入力の画面は中央に幅640pxの列（7.8） */
+@media (min-width: 1024px) {
+  .main {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+}

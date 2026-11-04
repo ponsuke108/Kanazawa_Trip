@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { signOut } from '@/api/auth';
 import { unlikePlan } from '@/api/likes';
 import { deletePlan, getLikedPlans, getMyPlans, unpublishPlan } from '@/api/plans';
+import { deleteSpotPost, getMySpotPosts } from '@/api/spotPosts';
 import { queryKeys, STALE_TIME } from '@/api/queryKeys';
 import { getTags } from '@/api/tags';
 import { AppLayout } from '@/components/common/AppLayout';
@@ -19,19 +20,25 @@ import { useToast } from '@/components/common/useToast';
 import { Messages, Toasts, UiMessages } from '@/constants/messages';
 import { useAuth, useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, renderTagIcon, StateIcons } from '@/lib/icons';
+import { ActionIcons, PostIcons, renderTagIcon, StateIcons } from '@/lib/icons';
 import { tagsQuery } from '@/lib/tagParams';
-import type { PlanSummary } from '@/types/models';
+import type { PlanSummary, SpotPost } from '@/types/models';
 import { PlanTile } from './PlanTile';
+import { PostTile } from './PostTile';
 import { SnowScene } from './SnowScene';
 import styles from './MyPage.module.css';
 
-type Tab = 'mine' | 'liked';
+type Tab = 'mine' | 'liked' | 'posts';
 
 const TABS: Array<{ value: Tab; label: string }> = [
   { value: 'mine', label: '自分のプラン' },
   { value: 'liked', label: 'いいねしたプラン' },
+  { value: 'posts', label: '自分の投稿' }, // v11
 ];
+
+function toTab(v: string | null): Tab {
+  return v === 'liked' || v === 'posts' ? v : 'mine';
+}
 
 // 時間に合わせたあいさつ
 function greeting(hour: number): string {
@@ -40,12 +47,15 @@ function greeting(hour: number): string {
   return 'こんばんは';
 }
 
-type Confirm = { kind: 'unpublish' | 'delete'; plan: PlanSummary } | null;
+type Confirm =
+  | { kind: 'unpublish' | 'delete'; plan: PlanSummary }
+  | { kind: 'deletePost'; post: SpotPost }
+  | null;
 
 // S-11 マイページ（6.4、F-24、F-32、BR-09、BR-10）。見た目は雪の茶屋街（7.7、I-22）
 export function MyPage() {
   const [params, setParams] = useSearchParams();
-  const tab: Tab = params.get('tab') === 'liked' ? 'liked' : 'mine';
+  const tab: Tab = toTab(params.get('tab'));
   const navigate = useNavigate();
   const user = useCurrentUser();
   const { setUser } = useAuth();
@@ -62,6 +72,11 @@ export function MyPage() {
     queryKey: queryKeys.plans.liked,
     queryFn: getLikedPlans,
     enabled: tab === 'liked',
+  });
+  const posts = useQuery({
+    queryKey: queryKeys.posts.mine,
+    queryFn: getMySpotPosts,
+    enabled: tab === 'posts',
   });
   const tags = useQuery({
     queryKey: queryKeys.tags,
@@ -88,6 +103,18 @@ export function MyPage() {
       setConfirm(null);
       toast.show({ type: 'success', message: Toasts.deleted });
       await invalidatePlans();
+    },
+    onError,
+  });
+
+  // （v11）自分の投稿の削除（BR-21）
+  const removePost = useMutation({
+    mutationFn: (postId: string) => deleteSpotPost(postId),
+    onSuccess: async () => {
+      setConfirm(null);
+      toast.show({ type: 'success', message: Toasts.deleted });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.posts.mine });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.spots });
     },
     onError,
   });
@@ -135,7 +162,7 @@ export function MyPage() {
     return items;
   };
 
-  const current = tab === 'mine' ? mine : liked;
+  const current = tab === 'posts' ? posts : tab === 'mine' ? mine : liked;
   const foodTag = tags.data?.find((t) => t.slug === 'food');
   const Search = ActionIcons.search;
   const Create = ActionIcons.create;
@@ -207,7 +234,7 @@ export function MyPage() {
                   { replace: true },
                 )
               }
-              label="表示するプラン"
+              label="表示するもの"
             />
           </div>
 
@@ -234,7 +261,7 @@ export function MyPage() {
                     </Button>
                   }
                 />
-              ) : (
+              ) : tab === 'liked' ? (
                 <EmptyState
                   icon={StateIcons.heart}
                   title={UiMessages.noLikedPlans}
@@ -244,26 +271,68 @@ export function MyPage() {
                     </Button>
                   }
                 />
+              ) : (
+                <EmptyState
+                  icon={PostIcons.post}
+                  title={UiMessages.noMyPosts}
+                  action={
+                    <Button icon={ActionIcons.search} onClick={() => navigate('/map')}>
+                      地図でスポットを探す
+                    </Button>
+                  }
+                />
               )}
             </div>
-          ) : (
+          ) : tab === 'posts' ? (
             <ol className={styles.grid}>
-              {current.data.map((plan, i) => {
-                // 1枚目は大きく。残りが奇数のときは、最後の1枚も横いっぱいにする
-                const wide =
-                  i === 0 || (i === current.data.length - 1 && current.data.length % 2 === 0);
+              {posts.data?.map((post, i, all) => {
+                const wide = i === 0 || (i === all.length - 1 && all.length % 2 === 0);
                 return (
-                  <li key={plan.id} className={wide ? styles.wide : undefined}>
-                    <PlanTile
-                      plan={plan}
-                      to={hrefOf(plan)}
+                  <li key={post.id} className={wide ? styles.wide : undefined}>
+                    <PostTile
+                      post={post}
                       size={wide ? 'large' : 'small'}
-                      status={tab === 'mine'}
-                      action={actionOf(plan)}
+                      action={
+                        <DropdownMenu
+                          items={[
+                            {
+                              label: '編集',
+                              icon: ActionIcons.edit,
+                              onSelect: () => navigate(`/posts/${post.id}/edit`),
+                            },
+                            {
+                              label: '削除',
+                              icon: ActionIcons.delete,
+                              danger: true,
+                              onSelect: () => setConfirm({ kind: 'deletePost', post }),
+                            },
+                          ]}
+                        />
+                      }
                     />
                   </li>
                 );
               })}
+            </ol>
+          ) : (
+            <ol className={styles.grid}>
+              {(mine.data && tab === 'mine' ? mine.data : (liked.data ?? [])).map(
+                (plan, i, all) => {
+                  // 1枚目は大きく。残りが奇数のときは、最後の1枚も横いっぱいにする
+                  const wide = i === 0 || (i === all.length - 1 && all.length % 2 === 0);
+                  return (
+                    <li key={plan.id} className={wide ? styles.wide : undefined}>
+                      <PlanTile
+                        plan={plan}
+                        to={hrefOf(plan)}
+                        size={wide ? 'large' : 'small'}
+                        status={tab === 'mine'}
+                        action={actionOf(plan)}
+                      />
+                    </li>
+                  );
+                },
+              )}
             </ol>
           )}
         </main>
@@ -288,7 +357,7 @@ export function MyPage() {
         message={Messages.unpublishConfirm}
         confirmLabel="非公開に戻す"
         loading={unpublish.isPending}
-        onConfirm={() => confirm && unpublish.mutate(confirm.plan.id)}
+        onConfirm={() => confirm?.kind === 'unpublish' && unpublish.mutate(confirm.plan.id)}
         onCancel={() => setConfirm(null)}
       />
       <ConfirmDialog
@@ -298,7 +367,17 @@ export function MyPage() {
         confirmLabel="削除する"
         danger
         loading={remove.isPending}
-        onConfirm={() => confirm && remove.mutate(confirm.plan.id)}
+        onConfirm={() => confirm?.kind === 'delete' && remove.mutate(confirm.plan.id)}
+        onCancel={() => setConfirm(null)}
+      />
+      <ConfirmDialog
+        open={confirm?.kind === 'deletePost'}
+        title="削除"
+        message={Messages.postDeleteConfirm}
+        confirmLabel="削除する"
+        danger
+        loading={removePost.isPending}
+        onConfirm={() => confirm?.kind === 'deletePost' && removePost.mutate(confirm.post.id)}
         onCancel={() => setConfirm(null)}
       />
     </div>
