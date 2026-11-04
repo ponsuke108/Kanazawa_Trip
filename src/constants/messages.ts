@@ -127,4 +127,9 @@ export const MapMessages = {
   loadError: '地図を読み込めませんでした',
   loading: '地図を読み込み中',
   attribution: '場所の情報：© OpenStreetMap contributors',
+  mapAttribution: '© OpenFreeMap © OpenMapTiles Data from OpenStreetMap',
+  outsideKanazawa: '現在地が金沢市の外です',
+  locationUnavailable: '現在地を使えませんでした。端末の位置情報の設定を確かめてください',
+  minorOnly: '定番以外だけ',
+  searchSpots: 'スポットを探す',
 } as const;

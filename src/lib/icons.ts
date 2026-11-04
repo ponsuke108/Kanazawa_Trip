@@ -30,8 +30,10 @@ import {
   Landmark,
   Leaf,
   LoaderCircle,
+  LocateFixed,
   LogIn,
   LogOut,
+  Map as MapIcon,
   MapPin,
   MessageSquareText,
   Mountain,
@@ -64,12 +66,19 @@ import type { PlanStatus, TransportMode } from '@/types/models';
 
 export type { LucideIcon };
 
-// 下部タブ
+// 下部タブ（v11：地図・探す・作る・マイページ）
 export const TabIcons = {
+  map: MapIcon,
   search: Search,
   create: CirclePlus,
-  ranking: Trophy,
   mypage: CircleUser,
+} satisfies Record<string, LucideIcon>;
+
+// （v11）地図：地図で探す・現在地。ランキングを見る（S-01、S-02）
+export const MapIcons = {
+  map: MapIcon,
+  locate: LocateFixed,
+  ranking: Trophy,
 } satisfies Record<string, LucideIcon>;
 
 // ブロック

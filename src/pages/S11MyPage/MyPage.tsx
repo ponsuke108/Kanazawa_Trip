@@ -256,7 +256,7 @@ export function MyPage() {
                   icon={StateIcons.empty}
                   title={UiMessages.noPlans}
                   action={
-                    <Button icon={ActionIcons.create} onClick={() => navigate('/plans/new')}>
+                    <Button icon={ActionIcons.create} onClick={() => navigate('/create')}>
                       プランを作る
                     </Button>
                   }
@@ -338,7 +338,7 @@ export function MyPage() {
         </main>
 
         <div className={styles.floating}>
-          <button type="button" className={styles.create} onClick={() => navigate('/plans/new')}>
+          <button type="button" className={styles.create} onClick={() => navigate('/create')}>
             <Create size={22} aria-hidden="true" />
             プランを作る
           </button>

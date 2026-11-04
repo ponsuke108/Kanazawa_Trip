@@ -1,0 +1,45 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-4);
+}
+
+.newPlan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.big {
+  min-height: calc(var(--tap-min) + var(--space-4));
+  font-size: var(--font-size-lg);
+}
+
+.note {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+}
+
+.others {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.others a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* PC：中央に幅640pxの列（7.8） */
+@media (min-width: 1024px) {
+  .main {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+}

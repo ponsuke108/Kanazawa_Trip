@@ -15,11 +15,10 @@ import { RankingPage } from '@/pages/S10Ranking/RankingPage';
 import { MyPage } from '@/pages/S11MyPage/MyPage';
 import { LoginPage } from '@/pages/S12Login/LoginPage';
 import { NotFoundPage } from '@/pages/NotFound/NotFoundPage';
-import { DevMapPage } from '@/pages/DevMap/DevMapPage';
 import { SpotPage } from '@/pages/S05Spot/SpotPage';
+import { MapPage } from '@/pages/S13Map/MapPage';
+import { CreatePage } from '@/pages/S14Create/CreatePage';
 import { SpotPostPage } from '@/pages/S17SpotPost/SpotPostPage';
-
-const SHOW_DEV_PAGES = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEV_PAGES === 'true';
 
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
 
@@ -45,12 +44,11 @@ const router = createBrowserRouter([
       { path: '/ranking', element: auth(<RankingPage />) },
       { path: '/mypage', element: auth(<MyPage />) },
       // （v11）
+      { path: '/map', element: auth(<MapPage />) },
+      { path: '/create', element: auth(<CreatePage />) },
       { path: '/spots/:spotId', element: auth(<SpotPage />) },
       { path: '/posts/new', element: auth(<SpotPostPage />) },
       { path: '/posts/:postId/edit', element: auth(<SpotPostPage />) },
-      // I-25・I-28 の確認用。開発のときと、Vercel の Preview で VITE_SHOW_DEV_PAGES=true のときだけ。
-      // 本番（Production）にはこの変数を入れない。I-30（S-13 地図）で消す
-      ...(SHOW_DEV_PAGES ? [{ path: '/dev/map', element: auth(<DevMapPage />) }] : []),
       { path: '*', element: auth(<NotFoundPage />) },
     ],
   },
