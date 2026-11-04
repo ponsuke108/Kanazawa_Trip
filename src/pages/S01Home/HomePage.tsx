@@ -10,10 +10,10 @@ import { IconButton } from '@/components/common/IconButton';
 import { Logo } from '@/components/common/Logo';
 import { PlanCard } from '@/components/common/PlanCard';
 import { PlanCardSkeletonList } from '@/components/common/PlanCardSkeleton';
-import { UiMessages } from '@/constants/messages';
+import { MapMessages, UiMessages } from '@/constants/messages';
 import { DataSources } from '@/constants/sources';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, StateIcons } from '@/lib/icons';
+import { ActionIcons, MapIcons, StateIcons } from '@/lib/icons';
 import styles from './HomePage.module.css';
 
 const TOP = 3; // BR-11：ホームには定番以外ランキングの上位3件
@@ -39,14 +39,22 @@ export function HomePage() {
       <main className={styles.main}>
         <p className={styles.lead}>{UiMessages.homeLead}</p>
         <div className={styles.entries}>
-          <Button icon={ActionIcons.search} fullWidth onClick={() => navigate('/search')}>
+          <Button icon={MapIcons.map} fullWidth onClick={() => navigate('/map')}>
+            地図で探す
+          </Button>
+          <Button
+            variant="secondary"
+            icon={ActionIcons.search}
+            fullWidth
+            onClick={() => navigate('/search')}
+          >
             プランを探す
           </Button>
           <Button
             variant="secondary"
             icon={ActionIcons.create}
             fullWidth
-            onClick={() => navigate('/plans/new')}
+            onClick={() => navigate('/create')}
           >
             プランを作る
           </Button>
@@ -94,6 +102,9 @@ export function HomePage() {
               )}
             </li>
           ))}
+          {/* （v11）地図と場所の情報の出典（BR-19、BR-24） */}
+          <li>地図：{MapMessages.mapAttribution}</li>
+          <li>{MapMessages.attribution}</li>
         </ul>
       </footer>
     </AppLayout>

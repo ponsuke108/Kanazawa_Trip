@@ -4,6 +4,11 @@ import { LngLatBounds, Map as MapLibreMap, Marker, type GeoJSONSource } from 'ma
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MAP_STYLE_URL } from '@/components/map/mapStyle';
 import { MapError, MapLoading } from '@/components/map/MapStatus';
+import { useToast } from '@/components/common/useToast';
+import { IconButton } from '@/components/common/IconButton';
+import { MapMessages } from '@/constants/messages';
+import { isInKanazawa } from '@/lib/geo';
+import { MapIcons } from '@/lib/icons';
 import { ClusterPin, SpotPin } from '@/components/map/SpotPin';
 import { repSpotId, toFeatureCollection } from '@/components/map/spotsGeoJson';
 import type { MapSpot, MapViewProps } from '@/components/map/types';
@@ -167,6 +172,44 @@ export function MapView({
     }
   }, [spots, status, fitToSpots]);
 
+  // 選んでいるスポットが束の中や画面の外で見えないときは、そこへ移る（S-13 の URL の spot、S-05 からの移動）
+  useEffect(() => {
+    const map = mapRef.current;
+    if (status !== 'ready' || !map || selectedSpotId === null) return;
+    const spot = spotsById.get(selectedSpotId);
+    if (!spot || markersRef.current.has(`s${spot.id}`)) return;
+    map.easeTo({
+      center: [spot.lng, spot.lat],
+      zoom: Math.max(map.getZoom(), CLUSTER_MAX_ZOOM + 1),
+    });
+  }, [selectedSpotId, spotsById, status]);
+
+  // 現在地（6.4 S-13）：押したときだけ端末の現在地を使い、金沢市の中なら移動する。保存も送信もしない
+  const toast = useToast();
+  const [locating, setLocating] = useState(false);
+  const locate = useCallback(() => {
+    if (!('geolocation' in navigator)) {
+      toast.show({ type: 'error', message: MapMessages.locationUnavailable });
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setLocating(false);
+        if (!isInKanazawa(coords.latitude, coords.longitude)) {
+          toast.show({ type: 'info', message: MapMessages.outsideKanazawa });
+          return;
+        }
+        mapRef.current?.easeTo({ center: [coords.longitude, coords.latitude], zoom: SPOT_ZOOM });
+      },
+      () => {
+        setLocating(false);
+        toast.show({ type: 'error', message: MapMessages.locationUnavailable });
+      },
+      { enableHighAccuracy: true, timeout: 10_000 },
+    );
+  }, [toast]);
+
   // 束を押すと、その範囲を拡大する（BR-24）
   const expandCluster = useCallback(async (clusterId: number, el: HTMLElement) => {
     const map = mapRef.current;
@@ -204,6 +247,11 @@ export function MapView({
           item.key,
         );
       })}
+      {interactive && status === 'ready' && (
+        <div className={styles.locate}>
+          <IconButton icon={MapIcons.locate} label="現在地" disabled={locating} onClick={locate} />
+        </div>
+      )}
       {status === 'loading' && <MapLoading />}
       {status === 'error' && <MapError onRetry={() => setReloadKey((k) => k + 1)} />}
     </div>

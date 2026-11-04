@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys, STALE_TIME } from '@/api/queryKeys';
 import { getTags } from '@/api/tags';
@@ -10,7 +10,7 @@ import { FullScreenLoading } from '@/components/common/FullScreenLoading';
 import { PageHeader } from '@/components/common/PageHeader';
 import { TagSelector } from '@/components/common/TagSelector';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons } from '@/lib/icons';
+import { ActionIcons, MapIcons } from '@/lib/icons';
 import { parseTagIds, tagsQuery } from '@/lib/tagParams';
 import styles from './SearchPage.module.css';
 
@@ -43,6 +43,11 @@ export function SearchPage() {
           <ErrorState message={errorMessage(tags.error)} onRetry={() => tags.refetch()} />
         ) : (
           <>
+            {/* （v11）下部タブからランキングをなくしたので、ここから開く（6.4 S-02） */}
+            <Link to="/ranking?type=minor" className={styles.ranking}>
+              <MapIcons.ranking size={20} aria-hidden="true" />
+              ランキングを見る
+            </Link>
             <div className={styles.lead}>
               <p>気になるタグを選んでください。どれか1つでも合うプランが見つかります。</p>
               {selected.length > 0 && (

@@ -1,0 +1,91 @@
+/* S-13 のピンのシート。スマホ・タブレットは地図の下に重ね、PC は右側のパネル（幅400px。7.8） */
+.sheet {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 60%;
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: var(--color-surface);
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding-top: var(--space-2);
+}
+
+.name {
+  font-size: var(--font-size-lg);
+}
+
+.label {
+  padding: calc(var(--space-1) / 2) var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-weak);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sub {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+}
+
+.photos {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+}
+
+.photos li {
+  flex: 0 0 auto;
+}
+
+.photo {
+  display: block;
+  width: 120px;
+  height: 90px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  object-fit: cover;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+@media (min-width: 1024px) {
+  .sheet {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: 400px;
+    max-height: none;
+    border-top: none;
+    border-left: 1px solid var(--color-border);
+    border-radius: 0;
+  }
+}

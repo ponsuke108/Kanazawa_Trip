@@ -1,0 +1,108 @@
+/* 地図を、ヘッダーと下部タブの間いっぱいに出す。AppLayout の下の余白（--space-6）の分だけ詰める */
+.stage {
+  position: relative;
+  height: calc(100dvh - var(--header-height) - var(--tabbar-height) - env(safe-area-inset-bottom));
+  margin-bottom: calc(var(--space-6) * -1);
+}
+
+/* 地図の上の検索欄と「定番以外だけ」 */
+.controls {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  left: var(--space-3);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-sub);
+  font-size: var(--font-size-md);
+  text-align: left;
+  pointer-events: auto;
+}
+
+.chip {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  pointer-events: auto;
+}
+
+.chipOn {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+/* まだこのサイトにない場所のシート（SpotSheet と同じ位置） */
+.candidate {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: var(--color-surface);
+}
+
+.candidateHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.candidateName {
+  padding-top: var(--space-2);
+  font-size: var(--font-size-lg);
+}
+
+.candidateSub {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+}
+
+/* PC：下部タブはないので、ヘッダーの下いっぱい。検索欄は左上に幅を決めて置き、シートは右（7.8） */
+@media (min-width: 1024px) {
+  .stage {
+    height: calc(100dvh - var(--header-height));
+  }
+
+  .controls {
+    right: auto;
+    width: 400px;
+  }
+
+  .candidate {
+    top: 0;
+    left: auto;
+    width: 400px;
+    border-top: none;
+    border-left: 1px solid var(--color-border);
+    border-radius: 0;
+  }
+}
