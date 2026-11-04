@@ -4,7 +4,12 @@ import { ApiError } from '@/api/errors';
 import { mockApi } from '@/api/mock/mockApi';
 import { rows } from '@/api/supabaseCall';
 import { getSupabase } from '@/lib/supabase';
-import { filterPlaceCandidates, NOMINATIM_VIEWBOX, type NominatimResult } from '@/lib/places';
+import {
+  filterPlaceCandidates,
+  foundOnlyOutsideKanazawa,
+  NOMINATIM_VIEWBOX,
+  type NominatimResult,
+} from '@/lib/places';
 import type { PlaceCandidate } from '@/types/models';
 
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
@@ -31,7 +36,8 @@ function waitTurn(): Promise<void> {
 
 // スポット名で OpenStreetMap の場所を探す（BR-19）。検索ボタンを押したときだけ呼ぶ。
 // 入力しながらの候補表示には使わない。同じ言葉の結果は画面側で TanStack Query が覚えておく（['places', query]）。
-// 結果の osm_ref がすでに spots にあれば existingSpotId を入れて返す
+// 結果の osm_ref がすでに spots にあれば existingSpotId を入れて返す。
+// 金沢市の外の場所だけ見つかったときは OUT_OF_AREA
 export async function searchPlaces(query: string): Promise<PlaceCandidate[]> {
   if (!isPlaceSearchEnabled()) throw new ApiError('PLACE_SEARCH_DISABLED');
   if (USE_MOCK) return mockApi.searchPlaces(query);
@@ -63,7 +69,11 @@ export async function searchPlaces(query: string): Promise<PlaceCandidate[]> {
   if (!Array.isArray(results)) throw new ApiError('PLACE_SEARCH_FAILED', '結果の形が違います');
 
   const candidates = filterPlaceCandidates(results);
-  if (candidates.length === 0) return [];
+  if (candidates.length === 0) {
+    // 金沢市の外の場所だけ見つかったときは、そう伝える（S-16）
+    if (foundOnlyOutsideKanazawa(results)) throw new ApiError('OUT_OF_AREA', 'OUT_OF_AREA');
+    return [];
+  }
   const existing = await rows(
     getSupabase()
       .from('spots')

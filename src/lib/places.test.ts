@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   filterPlaceCandidates,
+  foundOnlyOutsideKanazawa,
   NOMINATIM_VIEWBOX,
   toPlaceKind,
   toShortAddress,
@@ -118,5 +119,28 @@ describe('住所の短くし方（9.8）', () => {
 describe('Nominatim の範囲（handoff 8.3）', () => {
   it('viewbox は 西,北,東,南 の順で、lib/geo.ts と同じ数字', () => {
     expect(NOMINATIM_VIEWBOX).toBe('136.5,36.7,136.9,36.4');
+  });
+});
+
+describe('金沢市の外だけ見つかったか（S-16）', () => {
+  const outside = result({
+    osm_id: 9,
+    name: '金沢工業大学',
+    display_name: '金沢工業大学, 扇が丘, 野々市市, 石川県, 921-8501, 日本',
+  });
+
+  it('金沢市の外の場所だけなら true', () => {
+    expect(foundOnlyOutsideKanazawa([outside])).toBe(true);
+  });
+
+  it('金沢市の場所が1つでもあれば false', () => {
+    expect(foundOnlyOutsideKanazawa([outside, result({ osm_id: 10 })])).toBe(false);
+  });
+
+  it('バス停だけ、または何もないなら false（見つからなかった扱い）', () => {
+    expect(foundOnlyOutsideKanazawa([result({ category: 'highway', type: 'bus_stop' })])).toBe(
+      false,
+    );
+    expect(foundOnlyOutsideKanazawa([])).toBe(false);
   });
 });

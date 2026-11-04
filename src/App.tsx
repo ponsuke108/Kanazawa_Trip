@@ -17,6 +17,8 @@ import { LoginPage } from '@/pages/S12Login/LoginPage';
 import { NotFoundPage } from '@/pages/NotFound/NotFoundPage';
 import { DevMapPage } from '@/pages/DevMap/DevMapPage';
 
+const SHOW_DEV_PAGES = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEV_PAGES === 'true';
+
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
 
 // URLと画面の対応（要件定義書 11.5）。/login 以外はすべてログイン必須（BR-14）
@@ -40,8 +42,9 @@ const router = createBrowserRouter([
       { path: '/plans/:planId/edit', element: auth(<PlanEditorPage />) },
       { path: '/ranking', element: auth(<RankingPage />) },
       { path: '/mypage', element: auth(<MyPage />) },
-      // I-25 の地図の確認用。開発のときだけ。I-30（S-13 地図）で消す
-      ...(import.meta.env.DEV ? [{ path: '/dev/map', element: auth(<DevMapPage />) }] : []),
+      // I-25・I-28 の確認用。開発のときと、Vercel の Preview で VITE_SHOW_DEV_PAGES=true のときだけ。
+      // 本番（Production）にはこの変数を入れない。I-30（S-13 地図）で消す
+      ...(SHOW_DEV_PAGES ? [{ path: '/dev/map', element: auth(<DevMapPage />) }] : []),
       { path: '*', element: auth(<NotFoundPage />) },
     ],
   },

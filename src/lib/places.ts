@@ -95,3 +95,16 @@ export function filterPlaceCandidates(results: NominatimResult[]): PlaceCandidat
   }
   return out;
 }
+
+// 除く種類ではない場所が見つかったが、すべて金沢市の外だったか（S-16「金沢市の中の場所だけ登録できます」）
+export function foundOnlyOutsideKanazawa(results: NominatimResult[]): boolean {
+  const places = results.filter(
+    (r) =>
+      r.osm_type &&
+      r.osm_id !== undefined &&
+      Number.isFinite(Number(r.lat)) &&
+      Number.isFinite(Number(r.lon)) &&
+      !isExcluded(r.category ?? '', r.type ?? ''),
+  );
+  return places.length > 0 && filterPlaceCandidates(places).length === 0;
+}
