@@ -56,6 +56,7 @@ export const Toasts = {
   deleted: '削除しました',
   loggedIn: 'ログインしました',
   signedUp: '登録しました',
+  posted: '投稿しました', // （v11）S-17
 } as const;
 
 // 6.4 S-12 の失敗と入力の誤り（BR-05）
@@ -84,6 +85,16 @@ export const UiMessages = {
   sameSpotAdjacent: '直前と同じスポットは続けて追加できません',
   imageUnreadable: 'この画像は読み込めません', // BR-13
   untitledPlan: '無題のプラン', // BR-12
+  // （v11）S-05、S-17、S-11
+  spotNotFound: 'このスポットは見つかりません',
+  spotInactive: 'このスポットは使用中止です',
+  cannotPostSpot: 'このスポットには投稿できません',
+  postNotEditable: 'この投稿は編集できません',
+  noSpotPosts: 'まだ投稿がありません。行ったら最初の投稿をしてみませんか',
+  noMyPosts: 'まだ投稿がありません',
+  postHidden: '管理者が非表示にしました',
+  campaignJoined: 'キャンペーン参加',
+  photoShownOnMap: '写真は地図のピンやスポット詳細に表示されます', // BR-21
   homeLead: 'みんなの旅ノートから、金沢の旅を組み立てよう',
   minorRankingLead: '定番スポット以外を含むプランのランキングです',
 } as const;

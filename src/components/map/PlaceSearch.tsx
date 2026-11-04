@@ -12,6 +12,7 @@ import { FullScreenLoading } from '@/components/common/FullScreenLoading';
 import { IconButton } from '@/components/common/IconButton';
 import { MapAttribution } from '@/components/map/MapAttribution';
 import { PlaceSearchMessages } from '@/constants/messages';
+import { SpotTypeLabels } from '@/constants/spots';
 import { errorMessage } from '@/lib/errorMessage';
 import { distanceKm } from '@/lib/geo';
 import { ActionIcons, StateIcons } from '@/lib/icons';
@@ -294,12 +295,6 @@ function CandidateResults({
   );
 }
 
-const SPOT_TYPE_LABEL: Record<Spot['spotType'], string> = {
-  major: '定番',
-  minor: '定番以外',
-  hub: '起点',
-};
-
 // このサイトのスポットの行：スポット名、種類のラベル、紹介文か住所
 function SpotRow({ spot, onClick }: { spot: Spot; onClick: () => void }) {
   const sub = spot.description ?? spot.address;
@@ -307,7 +302,7 @@ function SpotRow({ spot, onClick }: { spot: Spot; onClick: () => void }) {
     <button type="button" className={styles.item} onClick={onClick}>
       <span className={styles.nameRow}>
         <span className={styles.name}>{spot.name}</span>
-        <span className={styles.label}>{SPOT_TYPE_LABEL[spot.spotType]}</span>
+        <span className={styles.label}>{SpotTypeLabels[spot.spotType]}</span>
       </span>
       {sub && <span className={styles.sub}>{sub}</span>}
     </button>

@@ -136,6 +136,8 @@
 
 /* ---- 切り替え（SegmentedControl）を、すりガラスの札に見せる ---- */
 .tabs [role='tablist'] {
+  /* （v11）3つになったので、幅が足りないときは折り返す */
+  flex-wrap: wrap;
   gap: var(--space-2);
   padding: 0;
   background: transparent;

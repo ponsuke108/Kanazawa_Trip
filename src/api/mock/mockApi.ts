@@ -854,6 +854,12 @@ export const mockApi = {
     state.posts = state.posts.filter((p) => p.id !== postId);
   },
 
+  // 表示用の URL から写真のパスに戻す（編集のとき）
+  spotPostImagePaths(post: SpotPost): string[] {
+    const stored = state.posts.find((p) => p.id === post.id);
+    return stored ? [...stored.imagePaths] : [];
+  },
+
   async uploadSpotPostImage(file: File): Promise<{ path: string; url: string }> {
     return mockApi.uploadPlanImage(file);
   },

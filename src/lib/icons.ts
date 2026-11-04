@@ -169,3 +169,8 @@ export const ShopIcons = {
   campaign: Ticket,
   approve: Check,
 } satisfies Record<string, LucideIcon>;
+
+// （v11）スポットの投稿（要件定義書 7.3）。ここに投稿・投稿なし
+export const PostIcons = {
+  post: Camera,
+} satisfies Record<string, LucideIcon>;

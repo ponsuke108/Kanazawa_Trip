@@ -1,0 +1,86 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-4);
+}
+
+/* 使用中止の注意（6.4 S-05） */
+.inactive {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.label {
+  padding: calc(var(--space-1) / 2) var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-weak);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.mapLink {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.description {
+  line-height: 1.7;
+}
+
+.sub {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.heading {
+  font-size: var(--font-size-lg);
+}
+
+.list,
+.planList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* PC：いまは中央に幅720pxの列。右に地図とキャンペーンを並べる形（7.8）は I-37 で合わせる */
+@media (min-width: 1024px) {
+  .main {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
