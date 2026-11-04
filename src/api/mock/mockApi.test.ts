@@ -100,3 +100,105 @@ describe('モックの保存（BR-06）', () => {
     expect(mine[0].id).toBe(id);
   });
 });
+
+// （v11）9.7 のモックの追加データと 11.6 のテスト
+describe('（v11）モックのスポットの登録（BR-20）', () => {
+  beforeEach(() => {
+    resetMockState();
+    mockApi.signInAsTaro();
+  });
+
+  it('同じ osm_ref で既存の id が返る', async () => {
+    const [terminal] = await mockApi.searchPlaces('クルーズ');
+    expect(terminal?.existingSpotId).toBe(100001);
+    if (!terminal) throw new Error('候補がない');
+    await expect(mockApi.registerSpot(terminal)).resolves.toEqual({ spotId: 100001, reused: true });
+  });
+
+  it('金沢市の外で OUT_OF_AREA になる', async () => {
+    const [outside] = await mockApi.searchPlaces('白山比咩');
+    if (!outside) throw new Error('候補がない');
+    await expect(mockApi.registerSpot(outside)).rejects.toMatchObject({ code: 'OUT_OF_AREA' });
+  });
+
+  it('50m 以内の同じ名前なら既存のスポット（にし茶屋街、id 8）を使う', async () => {
+    const [nishi] = await mockApi.searchPlaces('にし茶屋');
+    expect(nishi?.existingSpotId).toBeNull();
+    if (!nishi) throw new Error('候補がない');
+    await expect(mockApi.registerSpot(nishi)).resolves.toEqual({ spotId: 8, reused: true });
+  });
+
+  it('新しい場所は 100003 から登録され、getSpots に出る（エリアが空なので最後）', async () => {
+    const result = await mockApi.registerSpot({
+      osmRef: 'node/123',
+      name: '確認の甘味処',
+      lat: 36.57,
+      lng: 136.66,
+      address: '石川県金沢市確認町',
+      placeKind: '飲食店',
+      existingSpotId: null,
+    });
+    expect(result).toEqual({ spotId: 100003, reused: false });
+    const spots = await mockApi.getSpots();
+    expect(spots.at(-1)).toMatchObject({
+      id: 100003,
+      source: 'user',
+      area: null,
+      spotType: 'minor',
+    });
+    // もう一度登録すると同じ id
+    const again = await mockApi.searchPlaces('クルーズ');
+    expect(again).toHaveLength(1);
+  });
+
+  it('デモ用のスポットと利用者のスポットが getSpots に入る（9.7）', async () => {
+    const ids = (await mockApi.getSpots()).map((s) => s.id);
+    expect(ids).toEqual(expect.arrayContaining([90001, 100001, 100002]));
+  });
+});
+
+describe('（v11）モックのリスト・投稿・共有', () => {
+  beforeEach(() => {
+    resetMockState();
+    mockApi.signInAsTaro();
+  });
+
+  it('テスト太郎のリストは2つ。同じスポットは2回入らない（BR-18）', async () => {
+    const lists = await mockApi.getLists();
+    expect(lists.map((l) => l.name)).toEqual(['冬の金沢 1日目', '雨の日']);
+    expect(lists[0]?.firstSpotNames).toEqual(['金沢駅', '近江町市場', '鈴木大拙館']);
+    await expect(mockApi.addSpotToList('mock-list-2', 13)).resolves.toEqual({ added: false });
+    await expect(mockApi.addSpotToList('mock-list-2', 5)).resolves.toEqual({ added: true });
+    const detail = await mockApi.getList('mock-list-2');
+    expect(detail?.spots.map((s) => s.id)).toEqual([13, 12, 5]);
+  });
+
+  it('リストは1人20個まで（LIMIT_REACHED）', async () => {
+    for (let i = 0; i < 18; i += 1) await mockApi.createList({ name: `リスト${i}` });
+    await expect(mockApi.createList({ name: '21個目' })).rejects.toMatchObject({
+      code: 'LIMIT_REACHED',
+    });
+  });
+
+  it('投稿の数がスポットに入り、キャンペーン中のお店がわかる', async () => {
+    const spots = await mockApi.getSpots();
+    expect(spots.find((s) => s.id === 8)?.postCount).toBe(1);
+    expect(spots.find((s) => s.id === 100001)?.postCount).toBe(1);
+    const posts = await mockApi.getSpotPosts({ spotId: 8, page: 0 });
+    expect(posts.items.map((p) => p.author.displayName)).toEqual(['テスト花子']);
+    expect(await mockApi.getMySpotPosts()).toHaveLength(1);
+  });
+
+  it('共有リンクで、ログインしていなくてもプランが見られる（BR-30）', async () => {
+    const { url } = await mockApi.createShareLink('mock-plan-2');
+    const token = url.split('/shared/')[1] ?? '';
+    expect(token).toMatch(/^[A-Za-z0-9_-]{32}$/);
+    await mockApi.signOut();
+    const plan = await mockApi.getSharedPlan(token);
+    expect(plan?.id).toBe('mock-plan-2');
+    expect(plan?.author.id).toBe('');
+    mockApi.signInAsTaro();
+    await mockApi.stopShareLink('mock-plan-2');
+    expect(await mockApi.getSharedPlan(token)).toBeNull();
+  });
+});

@@ -12,7 +12,9 @@ export const AREAS = [
   'その他',
 ] as const;
 
-export function areaIndex(area: string): number {
+// 一覧での並び順。エリアが空（利用者のスポット）や一覧にないものは最後（10.3）
+export function areaIndex(area: string | null): number {
+  if (area === null) return AREAS.length;
   const i = (AREAS as readonly string[]).indexOf(area);
   return i === -1 ? AREAS.length : i;
 }

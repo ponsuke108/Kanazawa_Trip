@@ -7,6 +7,12 @@ const base: Omit<Spot, 'id' | 'name' | 'lat' | 'lng' | 'placeId'> = {
   spotType: 'minor',
   area: 'その他',
   isActive: true,
+  source: 'curated',
+  address: null,
+  placeKind: null,
+  postCount: 0,
+  latestImageUrl: null,
+  hasActiveCampaign: false,
 };
 const station: Spot = {
   ...base,

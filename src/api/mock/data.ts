@@ -1,7 +1,13 @@
 // モックデータ（要件定義書 9.7 をそのまま）
-import type { PlanStatus, Spot, Tag, TransportMode } from '@/types/models';
+import type { PlanStatus, Spot, Tag, TransportMode, UserRole } from '@/types/models';
 
-export const mockSpots: Spot[] = [
+// 9.7 の13件（開発側の登録）。v11 の項目は下の curated() で埋める
+type CuratedSeed = Pick<
+  Spot,
+  'id' | 'name' | 'spotType' | 'area' | 'description' | 'lat' | 'lng' | 'placeId' | 'isActive'
+>;
+
+const curatedSeeds: CuratedSeed[] = [
   {
     id: 1,
     name: '金沢駅',
@@ -147,6 +153,88 @@ export const mockSpots: Spot[] = [
   },
 ];
 
+// v11 の項目の既定値。投稿の数・写真・キャンペーンは mockApi で投稿とキャンペーンから計算する
+function v11Defaults(): Pick<
+  Spot,
+  'source' | 'address' | 'placeKind' | 'postCount' | 'latestImageUrl' | 'hasActiveCampaign'
+> {
+  return {
+    source: 'curated',
+    address: null,
+    placeKind: null,
+    postCount: 0,
+    latestImageUrl: null,
+    hasActiveCampaign: false,
+  };
+}
+
+function curated(seed: CuratedSeed): Spot {
+  return { ...seed, ...v11Defaults() };
+}
+
+// （v11）デモ用のスポット（9.7）。本番とモックの両方に入れる
+export const MOCK_DEMO_SPOT_ID = 90001;
+
+// （v11）モックの追加データ（9.7）：利用者のスポット。100002 はモック専用の架空のお店
+const userSpots: Spot[] = [
+  {
+    ...v11Defaults(),
+    id: 100001,
+    name: '金沢港クルーズターミナル',
+    spotType: 'minor',
+    area: null,
+    description: null,
+    lat: 36.6079,
+    lng: 136.6145,
+    placeId: null,
+    isActive: true,
+    source: 'user',
+    address: '石川県金沢市無量寺町',
+    placeKind: '建物',
+  },
+  {
+    ...v11Defaults(),
+    id: 100002,
+    name: 'テスト茶房',
+    spotType: 'minor',
+    area: null,
+    description: null,
+    lat: 36.557,
+    lng: 136.648,
+    placeId: null,
+    isActive: true,
+    source: 'user',
+    address: '石川県金沢市野町',
+    placeKind: '飲食店',
+  },
+];
+
+export const mockSpots: Spot[] = [
+  ...curatedSeeds.map(curated),
+  {
+    ...v11Defaults(),
+    id: MOCK_DEMO_SPOT_ID,
+    name: '金沢工業大学',
+    spotType: 'minor',
+    area: 'その他',
+    description: '扇が丘キャンパス。このサイトのデモで、お店の申請とキャンペーンを試すために使う',
+    lat: 36.530922,
+    lng: 136.627583,
+    placeId: null,
+    isActive: true,
+    address: '石川県野々市市扇が丘7-1',
+    placeKind: '場所',
+  },
+  ...userSpots,
+];
+
+// 利用者のスポットの osm_ref（BR-20 の重複の確かめに使う。Spot の型には含めない）
+export const mockOsmRefs: Record<number, string> = {
+  [MOCK_DEMO_SPOT_ID]: 'way/295949646',
+  100001: 'way/884746182',
+  100002: 'node/0000000001',
+};
+
 export const mockTags: Tag[] = [
   { id: 1, name: '食事', slug: 'food', group: 'theme' },
   { id: 2, name: '景観', slug: 'scenery', group: 'theme' },
@@ -161,21 +249,31 @@ export const mockTags: Tag[] = [
   { id: 11, name: '曇り', slug: 'cloudy', group: 'weather' },
 ];
 
-export type MockUser = { id: string; displayName: string; email: string };
+export type MockUser = { id: string; displayName: string; email: string; role: UserRole };
 
+// （v11）テスト太郎は一般、テスト花子は管理者、テスト茶房はお店（9.7）
 export const MOCK_TARO: MockUser = {
   id: 'mock-user-taro',
   displayName: 'テスト太郎',
   email: 'taro@example.com',
+  role: 'user',
 };
 
 export const MOCK_HANAKO: MockUser = {
   id: 'mock-user-hanako',
   displayName: 'テスト花子',
   email: 'hanako@example.com',
+  role: 'admin',
 };
 
-export const mockUsers: MockUser[] = [MOCK_TARO, MOCK_HANAKO];
+export const MOCK_SHOP_USER: MockUser = {
+  id: 'mock-user-shop',
+  displayName: 'テスト茶房',
+  email: 'shop@example.com',
+  role: 'official',
+};
+
+export const mockUsers: MockUser[] = [MOCK_TARO, MOCK_HANAKO, MOCK_SHOP_USER];
 
 // ブロックの定義。spot の transportMode は「そのスポットへ何で来たか」（BR-04）
 export type MockBlockSeed =
@@ -281,4 +379,105 @@ export const mockPlans: MockPlanSeed[] = [
 export const mockLikes: Array<{ userId: string; planId: string; createdAt: string }> = [
   { userId: MOCK_TARO.id, planId: 'mock-plan-1', createdAt: '2026-10-06T10:00:00+09:00' },
   { userId: MOCK_TARO.id, planId: 'mock-plan-4', createdAt: '2026-10-09T10:00:00+09:00' },
+];
+
+// ---- （v11）モックの追加データ（9.7） ----
+
+// テスト太郎のリスト。スポットは入れた順
+export const mockLists: Array<{
+  id: string;
+  userId: string;
+  name: string;
+  updatedAt: string;
+  spotIds: number[];
+}> = [
+  {
+    id: 'mock-list-1',
+    userId: MOCK_TARO.id,
+    name: '冬の金沢 1日目',
+    updatedAt: '2026-11-02T10:00:00+09:00',
+    spotIds: [1, 2, 11, 8, 100001],
+  },
+  {
+    id: 'mock-list-2',
+    userId: MOCK_TARO.id,
+    name: '雨の日',
+    updatedAt: '2026-11-01T10:00:00+09:00',
+    spotIds: [13, 12],
+  },
+];
+
+// スポットの投稿。モックの写真は用意しない（写真がないときの表示になる。本物では写真は必須）
+export const mockSpotPosts: Array<{
+  id: string;
+  userId: string;
+  spotId: number;
+  body: string;
+  createdAt: string;
+}> = [
+  {
+    id: 'mock-post-1',
+    userId: MOCK_HANAKO.id,
+    spotId: 8,
+    body: '朝のうちは人が少なく、格子の町並みがゆっくり見られた',
+    createdAt: '2026-11-02T09:00:00+09:00',
+  },
+  {
+    id: 'mock-post-2',
+    userId: MOCK_TARO.id,
+    spotId: 100001,
+    body: '夕方に行くと海に沈む夕日が見られる',
+    createdAt: '2026-11-03T17:30:00+09:00',
+  },
+];
+
+// お店とキャンペーン（モック専用の架空のお店。実在のお店の名前や連絡先は入れない）
+export const MOCK_SHOP = {
+  id: 'mock-shop-1',
+  spotId: 100002,
+  ownerId: MOCK_SHOP_USER.id,
+  name: 'テスト茶房',
+};
+
+export const mockCampaign = {
+  id: 'mock-campaign-1',
+  shopId: MOCK_SHOP.id,
+  shopName: MOCK_SHOP.name,
+  title: '投稿で抹茶ラテ割引',
+  benefit: '抹茶ラテ 100円引き',
+  notice: '',
+  description: '',
+  imageUrl: null,
+  startsOn: '2026-11-01',
+  endsOn: '2026-12-31',
+  status: 'active' as const,
+};
+
+// 場所の検索（searchPlaces）のモックの候補。名前に入力の文字を含むものを返す
+export const mockPlaceCandidates = [
+  {
+    osmRef: 'way/884746182',
+    name: '金沢港クルーズターミナル',
+    lat: 36.6079,
+    lng: 136.6145,
+    address: '石川県金沢市無量寺町',
+    placeKind: '建物',
+  },
+  {
+    osmRef: 'node/2146147847',
+    name: 'にし茶屋街',
+    lat: 36.55676,
+    lng: 136.6474,
+    address: '石川県金沢市野町',
+    placeKind: '観光名所',
+  },
+  {
+    // 金沢市の外（白山市）。BR-20 の確かめで登録できないことを確かめる
+    osmRef: 'way/0000000002',
+    name: '白山比咩神社',
+    lat: 36.4366,
+    lng: 136.6285,
+    address: '石川県白山市三宮町',
+    placeKind: '寺社',
+  },
 ];

@@ -3,10 +3,17 @@
 import { areaIndex } from '@/constants/areas';
 import { ApiError } from '@/api/errors';
 import { validatePlan } from '@/lib/blocks';
+import { distanceKm, isInKanazawa } from '@/lib/geo';
 import {
+  MOCK_SHOP,
   MOCK_TARO,
+  mockCampaign,
   mockLikes,
+  mockLists,
+  mockOsmRefs,
+  mockPlaceCandidates,
   mockPlans,
+  mockSpotPosts,
   mockSpots,
   mockTags,
   mockUsers,
@@ -15,11 +22,18 @@ import {
 import type {
   AuthUser,
   Block,
+  Campaign,
+  ListDetail,
+  ListSummary,
+  PlaceCandidate,
   PlanDetail,
   PlanSummary,
   SavePlanInput,
+  SaveSpotPostInput,
   SearchResult,
   Spot,
+  SpotDetail,
+  SpotPost,
   Tag,
   TransportMode,
 } from '@/types/models';
@@ -42,6 +56,42 @@ type StoredBlock =
 type StoredPlan = Omit<MockPlanSeed, 'blocks'> & { blocks: StoredBlock[] };
 
 type StoredLike = { userId: string; planId: string; createdAt: string };
+
+// （v11）
+type StoredList = {
+  id: string;
+  userId: string;
+  name: string;
+  updatedAt: string;
+  spotIds: number[];
+};
+type StoredPost = {
+  id: string;
+  userId: string;
+  spotId: number;
+  body: string;
+  imagePaths: string[];
+  isHidden: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function seedSpots(): Spot[] {
+  return mockSpots.map((s) => ({ ...s }));
+}
+
+function seedLists(): StoredList[] {
+  return mockLists.map((l) => ({ ...l, spotIds: [...l.spotIds] }));
+}
+
+function seedPosts(): StoredPost[] {
+  return mockSpotPosts.map((p) => ({
+    ...p,
+    imagePaths: [],
+    isHidden: false,
+    updatedAt: p.createdAt,
+  }));
+}
 
 let seq = 0;
 function newId(prefix: string): string {
@@ -74,6 +124,13 @@ const state = {
   images: new Map<string, string>(),
   session: null as AuthUser | null,
   sessionLoaded: false,
+  // （v11）
+  spots: seedSpots(),
+  osmRefs: { ...mockOsmRefs } as Record<number, string>,
+  nextUserSpotId: 100003,
+  lists: seedLists(),
+  posts: seedPosts(),
+  shareTokens: new Map<string, string>(), // planId → 合言葉
 };
 
 // テスト用：状態を初期値に戻す
@@ -83,6 +140,12 @@ export function resetMockState(): void {
   state.images.clear();
   state.session = null;
   state.sessionLoaded = true;
+  state.spots = seedSpots();
+  state.osmRefs = { ...mockOsmRefs };
+  state.nextUserSpotId = 100003;
+  state.lists = seedLists();
+  state.posts = seedPosts();
+  state.shareTokens.clear();
   writeSession(null);
 }
 
@@ -126,11 +189,80 @@ function requireUser(): AuthUser {
   return user;
 }
 
-function spotById(id: number): Spot {
-  const spot = mockSpots.find((s) => s.id === id);
-  if (!spot) throw new ApiError('NOT_FOUND', `spot ${id}`);
-  return spot;
+// （v11）キャンペーン中か（日本時間の今日が期間の中で、status が active。BR-27）
+function todayJst(): string {
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Tokyo' });
 }
+
+function activeCampaignOf(spotId: number): Campaign | null {
+  if (spotId !== MOCK_SHOP.spotId) return null;
+  const today = todayJst();
+  const c = mockCampaign;
+  return c.status === 'active' && c.startsOn <= today && today <= c.endsOn ? { ...c } : null;
+}
+
+// 投稿の数、ピンの写真（表示中の投稿のいちばん新しい写真）、キャンペーンを足す（spot_summaries と同じ）
+function withSummary(spot: Spot): Spot {
+  const posts = state.posts
+    .filter((p) => p.spotId === spot.id && !p.isHidden)
+    .sort((a, b) => byTimeDesc(a.createdAt, b.createdAt));
+  const latestPath = posts.flatMap((p) => p.imagePaths)[0] ?? null;
+  return {
+    ...spot,
+    postCount: posts.length,
+    latestImageUrl: imageUrl(latestPath),
+    hasActiveCampaign: activeCampaignOf(spot.id) !== null,
+  };
+}
+
+function spotById(id: number): Spot {
+  const spot = state.spots.find((s) => s.id === id);
+  if (!spot) throw new ApiError('NOT_FOUND', `spot ${id}`);
+  return withSummary(spot);
+}
+
+function toAuthUser(u: (typeof mockUsers)[number]): AuthUser {
+  return { id: u.id, email: u.email, displayName: u.displayName, role: u.role };
+}
+
+function ownList(listId: string, user: AuthUser): StoredList {
+  const list = state.lists.find((l) => l.id === listId && l.userId === user.id);
+  if (!list) throw new ApiError('NOT_FOUND');
+  return list;
+}
+
+function toListSummary(list: StoredList): ListSummary {
+  return {
+    id: list.id,
+    name: list.name,
+    spotCount: list.spotIds.length,
+    spotIds: [...list.spotIds],
+    firstSpotNames: list.spotIds.slice(0, 3).map((id) => spotById(id).name),
+    updatedAt: list.updatedAt,
+  };
+}
+
+function toPost(p: StoredPost): SpotPost {
+  return {
+    id: p.id,
+    spot: { id: p.spotId, name: spotById(p.spotId).name },
+    author: { id: p.userId, displayName: displayName(p.userId) },
+    body: p.body,
+    imageUrls: p.imagePaths.flatMap((path) => {
+      const url = imageUrl(path);
+      return url ? [url] : [];
+    }),
+    isCampaign: false,
+    isHidden: p.isHidden,
+    rewardId: null,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+  };
+}
+
+const LIST_LIMIT = 20; // BR-18
+const LIST_SPOT_LIMIT = 30; // BR-18
+const POST_PAGE_SIZE = 20; // 10.3
 
 function displayName(userId: string): string {
   return mockUsers.find((u) => u.id === userId)?.displayName ?? '利用者';
@@ -248,10 +380,11 @@ export const mockApi = {
   async getSpots(): Promise<Spot[]> {
     await delay();
     requireUser();
-    return mockSpots
+    // （v11）利用者のスポットも含む。エリアが空のものは最後
+    return state.spots
       .filter((s) => s.isActive)
       .sort((a, b) => areaIndex(a.area) - areaIndex(b.area) || a.id - b.id)
-      .map((s) => ({ ...s }));
+      .map(withSummary);
   },
 
   // BR-01
@@ -453,11 +586,14 @@ export const mockApi = {
   },
 
   signInAsTaro(): AuthUser {
-    const user: AuthUser = {
-      id: MOCK_TARO.id,
-      email: MOCK_TARO.email,
-      displayName: MOCK_TARO.displayName,
-    };
+    return mockApi.signInAs(MOCK_TARO.id);
+  },
+
+  // テスト用：別の利用者としてログインする
+  signInAs(userId: string): AuthUser {
+    const found = mockUsers.find((u) => u.id === userId);
+    if (!found) throw new ApiError('NOT_FOUND');
+    const user = toAuthUser(found);
     state.session = user;
     state.sessionLoaded = true;
     writeSession(user);
@@ -472,6 +608,309 @@ export const mockApi = {
   },
 
   async getCurrentUser(): Promise<AuthUser | null> {
-    return currentUser();
+    const user = currentUser();
+    // 以前のモックで保存したログイン状態には role がないので、利用者の一覧から補う
+    if (user && !user.role) {
+      const found = mockUsers.find((u) => u.id === user.id);
+      return { ...user, role: found?.role ?? 'user' };
+    }
+    return user;
+  },
+
+  // ---- （v11）スポット ----
+
+  async getSpot(spotId: number): Promise<SpotDetail | null> {
+    await delay();
+    requireUser();
+    if (!state.spots.some((s) => s.id === spotId)) return null;
+    const campaign = activeCampaignOf(spotId);
+    return { ...spotById(spotId), campaign, shopName: campaign ? MOCK_SHOP.name : null };
+  },
+
+  // 9.7：3件の候補から、名前に入力の文字を含むものを返す。osm_ref が登録済みなら existingSpotId を入れる
+  async searchPlaces(query: string): Promise<PlaceCandidate[]> {
+    await delay();
+    requireUser();
+    const q = query.trim();
+    if (q === '') return [];
+    return mockPlaceCandidates
+      .filter((c) => c.name.includes(q))
+      .map((c) => ({ ...c, existingSpotId: spotIdByOsmRef(c.osmRef) }));
+  },
+
+  // BR-20：同じ osm_ref → その id。金沢市の外 → OUT_OF_AREA。50m 以内の同じ名前 → その id
+  async registerSpot(candidate: PlaceCandidate): Promise<{ spotId: number; reused: boolean }> {
+    await delay();
+    const user = requireUser();
+    void user;
+    const byRef = spotIdByOsmRef(candidate.osmRef);
+    if (byRef !== null) return { spotId: byRef, reused: true };
+    // 本物は場所の検索で住所が金沢市のものだけを候補にする（9.8）。モックの候補は絞っていないので、ここで住所も見る
+    if (!isInKanazawa(candidate.lat, candidate.lng) || !candidate.address.includes('金沢市')) {
+      throw new ApiError('OUT_OF_AREA', 'OUT_OF_AREA');
+    }
+    const near = state.spots
+      .filter((s) => s.name === candidate.name && distanceKm(s, candidate) * 1000 <= 50)
+      .sort((a, b) => distanceKm(a, candidate) - distanceKm(b, candidate))[0];
+    if (near) return { spotId: near.id, reused: true };
+    const id = state.nextUserSpotId;
+    state.nextUserSpotId += 1;
+    state.spots.push({
+      id,
+      name: candidate.name.slice(0, 50),
+      description: null,
+      lat: candidate.lat,
+      lng: candidate.lng,
+      placeId: null,
+      spotType: 'minor',
+      area: null,
+      isActive: true,
+      source: 'user',
+      address: candidate.address.slice(0, 100),
+      placeKind: candidate.placeKind,
+      postCount: 0,
+      latestImageUrl: null,
+      hasActiveCampaign: false,
+    });
+    state.osmRefs[id] = candidate.osmRef;
+    return { spotId: id, reused: false };
+  },
+
+  // ---- （v11）リスト（BR-18） ----
+
+  async getLists(): Promise<ListSummary[]> {
+    await delay();
+    const user = requireUser();
+    return state.lists
+      .filter((l) => l.userId === user.id)
+      .sort((a, b) => byTimeDesc(a.updatedAt, b.updatedAt))
+      .map(toListSummary);
+  },
+
+  async getList(listId: string): Promise<ListDetail | null> {
+    await delay();
+    const user = requireUser();
+    const list = state.lists.find((l) => l.id === listId && l.userId === user.id);
+    if (!list) return null;
+    return {
+      id: list.id,
+      name: list.name,
+      spots: list.spotIds.map(spotById),
+      updatedAt: list.updatedAt,
+    };
+  },
+
+  async createList({ name }: { name: string }): Promise<{ id: string }> {
+    await delay();
+    const user = requireUser();
+    const clean = name.trim();
+    if (clean.length < 1 || clean.length > 30) throw new ApiError('UNKNOWN', 'lists_name_check');
+    if (state.lists.filter((l) => l.userId === user.id).length >= LIST_LIMIT) {
+      throw new ApiError('LIMIT_REACHED', 'LIMIT_REACHED');
+    }
+    const list: StoredList = {
+      id: newId('mock-list'),
+      userId: user.id,
+      name: clean,
+      updatedAt: new Date().toISOString(),
+      spotIds: [],
+    };
+    state.lists.push(list);
+    return { id: list.id };
+  },
+
+  async createListFromSpots({
+    name,
+    spotIds,
+  }: {
+    name: string;
+    spotIds: number[];
+  }): Promise<{ id: string }> {
+    const { id } = await mockApi.createList({ name: name.trim().slice(0, 30) });
+    const list = state.lists.find((l) => l.id === id);
+    if (list) {
+      const unique = [...new Set(spotIds)];
+      if (unique.length > LIST_SPOT_LIMIT) throw new ApiError('LIMIT_REACHED', 'LIMIT_REACHED');
+      list.spotIds = unique.map((sid) => spotById(sid).id);
+    }
+    return { id };
+  },
+
+  async renameList(listId: string, name: string): Promise<void> {
+    await delay();
+    const list = ownList(listId, requireUser());
+    const clean = name.trim();
+    if (clean.length < 1 || clean.length > 30) throw new ApiError('UNKNOWN', 'lists_name_check');
+    list.name = clean;
+    list.updatedAt = new Date().toISOString();
+  },
+
+  async deleteList(listId: string): Promise<void> {
+    await delay();
+    ownList(listId, requireUser());
+    state.lists = state.lists.filter((l) => l.id !== listId);
+  },
+
+  async addSpotToList(listId: string, spotId: number): Promise<{ added: boolean }> {
+    await delay();
+    const list = ownList(listId, requireUser());
+    if (list.spotIds.includes(spotId)) return { added: false };
+    if (list.spotIds.length >= LIST_SPOT_LIMIT)
+      throw new ApiError('LIMIT_REACHED', 'LIMIT_REACHED');
+    list.spotIds.push(spotById(spotId).id);
+    list.updatedAt = new Date().toISOString();
+    return { added: true };
+  },
+
+  async removeSpotFromList(listId: string, spotId: number): Promise<void> {
+    await delay();
+    const list = ownList(listId, requireUser());
+    list.spotIds = list.spotIds.filter((id) => id !== spotId);
+    list.updatedAt = new Date().toISOString();
+  },
+
+  // ---- （v11）スポットの投稿（BR-21） ----
+
+  async getSpotPosts({
+    spotId,
+    page,
+  }: {
+    spotId: number;
+    page: number;
+  }): Promise<{ items: SpotPost[]; hasMore: boolean }> {
+    await delay();
+    requireUser();
+    const all = state.posts
+      .filter((p) => p.spotId === spotId && !p.isHidden)
+      .sort((a, b) => byTimeDesc(a.createdAt, b.createdAt) || a.id.localeCompare(b.id));
+    const from = page * POST_PAGE_SIZE;
+    return {
+      items: all.slice(from, from + POST_PAGE_SIZE).map(toPost),
+      hasMore: from + POST_PAGE_SIZE < all.length,
+    };
+  },
+
+  async getSpotPost(postId: string): Promise<SpotPost | null> {
+    await delay();
+    const user = requireUser();
+    const post = state.posts.find((p) => p.id === postId && p.userId === user.id);
+    return post ? toPost(post) : null;
+  },
+
+  async getMySpotPosts(): Promise<SpotPost[]> {
+    await delay();
+    const user = requireUser();
+    return state.posts
+      .filter((p) => p.userId === user.id)
+      .sort((a, b) => byTimeDesc(a.createdAt, b.createdAt))
+      .map(toPost);
+  },
+
+  // save_spot_post と同じ確かめ（10.9）。キャンペーンの特典の発行はモックでも I-37 で足す
+  async saveSpotPost(input: SaveSpotPostInput): Promise<{ id: string; rewardId: string | null }> {
+    await delay();
+    const user = requireUser();
+    const body = input.body.trim();
+    if (body.length < 1 || body.length > 300) throw new ApiError('UNKNOWN', 'POST_BODY_INVALID');
+    if (input.imagePaths.length < 1 || input.imagePaths.length > 4) {
+      throw new ApiError('UNKNOWN', 'POST_IMAGES_INVALID');
+    }
+    if (input.imagePaths.some((p) => !p.startsWith(`${user.id}/`))) {
+      throw new ApiError('FORBIDDEN');
+    }
+    const now = new Date().toISOString();
+    if (input.id === null) {
+      const spot = spotById(input.spotId);
+      if (!spot.isActive) throw new ApiError('NOT_FOUND');
+      const post: StoredPost = {
+        id: newId('mock-post'),
+        userId: user.id,
+        spotId: spot.id,
+        body,
+        imagePaths: [...input.imagePaths],
+        isHidden: false,
+        createdAt: now,
+        updatedAt: now,
+      };
+      state.posts.push(post);
+      return { id: post.id, rewardId: null };
+    }
+    const post = state.posts.find((p) => p.id === input.id);
+    if (!post || post.userId !== user.id || post.spotId !== input.spotId) {
+      throw new ApiError('FORBIDDEN');
+    }
+    post.body = body;
+    post.imagePaths = [...input.imagePaths];
+    post.updatedAt = now;
+    return { id: post.id, rewardId: null };
+  },
+
+  async deleteSpotPost(postId: string): Promise<void> {
+    await delay();
+    const user = requireUser();
+    const post = state.posts.find((p) => p.id === postId);
+    if (!post || post.userId !== user.id) throw new ApiError('FORBIDDEN');
+    for (const path of post.imagePaths) state.images.delete(path);
+    state.posts = state.posts.filter((p) => p.id !== postId);
+  },
+
+  async uploadSpotPostImage(file: File): Promise<{ path: string; url: string }> {
+    return mockApi.uploadPlanImage(file);
+  },
+
+  // ---- （v11）プラン ----
+
+  // そのスポットを含む公開中のプランを、いいね数の多い順に5件
+  async getPlansBySpot(spotId: number): Promise<PlanSummary[]> {
+    await delay();
+    requireUser();
+    return published()
+      .filter((p) => spotBlocks(p).some((b) => b.spotId === spotId))
+      .map(toSummary)
+      .sort(
+        (a, b) =>
+          b.likeCount - a.likeCount ||
+          byTimeDesc(a.publishedAt, b.publishedAt) ||
+          a.id.localeCompare(b.id),
+      )
+      .slice(0, 5);
+  },
+
+  // BR-30：すでに共有していれば、そのリンクを返す
+  async createShareLink(planId: string): Promise<{ url: string }> {
+    await delay();
+    ownPlan(planId, requireUser());
+    let token = state.shareTokens.get(planId);
+    if (!token) {
+      token = `mock${newId('share').replace(/[^A-Za-z0-9]/g, '')}`.padEnd(32, 'x').slice(0, 32);
+      state.shareTokens.set(planId, token);
+    }
+    const origin = globalThis.location?.origin ?? 'http://localhost:5173';
+    return { url: `${origin}/shared/${token}` };
+  },
+
+  async stopShareLink(planId: string): Promise<void> {
+    await delay();
+    ownPlan(planId, requireUser());
+    state.shareTokens.delete(planId);
+  },
+
+  // ログインしていなくても見られる。作成者の id は返さない（BR-30）
+  async getSharedPlan(token: string): Promise<PlanDetail | null> {
+    await delay();
+    const planId = [...state.shareTokens.entries()].find(([, t]) => t === token)?.[0];
+    const plan = planId ? state.plans.find((p) => p.id === planId) : undefined;
+    if (!plan) return null;
+    const detail = toDetail(plan);
+    return {
+      ...detail,
+      author: { id: '', displayName: detail.author.displayName },
+      sourcePlan: null,
+    };
   },
 };
+
+function spotIdByOsmRef(osmRef: string): number | null {
+  const found = Object.entries(state.osmRefs).find(([, ref]) => ref === osmRef);
+  return found ? Number(found[0]) : null;
+}

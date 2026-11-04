@@ -10,6 +10,11 @@ export type ErrorCode =
   | 'VALIDATION' // 入力の確認で失敗（issues に詳細）
   | 'AUTH_INVALID_CREDENTIALS' // メールアドレスかパスワードが違う
   | 'AUTH_EMAIL_TAKEN' // 登録済みのメールアドレス
+  | 'LIMIT_REACHED' // （v11）リストの数・リストのスポット数などの上限
+  | 'OUT_OF_AREA' // （v11）金沢市の外の場所
+  | 'PLACE_SEARCH_DISABLED' // （v11）場所の検索を止めている（BR-19）
+  | 'PLACE_SEARCH_FAILED' // （v11）Nominatim の失敗、回数の制限（429）
+  | 'CAMPAIGN_NOT_ELIGIBLE' // （v11）特典の対象でない（期限切れなど）
   | 'UNKNOWN';
 
 export class ApiError extends Error {
@@ -77,7 +82,15 @@ export function toApiError(e: unknown): ApiError {
   if (code === 'P0001') {
     const key = message.trim();
     if (isValidationCode(key)) return new ApiError('VALIDATION', key, [toValidationIssue(key)]);
-    if (key === 'UNAUTHORIZED' || key === 'FORBIDDEN' || key === 'NOT_FOUND') {
+    if (
+      key === 'UNAUTHORIZED' ||
+      key === 'FORBIDDEN' ||
+      key === 'NOT_FOUND' ||
+      // （v11）10.2 の表
+      key === 'LIMIT_REACHED' ||
+      key === 'OUT_OF_AREA' ||
+      key === 'CAMPAIGN_NOT_ELIGIBLE'
+    ) {
       return new ApiError(key, key);
     }
   }

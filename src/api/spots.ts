@@ -1,12 +1,52 @@
 import { USE_MOCK } from '@/api/config';
-import { sortSpots } from '@/api/mappers';
+import { ApiError } from '@/api/errors';
+import { sortSpots, toSpotFromSummary } from '@/api/mappers';
 import { mockApi } from '@/api/mock/mockApi';
-import { rows } from '@/api/supabaseCall';
+import { maybeOne, one, rows, spotImageUrlOf } from '@/api/supabaseCall';
 import { getSupabase } from '@/lib/supabase';
-import type { Spot } from '@/types/models';
+import type { PlaceCandidate, Spot, SpotDetail } from '@/types/models';
 
-// 使用中のスポットをエリア、sort_order、id の順に全件取得（10.3、BR-17）
+// 使用中のスポットを spot_summaries からエリア、sort_order、id の順に全件取得（10.3、BR-17）。
+// （v11）利用者のスポットも含む。エリアが空のものは最後
 export async function getSpots(): Promise<Spot[]> {
   if (USE_MOCK) return mockApi.getSpots();
-  return sortSpots(await rows(getSupabase().from('spots').select('*').eq('is_active', true)));
+  return sortSpots(
+    await rows(getSupabase().from('spot_summaries').select('*').eq('is_active', true)),
+    spotImageUrlOf,
+  );
+}
+
+// （v11）スポット詳細（S-05、S-17）。使用中止のスポットも返す。見つからなければ null。
+// キャンペーン（campaign、shopName）は、お店とキャンペーンの表ができる I-36・I-37 で足す
+export async function getSpot(spotId: number): Promise<SpotDetail | null> {
+  if (USE_MOCK) return mockApi.getSpot(spotId);
+  if (!Number.isInteger(spotId) || spotId <= 0) return null;
+  const row = await maybeOne(
+    getSupabase().from('spot_summaries').select('*').eq('id', spotId).maybeSingle(),
+  );
+  if (!row) return null;
+  return { ...toSpotFromSummary(row, spotImageUrlOf), campaign: null, shopName: null };
+}
+
+// （v11）場所の候補をスポットとして登録する（RPC register_spot、BR-20）。
+// 同じ場所がすでにあれば、その id を reused: true で返す。金沢市の外は OUT_OF_AREA
+export async function registerSpot(
+  candidate: PlaceCandidate,
+): Promise<{ spotId: number; reused: boolean }> {
+  if (USE_MOCK) return mockApi.registerSpot(candidate);
+  const result = await one(
+    getSupabase().rpc('register_spot', {
+      p_candidate: {
+        osm_ref: candidate.osmRef,
+        name: candidate.name,
+        lat: candidate.lat,
+        lng: candidate.lng,
+        address: candidate.address,
+        place_kind: candidate.placeKind,
+      },
+    }),
+  );
+  const first = result[0];
+  if (!first) throw new ApiError('UNKNOWN', 'register_spot の結果が空です');
+  return { spotId: first.spot_id, reused: first.reused };
 }

@@ -362,6 +362,89 @@ export type Database = {
           },
         ];
       };
+      spot_post_images: {
+        Row: {
+          id: string;
+          image_path: string;
+          position: number;
+          post_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          id?: string;
+          image_path: string;
+          position: number;
+          post_id: string;
+        };
+        Update: {
+          id?: string;
+          image_path?: string;
+          position?: number;
+          post_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'spot_post_images_post_id_fkey';
+            columns: ['post_id'];
+            isOneToOne: false;
+            referencedRelation: 'spot_posts';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      spot_posts: {
+        Row: {
+          body: string;
+          created_at: string;
+          id: string;
+          is_hidden: boolean;
+          spot_id: number;
+          updated_at: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          body: string;
+          created_at?: string;
+          id?: string;
+          is_hidden?: boolean;
+          spot_id: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          id?: string;
+          is_hidden?: boolean;
+          spot_id?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'spot_posts_spot_id_fkey';
+            columns: ['spot_id'];
+            isOneToOne: false;
+            referencedRelation: 'spot_summaries';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'spot_posts_spot_id_fkey';
+            columns: ['spot_id'];
+            isOneToOne: false;
+            referencedRelation: 'spots';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'spot_posts_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       tags: {
         Row: {
           id: number;

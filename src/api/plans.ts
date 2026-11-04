@@ -1,6 +1,14 @@
 import { USE_MOCK } from '@/api/config';
 import { ApiError } from '@/api/errors';
-import { sortTags, toBlocks, toSavePlanJson, toSummary, type BlockRow } from '@/api/mappers';
+import {
+  sortTags,
+  toBlocks,
+  toSavePlanJson,
+  toSharedPlan,
+  toSummary,
+  type BlockRow,
+  type SharedPlanJson,
+} from '@/api/mappers';
 import { mockApi } from '@/api/mock/mockApi';
 import {
   currentUserId,
@@ -200,4 +208,80 @@ export async function getLikedPlans(): Promise<PlanSummary[]> {
     const r = byId.get(l.plan_id);
     return r ? [toSummary(r, imageUrlOf)] : [];
   });
+}
+
+// （v11）そのスポットを含む公開中のプランを、いいね数の多い順に5件（S-05）
+export async function getPlansBySpot(spotId: number): Promise<PlanSummary[]> {
+  if (USE_MOCK) return mockApi.getPlansBySpot(spotId);
+  const supabase = getSupabase();
+  const blocks = await fetchRows(
+    supabase.from('plan_blocks').select('plan_id').eq('spot_id', spotId),
+  );
+  const planIds = [...new Set(blocks.map((b) => b.plan_id))];
+  if (planIds.length === 0) return [];
+  const rows = await fetchRows(
+    supabase
+      .from('plan_summaries')
+      .select('*')
+      .eq('status', 'published')
+      .in('id', planIds)
+      .order('like_count', { ascending: false })
+      .order('published_at', { ascending: false })
+      .order('id')
+      .limit(5),
+  );
+  return rows.map((r) => toSummary(r, imageUrlOf));
+}
+
+// （v11）共有リンク（BR-30）。合言葉は推測できない32文字（英数字と - _）
+function newShareToken(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_');
+}
+
+export function shareUrlOf(token: string): string {
+  return `${window.location.origin}/shared/${token}`;
+}
+
+// 共有リンクを作る。すでに共有していれば、そのリンクを返す
+export async function createShareLink(planId: string): Promise<{ url: string }> {
+  if (USE_MOCK) return mockApi.createShareLink(planId);
+  const supabase = getSupabase();
+  const userId = await currentUserId();
+  const plan = await maybeOne(
+    supabase
+      .from('plans')
+      .select('share_token')
+      .eq('id', planId)
+      .eq('user_id', userId)
+      .maybeSingle(),
+  );
+  if (!plan) throw new ApiError('FORBIDDEN');
+  if (plan.share_token) return { url: shareUrlOf(plan.share_token) };
+  const token = newShareToken();
+  const rows = await fetchRows(
+    supabase.from('plans').update({ share_token: token }).eq('id', planId).select('id'),
+  );
+  if (rows.length === 0) throw new ApiError('FORBIDDEN');
+  return { url: shareUrlOf(token) };
+}
+
+// 共有を止める。以前のリンクは見られなくなる（BR-30）
+export async function stopShareLink(planId: string): Promise<void> {
+  if (USE_MOCK) return mockApi.stopShareLink(planId);
+  const rows = await fetchRows(
+    getSupabase().from('plans').update({ share_token: null }).eq('id', planId).select('id'),
+  );
+  if (rows.length === 0) throw new ApiError('FORBIDDEN');
+}
+
+// 共有されたプラン（RPC get_shared_plan）。ログインしていなくても呼べる（BR-30）
+export async function getSharedPlan(token: string): Promise<PlanDetail | null> {
+  if (USE_MOCK) return mockApi.getSharedPlan(token);
+  if (!/^[A-Za-z0-9_-]{32}$/.test(token)) return null;
+  const data = await maybeOne(getSupabase().rpc('get_shared_plan', { p_token: token }));
+  if (!data) return null;
+  return toSharedPlan(data as unknown as SharedPlanJson, imageUrlOf);
 }
