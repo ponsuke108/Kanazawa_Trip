@@ -9,3 +9,9 @@
   color: var(--color-text-sub);
   font-size: var(--font-size-sm);
 }
+
+.check {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}

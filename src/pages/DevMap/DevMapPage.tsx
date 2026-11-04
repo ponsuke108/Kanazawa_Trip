@@ -6,13 +6,19 @@ import { AppLayout } from '@/components/common/AppLayout';
 import { ErrorState } from '@/components/common/ErrorState';
 import { FullScreenLoading } from '@/components/common/FullScreenLoading';
 import { PageHeader } from '@/components/common/PageHeader';
+import { Button } from '@/components/common/Button';
 import { LazyMapView } from '@/components/map/LazyMapView';
 import { MapAttribution } from '@/components/map/MapAttribution';
+import { PlaceSearch } from '@/components/map/PlaceSearch';
+import { useResolveSpot } from '@/hooks/useResolveSpot';
+import { ActionIcons } from '@/lib/icons';
+import type { SpotOrCandidate } from '@/types/models';
 import type { MapSpot } from '@/components/map/types';
 import { errorMessage } from '@/lib/errorMessage';
 import styles from './DevMapPage.module.css';
 
-// I-25 の確認用の仮の画面（開発のときだけ /dev/map で開ける）。S-13 を作る I-30 で消す。
+// I-25・I-28 の確認用の仮の画面（開発のときだけ /dev/map で開ける）。S-13 を作る I-30 で消す。
+// I-28：「場所を探す」で S-16 を開き、選んだものを「登録して確かめる」で registerSpot する
 // 写真のピンと札を確かめるため、いくつかのスポットに単色の仮の写真とキャンペーン中の印を付ける
 function sampleImage(color: string): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="${color}"/></svg>`;
@@ -23,6 +29,9 @@ const SAMPLE_COLORS = ['#7aa874', '#d9a05b', '#6f8fc9', '#c97a8f'];
 export function DevMapPage() {
   const spots = useQuery({ queryKey: queryKeys.spots, queryFn: getSpots });
   const [selected, setSelected] = useState<number | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [picked, setPicked] = useState<SpotOrCandidate | null>(null);
+  const resolve = useResolveSpot();
 
   const mapSpots = useMemo<MapSpot[]>(
     () =>
@@ -56,6 +65,44 @@ export function DevMapPage() {
               height="60dvh"
             />
             <MapAttribution />
+            <section className={styles.check}>
+              <Button
+                variant="secondary"
+                icon={ActionIcons.search}
+                onClick={() => setSearchOpen(true)}
+              >
+                場所を探す（I-28 の確認）
+              </Button>
+              {picked && (
+                <p className={styles.note}>
+                  選んだもの：
+                  {picked.kind === 'spot'
+                    ? `このサイトのスポット ${picked.spot.name}（id ${picked.spot.id}）`
+                    : `OpenStreetMap の場所 ${picked.candidate.name}（${picked.candidate.osmRef}）`}
+                </p>
+              )}
+              {picked && (
+                <Button loading={resolve.isPending} onClick={() => resolve.mutate(picked)}>
+                  登録して確かめる
+                </Button>
+              )}
+              {resolve.isSuccess && (
+                <p className={styles.note}>
+                  スポット id {resolve.data.spotId}（
+                  {resolve.data.reused ? '既存のスポット' : '新しく登録'}）
+                </p>
+              )}
+              {resolve.isError && <p className={styles.note}>{errorMessage(resolve.error)}</p>}
+            </section>
+            <PlaceSearch
+              open={searchOpen}
+              onClose={() => setSearchOpen(false)}
+              onSelect={(r) => {
+                setPicked(r);
+                resolve.reset();
+                setSearchOpen(false);
+              }}
+            />
           </>
         )}
       </main>

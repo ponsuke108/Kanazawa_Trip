@@ -1,0 +1,146 @@
+/* S-16 場所を探す（6.4）。元の画面の上に画面いっぱいに重ねる */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--header-height);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--font-size-md);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+.hint {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  text-align: left;
+}
+
+.nameRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.name {
+  font-weight: 700;
+}
+
+.label,
+.kind {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.label {
+  background: var(--color-primary-weak);
+  color: var(--color-primary);
+}
+
+.kind {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-sub);
+}
+
+.sub {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+}
+
+.osm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.candidates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* BR-20：近くに別のスポットがあるときの確認 */
+.nearby {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-weak);
+  font-size: var(--font-size-sm);
+}
+
+.nearbyActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* タブレットと PC：内容の幅を広げる（7.8） */
+@media (min-width: 768px) {
+  .body {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .body {
+    max-width: 640px;
+  }
+}

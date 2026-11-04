@@ -25,6 +25,23 @@ export const Messages = {
   straightDistance: '直線距離です。実際の道のりは「経路を見る」で確かめてください',
 } as const;
 
+// （v11）S-16 場所を探す（6.4）
+export const PlaceSearchMessages = {
+  placeholder: 'スポット名を入力',
+  emptyInput: 'スポット名を入れてください（例：にし茶屋街、鈴木大拙館）',
+  noSiteSpots: 'このサイトには見つかりませんでした',
+  searchLead: '見つからないときは：',
+  searchButton: 'OpenStreetMap で探す',
+  searching: 'OpenStreetMap で探しています',
+  noCandidates:
+    '見つかりませんでした。名前を変えて探してください。見つからない場所は、チームに連絡してください',
+  nearbyTitle: (name: string) => `近くに${name}があります。同じ場所ならこちらを選んでください`,
+  chooseNearby: (name: string) => `${name}を選ぶ`,
+  chooseCandidate: '別の場所なので、この候補を選ぶ',
+  siteSpots: 'このサイトのスポット',
+  candidates: 'OpenStreetMap の場所',
+} as const;
+
 // （v11）リストに入れたとき（6.5）
 export function addedToListMessage(listName: string): string {
   return `リスト「${listName}」に入れました`;
