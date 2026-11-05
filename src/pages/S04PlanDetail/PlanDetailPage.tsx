@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createListFromSpots } from '@/api/lists';
 import { getPlan, unpublishPlan } from '@/api/plans';
 import { queryKeys } from '@/api/queryKeys';
 import { BlockList } from '@/components/blocks/BlockList';
@@ -13,10 +14,12 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PlanCardSkeletonList } from '@/components/common/PlanCardSkeleton';
 import { useToast } from '@/components/common/useToast';
-import { Messages, Toasts, UiMessages } from '@/constants/messages';
+import { Messages, savedToListMessage, Toasts, UiMessages } from '@/constants/messages';
+import { listErrorMessage } from '@/hooks/useListMutations';
+import { formatTitle } from '@/lib/format';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, StateIcons } from '@/lib/icons';
+import { ActionIcons, ListIcons, StateIcons } from '@/lib/icons';
 import { LikeButton } from '@/pages/S04PlanDetail/LikeButton';
 import { PlanHeading } from '@/components/common/PlanHeading';
 import styles from './PlanDetailPage.module.css';
@@ -43,6 +46,28 @@ export function PlanDetailPage() {
       await queryClient.invalidateQueries({ queryKey: queryKeys.plans.all });
     },
     onError: (err) => toast.show({ type: 'error', message: errorMessage(err) }),
+  });
+
+  // （v11）F-44、BR-18：プランのスポットを新しいリストにまとめて入れる。
+  // 名前はプランのタイトル（30文字まで）、同じスポットは1つにまとめる
+  const saveToList = useMutation({
+    mutationFn: async () => {
+      const detail = plan.data;
+      if (!detail) throw new Error('プランがありません');
+      const name = formatTitle(detail.title).slice(0, 30);
+      const spotIds = detail.blocks.flatMap((b) => (b.type === 'spot' ? [b.spot.id] : []));
+      const { id } = await createListFromSpots({ name, spotIds });
+      return { id, name };
+    },
+    onSuccess: async ({ id, name }) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.lists.all });
+      toast.show({
+        type: 'success',
+        message: savedToListMessage(name),
+        action: { label: '開く', onClick: () => navigate(`/lists/${id}`) },
+      });
+    },
+    onError: (err) => toast.show({ type: 'error', message: listErrorMessage(err, 'list') }),
   });
 
   const data = plan.data;
@@ -92,6 +117,15 @@ export function PlanDetailPage() {
                 onClick={() => navigate(`/plans/new?step=blocks&from=${data.id}`)}
               >
                 コピーして編集
+              </Button>
+              <Button
+                variant="secondary"
+                icon={ListIcons.newList}
+                loading={saveToList.isPending}
+                disabled={!data.blocks.some((b) => b.type === 'spot')}
+                onClick={() => saveToList.mutate()}
+              >
+                スポットをリストに保存
               </Button>
             </div>
             {data.sourcePlan && (

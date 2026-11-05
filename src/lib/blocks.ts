@@ -3,6 +3,7 @@ import { toValidationIssue } from '@/api/errors';
 import type {
   Block,
   DisplayBlock,
+  ListDetail,
   MoveBlock,
   PlanDetail,
   PlanStatus,
@@ -32,8 +33,9 @@ export type EditorBlock =
   | { key: string; type: 'comment'; body: string };
 
 export type EditorState = {
-  version: 1; // 一時保存の形式の版
+  version: 2; // 一時保存の形式の版（v11 で 2 に上げた。1 の一時保存は捨てる）
   planId: string | null; // 新規なら null
+  listId: string | null; // （v11）プランを作るときに選んだリスト。S-07 の最初のリストに使う。保存はしない
   originalStatus: PlanStatus | null; // 編集開始時の状態。公開中なら「下書き保存」を出さない
   sourcePlan: { id: string; authorName: string; title: string } | null;
   title: string;
@@ -164,8 +166,9 @@ export function newBlockKey(): string {
 
 export function emptyEditorState(): EditorState {
   return {
-    version: 1,
+    version: 2,
     planId: null,
+    listId: null,
     originalStatus: null,
     sourcePlan: null,
     title: '',
@@ -191,8 +194,9 @@ export function planToEditorState(plan: PlanDetail, { copy }: { copy: boolean })
       : { key: copy ? newBlockKey() : b.id, type: 'comment', body: b.body },
   );
   return {
-    version: 1,
+    version: 2,
     planId: copy ? null : plan.id,
+    listId: null,
     originalStatus: copy ? null : plan.status,
     sourcePlan: copy
       ? { id: plan.id, authorName: plan.author.displayName, title: plan.title }
@@ -205,6 +209,23 @@ export function planToEditorState(plan: PlanDetail, { copy }: { copy: boolean })
     dirty: false,
     savedAt: null,
   };
+}
+
+// （v11）リストから作る（BR-18、K33）：印を付けたスポットを、リストの並びのままスポットブロックにする。
+// 移動手段は徒歩（最初は空。BR-04）。使用中止のスポットはプランに入れられない
+export function listToEditorState(list: ListDetail, spotIds: number[]): EditorState {
+  const chosen = new Set(spotIds);
+  const blocks: EditorBlock[] = list.spots
+    .filter((s) => chosen.has(s.id) && s.isActive)
+    .map((spot) => ({
+      key: newBlockKey(),
+      type: 'spot',
+      spot,
+      transportMode: 'walk',
+      imagePath: null,
+      imageUrl: null,
+    }));
+  return { ...emptyEditorState(), listId: list.id, blocks: normalizeBlocks(blocks) };
 }
 
 // 保存用の入力を作る。タイトルの前後の空白と空のコメントを取り除き、BR-04 で整える（BR-05）

@@ -11,7 +11,7 @@ export function loadDraft(key: string): EditorState | null {
     const raw = localStorage.getItem(key);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<EditorState>;
-    if (parsed.version !== 1 || !Array.isArray(parsed.blocks)) {
+    if (parsed.version !== 2 || !Array.isArray(parsed.blocks)) {
       localStorage.removeItem(key);
       return null;
     }

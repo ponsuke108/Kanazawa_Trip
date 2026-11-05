@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mockSpots } from '@/api/mock/data';
 import {
+  listToEditorState,
   normalizeBlocks,
   planToEditorState,
   toDisplayBlocks,
@@ -271,5 +272,36 @@ describe('planToEditorState・toSavePlanInput（BR-07）', () => {
       { type: 'comment', body: 'メモ' },
       { type: 'spot', spotId: 2, transportMode: 'bus', imagePath: null },
     ]);
+  });
+});
+
+describe('listToEditorState（BR-18、IT-13）', () => {
+  const list = {
+    id: 'l1',
+    name: 'リスト',
+    updatedAt: '',
+    spots: [1, 2, 11, 8, 13].map((id) => mockSpots.find((s) => s.id === id)!),
+  };
+
+  it('印を付けたスポットを、リストの並びのままブロックにする。移動手段は徒歩（最初は空）', () => {
+    const state = listToEditorState(list, [8, 1, 11, 13]);
+    expect(state.listId).toBe('l1');
+    expect(state.planId).toBeNull();
+    expect(state.blocks.map((b) => (b.type === 'spot' ? b.spot.id : 0))).toEqual([1, 11, 8, 13]);
+    expect(state.blocks.map((b) => (b.type === 'spot' ? b.transportMode : 'x'))).toEqual([
+      null,
+      'walk',
+      'walk',
+      'walk',
+    ]);
+  });
+
+  it('使用中止のスポットは入れない', () => {
+    const inactive = {
+      ...list,
+      spots: list.spots.map((s) => (s.id === 2 ? { ...s, isActive: false } : s)),
+    };
+    const state = listToEditorState(inactive, [1, 2]);
+    expect(state.blocks).toHaveLength(1);
   });
 });

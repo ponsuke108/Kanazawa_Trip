@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { getPlansBySpot } from '@/api/plans';
 import { queryKeys } from '@/api/queryKeys';
 import { getSpotPosts } from '@/api/spotPosts';
 import { getSpot } from '@/api/spots';
+import { AddToListSheet } from '@/components/common/AddToListSheet';
 import { AppLayout } from '@/components/common/AppLayout';
 import { Button } from '@/components/common/Button';
 import { DropdownMenu } from '@/components/common/DropdownMenu';
@@ -19,14 +21,14 @@ import { UiMessages } from '@/constants/messages';
 import { isDemoSpot, SpotTypeLabels } from '@/constants/spots';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, PostIcons, StateIcons } from '@/lib/icons';
+import { ActionIcons, ListIcons, PostIcons, StateIcons } from '@/lib/icons';
 import type { SpotDetail } from '@/types/models';
 import styles from './SpotPage.module.css';
 
 const MAP_HEIGHT = '160px'; // 6.4 S-05：小さな地図の高さ
 
 // S-05 スポット詳細（6.4、F-41、BR-21、K37）。
-// 「リストに追加」は I-31、キャンペーンの表示は I-37 で足す
+// キャンペーンの表示は I-37 で足す
 export function SpotPage() {
   const { spotId: raw = '' } = useParams();
   const spotId = Number(raw);
@@ -63,6 +65,7 @@ export function SpotPage() {
 function SpotDetailView({ spot }: { spot: SpotDetail }) {
   const navigate = useNavigate();
   const PostIcon = PostIcons.post;
+  const [listOpen, setListOpen] = useState(false);
 
   return (
     <>
@@ -92,6 +95,15 @@ function SpotDetailView({ spot }: { spot: SpotDetail }) {
 
       <div className={styles.actions}>
         <Button
+          variant="secondary"
+          icon={ListIcons.add}
+          fullWidth
+          disabled={!spot.isActive}
+          onClick={() => setListOpen(true)}
+        >
+          リストに追加
+        </Button>
+        <Button
           icon={PostIcon}
           fullWidth
           disabled={!spot.isActive}
@@ -106,6 +118,11 @@ function SpotDetailView({ spot }: { spot: SpotDetail }) {
 
       {/* 利用者のスポットは OpenStreetMap の場所の情報を使っている（BR-19） */}
       {spot.source === 'user' && <MapAttribution />}
+      <AddToListSheet
+        spot={{ kind: 'spot', spot }}
+        open={listOpen}
+        onClose={() => setListOpen(false)}
+      />
     </>
   );
 }
