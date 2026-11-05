@@ -1,14 +1,83 @@
+/* S-07 スポット選択（6.4）。スマホ・タブレットは画面いっぱい、PC は中央の大きなダイアログ（幅960px。7.8） */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-sheet);
+  display: flex;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-text) 45%, transparent);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  height: 100%;
+  background: var(--color-surface);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  flex: 1;
+  font-size: var(--font-size-lg);
+}
+
+/* 見出しの右の小さな切り替え（一覧・地図） */
+.viewToggle [role='tablist'] {
+  padding: calc(var(--space-1) / 2);
+}
+
+.viewToggle [role='tab'] {
+  min-height: calc(var(--tap-min) - var(--space-2));
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
 .filters {
-  position: sticky;
-  top: calc(var(--space-4) * -1);
-  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin: calc(var(--space-4) * -1) calc(var(--space-4) * -1) var(--space-3);
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
+}
+
+/* 「すべて」「リスト」は上に大きく */
+.tabs [role='tab'] {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+}
+
+.chip {
+  flex: 0 0 auto;
+  min-height: calc(var(--tap-min) - var(--space-1));
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
   background: var(--color-surface);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.chipOn {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-weight: 700;
 }
 
 .search,
@@ -47,6 +116,35 @@
   accent-color: var(--color-primary);
 }
 
+/* 一覧と地図 */
+.content {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.listPane {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  overflow-y: auto;
+}
+
+.mapPane {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.showList .mapPane {
+  display: none;
+}
+
+.showMap .listPane {
+  display: none;
+}
+
 .group {
   margin-bottom: var(--space-4);
 }
@@ -65,8 +163,8 @@
 
 .item {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  align-items: flex-start;
+  gap: var(--space-3);
   width: 100%;
   min-height: var(--tap-min);
   padding: var(--space-3);
@@ -81,8 +179,50 @@
   background: var(--color-bg);
 }
 
+/* 「すべて」タブで、リストに保存したスポットの行（7.2 --color-list-highlight） */
+.highlight {
+  background: var(--color-list-highlight);
+}
+
+/* 写真の小さな丸。写真がなければ縁の色だけの丸（ピンと同じ色。BR-24） */
+.thumb {
+  --pin-color: var(--color-pin-minor);
+
+  flex-shrink: 0;
+  width: var(--space-6);
+  height: var(--space-6);
+  overflow: hidden;
+  border: 3px solid var(--pin-color);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+}
+
+.thumb[data-type='major'] {
+  --pin-color: var(--color-pin-major);
+}
+
+.thumb[data-type='hub'] {
+  --pin-color: var(--color-pin-hub);
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
 .nameRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
 }
@@ -91,14 +231,32 @@
   font-weight: 700;
 }
 
-.label {
+.label,
+.campaign,
+.inactive {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   padding: 0 var(--space-2);
   border-radius: var(--radius-full);
-  background: var(--color-primary-weak);
-  color: var(--color-primary);
   font-size: var(--font-size-xs);
   font-weight: 600;
   white-space: nowrap;
+}
+
+.label {
+  background: var(--color-primary-weak);
+  color: var(--color-primary);
+}
+
+.campaign {
+  border: 1px solid var(--color-campaign);
+  color: var(--color-campaign);
+}
+
+.inactive {
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
 }
 
 .description {
@@ -107,6 +265,15 @@
   font-size: var(--font-size-sm);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.saved {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
 }
 
 .note {
@@ -118,4 +285,73 @@
   padding: var(--space-5) 0;
   color: var(--color-text-sub);
   text-align: center;
+}
+
+.emptyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) 0;
+  color: var(--color-text-sub);
+  text-align: center;
+}
+
+.searchMore {
+  padding-top: var(--space-2);
+}
+
+/* 地図のピンを押したときの小さなシート */
+.pinSheet {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  left: var(--space-3);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.pinHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.pinName {
+  font-weight: 700;
+}
+
+/* PC：大きなダイアログ（幅960px）。左に一覧、右に地図を並べ、切り替えは出さない（7.8） */
+@media (min-width: 1024px) {
+  .backdrop {
+    align-items: center;
+    padding: var(--space-6);
+  }
+
+  .dialog {
+    max-width: 960px;
+    height: min(100%, 860px);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .viewToggle {
+    display: none;
+  }
+
+  .showList .mapPane,
+  .showMap .listPane {
+    display: block;
+  }
+
+  .mapPane {
+    border-left: 1px solid var(--color-border);
+  }
 }

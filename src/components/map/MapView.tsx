@@ -141,11 +141,15 @@ export function MapView({
       // 背景の地図そのものを読み込めないときだけ失敗にする（読み込んだ後のタイルの失敗は無視）
       if (!loaded) setStatus('error');
     });
+    // 親の大きさが変わったとき（一覧と地図の切り替えで隠れていた地図が出たときなど）に描き直す
+    const resizeObserver = new ResizeObserver(() => map.resize());
+    resizeObserver.observe(container);
     map.on('moveend', syncMarkers);
     map.on('sourcedata', (e) => {
       if (e.sourceId === SOURCE_ID && e.isSourceLoaded) syncMarkers();
     });
     return () => {
+      resizeObserver.disconnect();
       for (const { marker } of markers.values()) marker.remove();
       markers.clear();
       setItems([]);

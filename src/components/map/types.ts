@@ -5,6 +5,7 @@ import type { Spot } from '@/types/models';
 export type MapSpot = Pick<Spot, 'id' | 'name' | 'lat' | 'lng' | 'spotType'> & {
   latestImageUrl?: string | null; // 写真のピン。null なら縁の色だけの丸（BR-24）
   hasActiveCampaign?: boolean; // キャンペーン中なら札（Ticket）を付ける（BR-24）
+  highlighted?: boolean; // （v11）リストに保存したスポット：ピンを大きくし Bookmark の札を付ける（6.4 S-07）
 };
 
 export type MapViewProps = {
