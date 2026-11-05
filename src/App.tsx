@@ -26,6 +26,7 @@ import { NaviPage } from '@/pages/S18Navi/NaviPage';
 import { SharedPlanPage } from '@/pages/S24Shared/SharedPlanPage';
 import { ApplyPage } from '@/pages/S19Apply/ApplyPage';
 import { ShopPage } from '@/pages/S20Shop/ShopPage';
+import { RewardPage } from '@/pages/S23Reward/RewardPage';
 import type { UserRole } from '@/types/models';
 
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
       // （v11 第3段階）S-19 は一般だけ、S-20 はお店だけ（6.2）
       { path: '/official/apply', element: authRole('user', <ApplyPage />) },
       { path: '/official', element: authRole('official', <ShopPage />) },
+      { path: '/rewards/:rewardId', element: auth(<RewardPage />) },
       { path: '*', element: auth(<NotFoundPage />) },
     ],
   },

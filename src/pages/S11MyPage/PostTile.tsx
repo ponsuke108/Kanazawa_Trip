@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
-import { UiMessages } from '@/constants/messages';
+import { RewardMessages, UiMessages } from '@/constants/messages';
+import { ShopIcons } from '@/lib/icons';
 import type { SpotPost } from '@/types/models';
 import styles from './PlanTile.module.css';
 
@@ -15,6 +16,7 @@ type Props = {
 export function PostTile({ post, size, action }: Props) {
   const firstLine = post.body.split('\n')[0] ?? '';
   const cover = post.imageUrls[0];
+  const Ticket = ShopIcons.campaign;
   return (
     <article className={`${styles.tile} ${size === 'large' ? styles.large : ''}`}>
       <Link to={`/spots/${post.spot.id}`} className={styles.link}>
@@ -37,6 +39,13 @@ export function PostTile({ post, size, action }: Props) {
         <span className={styles.status}>
           <span className={styles.hiddenLabel}>{UiMessages.postHidden}</span>
         </span>
+      )}
+      {/* （v11）有効な特典があれば「特典を見る」→ S-23（BR-28） */}
+      {post.rewardId && (
+        <Link to={`/rewards/${post.rewardId}`} className={styles.rewardLink}>
+          <Ticket size={14} aria-hidden="true" />
+          {RewardMessages.viewReward}
+        </Link>
       )}
       {action && <span className={styles.action}>{action}</span>}
     </article>

@@ -131,6 +131,7 @@
   color: var(--color-snow-ink);
   font-size: var(--font-size-md);
   text-align: left;
+  text-decoration: none; /* （v11）お店・管理者の入口のリンクにも使う */
   box-shadow: var(--shadow-snow-soft);
 }
 
