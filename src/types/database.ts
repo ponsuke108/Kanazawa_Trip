@@ -3,6 +3,149 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      admin_actions: {
+        Row: {
+          action: string;
+          admin_id: string;
+          created_at: string;
+          id: number;
+          reason: string | null;
+          target_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          action: string;
+          admin_id: string;
+          created_at?: string;
+          id?: number;
+          reason?: string | null;
+          target_id: string;
+        };
+        Update: {
+          action?: string;
+          admin_id?: string;
+          created_at?: string;
+          id?: number;
+          reason?: string | null;
+          target_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'admin_actions_admin_id_fkey';
+            columns: ['admin_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      campaign_rewards: {
+        Row: {
+          campaign_id: string;
+          distance_m: number;
+          id: string;
+          issued_at: string;
+          post_id: string | null;
+          used_at: string | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          campaign_id: string;
+          distance_m: number;
+          id?: string;
+          issued_at?: string;
+          post_id?: string | null;
+          used_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          campaign_id?: string;
+          distance_m?: number;
+          id?: string;
+          issued_at?: string;
+          post_id?: string | null;
+          used_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'campaign_rewards_campaign_id_fkey';
+            columns: ['campaign_id'];
+            isOneToOne: false;
+            referencedRelation: 'campaigns';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'campaign_rewards_post_id_fkey';
+            columns: ['post_id'];
+            isOneToOne: false;
+            referencedRelation: 'spot_posts';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'campaign_rewards_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      campaigns: {
+        Row: {
+          benefit: string;
+          created_at: string;
+          description: string;
+          ends_on: string;
+          id: string;
+          image_path: string | null;
+          notice: string;
+          shop_id: string;
+          starts_on: string;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          benefit: string;
+          created_at?: string;
+          description?: string;
+          ends_on: string;
+          id?: string;
+          image_path?: string | null;
+          notice?: string;
+          shop_id: string;
+          starts_on: string;
+          status?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          benefit?: string;
+          created_at?: string;
+          description?: string;
+          ends_on?: string;
+          id?: string;
+          image_path?: string | null;
+          notice?: string;
+          shop_id?: string;
+          starts_on?: string;
+          status?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'campaigns_shop_id_fkey';
+            columns: ['shop_id'];
+            isOneToOne: false;
+            referencedRelation: 'shops';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       likes: {
         Row: {
           created_at: string;
@@ -276,19 +419,138 @@ export type Database = {
           created_at: string;
           display_name: string;
           id: string;
+          role: string;
         };
         ComputedFields: never;
         Insert: {
           created_at?: string;
           display_name: string;
           id: string;
+          role?: string;
         };
         Update: {
           created_at?: string;
           display_name?: string;
           id?: string;
+          role?: string;
         };
         Relationships: [];
+      };
+      shop_applications: {
+        Row: {
+          campaign_draft: Json | null;
+          contact_email: string;
+          contact_name: string;
+          contact_phone: string;
+          created_at: string;
+          id: string;
+          introduction: string;
+          reject_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          shop_name: string;
+          spot_id: number;
+          status: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          campaign_draft?: Json | null;
+          contact_email: string;
+          contact_name: string;
+          contact_phone: string;
+          created_at?: string;
+          id?: string;
+          introduction?: string;
+          reject_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          shop_name: string;
+          spot_id: number;
+          status?: string;
+          user_id: string;
+        };
+        Update: {
+          campaign_draft?: Json | null;
+          contact_email?: string;
+          contact_name?: string;
+          contact_phone?: string;
+          created_at?: string;
+          id?: string;
+          introduction?: string;
+          reject_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          shop_name?: string;
+          spot_id?: number;
+          status?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'shop_applications_spot_id_fkey';
+            columns: ['spot_id'];
+            isOneToOne: false;
+            referencedRelation: 'spots';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'shop_applications_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      shops: {
+        Row: {
+          created_at: string;
+          id: string;
+          introduction: string;
+          name: string;
+          owner_id: string;
+          spot_id: number;
+          status: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          introduction?: string;
+          name: string;
+          owner_id: string;
+          spot_id: number;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          introduction?: string;
+          name?: string;
+          owner_id?: string;
+          spot_id?: number;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'shops_owner_id_fkey';
+            columns: ['owner_id'];
+            isOneToOne: true;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'shops_spot_id_fkey';
+            columns: ['spot_id'];
+            isOneToOne: true;
+            referencedRelation: 'spots';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       spots: {
         Row: {
@@ -395,6 +657,7 @@ export type Database = {
       spot_posts: {
         Row: {
           body: string;
+          campaign_id: string | null;
           created_at: string;
           id: string;
           is_hidden: boolean;
@@ -405,6 +668,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           body: string;
+          campaign_id?: string | null;
           created_at?: string;
           id?: string;
           is_hidden?: boolean;
@@ -414,6 +678,7 @@ export type Database = {
         };
         Update: {
           body?: string;
+          campaign_id?: string | null;
           created_at?: string;
           id?: string;
           is_hidden?: boolean;
@@ -541,14 +806,29 @@ export type Database = {
       };
     };
     Functions: {
+      active_campaign_id: { Args: { p_spot_id: number }; Returns: string };
+      admin_set_status: {
+        Args: { p_id: string; p_reason: string | null; p_target: string; p_value: string };
+        Returns: undefined;
+      };
+      check_campaign_eligibility: {
+        Args: { p_accuracy: number; p_lat: number; p_lng: number; p_spot_id: number };
+        Returns: { campaign_id: string | null; distance_m: number | null; eligible: boolean }[];
+      };
       distance_m: {
         Args: { p_lat1: number; p_lat2: number; p_lng1: number; p_lng2: number };
         Returns: number;
       };
       get_shared_plan: { Args: { p_token: string }; Returns: Json };
+      is_admin: { Args: never; Returns: boolean };
+      jst_today: { Args: never; Returns: string };
       register_spot: {
         Args: { p_candidate: Json };
         Returns: { reused: boolean; spot_id: number }[];
+      };
+      review_application: {
+        Args: { p_approve: boolean; p_id: string; p_reason: string | null };
+        Returns: undefined;
       };
       save_plan: { Args: { p_plan: Json }; Returns: string };
       save_spot_post: {
@@ -577,6 +857,8 @@ export type Database = {
           user_id: string;
         }[];
       };
+      submit_application: { Args: { p_input: Json }; Returns: string };
+      use_reward: { Args: { p_reward_id: string }; Returns: undefined };
     };
     Enums: {
       [_ in never]: never;
