@@ -2,13 +2,17 @@
 import { areaIndex } from '@/constants/areas';
 import type { Database } from '@/types/database';
 import type {
+  ApplicationInput,
   Block,
+  Campaign,
+  CampaignInput,
   ListSummary,
   PlanDetail,
   PlanStatus,
   PlanSummary,
   SavePlanInput,
   SaveSpotPostInput,
+  ShopApplication,
   Spot,
   SpotPost,
   SpotType,
@@ -184,6 +188,7 @@ export type SpotPostRow = {
   user_id: string;
   body: string;
   is_hidden: boolean;
+  campaign_id: string | null;
   created_at: string;
   updated_at: string;
   spot: { id: number; name: string } | null;
@@ -191,7 +196,11 @@ export type SpotPostRow = {
   images: Array<{ image_path: string; position: number }>;
 };
 
-export function toSpotPost(r: SpotPostRow, imageUrlOf: ImageUrlOf): SpotPost {
+export function toSpotPost(
+  r: SpotPostRow,
+  imageUrlOf: ImageUrlOf,
+  rewardId: string | null = null,
+): SpotPost {
   return {
     id: r.id,
     spot: { id: r.spot?.id ?? 0, name: r.spot?.name ?? '' },
@@ -200,9 +209,9 @@ export function toSpotPost(r: SpotPostRow, imageUrlOf: ImageUrlOf): SpotPost {
     imageUrls: [...r.images]
       .sort((a, b) => a.position - b.position)
       .map((i) => imageUrlOf(i.image_path)),
-    isCampaign: false, // キャンペーン（campaign_id）は I-36 で足す
+    isCampaign: r.campaign_id !== null, // 「キャンペーン参加」のラベル（BR-21、BR-28）
     isHidden: r.is_hidden,
-    rewardId: null, // 特典は I-36 で足す
+    rewardId, // 本人の有効な特典（getMySpotPosts だけ）
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -277,5 +286,130 @@ export function toSharedPlan(j: SharedPlanJson, imageUrlOf: ImageUrlOf): PlanDet
       })),
       imageUrlOf,
     ),
+  };
+}
+
+// ---- （v11 第3段階）キャンペーン・特典・申請・お店（9.2、10.7） ----
+
+export type CampaignRow = {
+  id: string;
+  shop_id: string;
+  title: string;
+  benefit: string;
+  notice: string;
+  description: string;
+  image_path: string | null;
+  starts_on: string;
+  ends_on: string;
+  status: string;
+  shop: { name: string } | null;
+};
+
+export function toCampaign(r: CampaignRow, imageUrlOf: ImageUrlOf): Campaign {
+  return {
+    id: r.id,
+    shopId: r.shop_id,
+    shopName: r.shop?.name ?? '',
+    title: r.title,
+    benefit: r.benefit,
+    notice: r.notice,
+    description: r.description,
+    imageUrl: r.image_path ? imageUrlOf(r.image_path) : null,
+    startsOn: r.starts_on,
+    endsOn: r.ends_on,
+    status: r.status === 'ended' || r.status === 'stopped' ? r.status : 'active',
+  };
+}
+
+// campaigns に書く列（saveCampaign、申請の campaign_draft）
+export function toCampaignColumns(input: CampaignInput) {
+  return {
+    title: input.title.trim(),
+    benefit: input.benefit.trim(),
+    notice: input.notice,
+    description: input.description,
+    image_path: input.imagePath,
+    starts_on: input.startsOn,
+    ends_on: input.endsOn,
+  };
+}
+
+// 日本時間の日付（YYYY-MM-DD）。特典は受け取った日のうち有効（BR-28）
+export function jstDateOf(iso: string): string {
+  return new Date(iso).toLocaleDateString('sv-SE', { timeZone: 'Asia/Tokyo' });
+}
+
+export function rewardExpiresAt(issuedAt: string): string {
+  return `${jstDateOf(issuedAt)}T23:59:59+09:00`;
+}
+
+export function isRewardValid(r: { issued_at: string; used_at: string | null }, now = new Date()) {
+  return r.used_at === null && jstDateOf(r.issued_at) === jstDateOf(now.toISOString());
+}
+
+type CampaignDraftJson = {
+  title?: string;
+  benefit?: string;
+  notice?: string;
+  description?: string;
+  image_path?: string | null;
+  starts_on?: string;
+  ends_on?: string;
+};
+
+export type ApplicationRow = {
+  id: string;
+  shop_name: string;
+  introduction: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string;
+  campaign_draft: unknown;
+  status: string;
+  reject_reason: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+  spot: { id: number; name: string } | null;
+};
+
+export function toApplication(r: ApplicationRow): ShopApplication {
+  const d = r.campaign_draft as CampaignDraftJson | null;
+  return {
+    id: r.id,
+    spot: { id: r.spot?.id ?? 0, name: r.spot?.name ?? '' },
+    shopName: r.shop_name,
+    introduction: r.introduction,
+    contactName: r.contact_name,
+    contactEmail: r.contact_email,
+    contactPhone: r.contact_phone,
+    campaignDraft: d
+      ? {
+          id: null,
+          title: d.title ?? '',
+          benefit: d.benefit ?? '',
+          notice: d.notice ?? '',
+          description: d.description ?? '',
+          imagePath: d.image_path ?? null,
+          startsOn: d.starts_on ?? '',
+          endsOn: d.ends_on ?? '',
+        }
+      : null,
+    status: r.status === 'approved' || r.status === 'rejected' ? r.status : 'pending',
+    rejectReason: r.reject_reason,
+    createdAt: r.created_at,
+    reviewedAt: r.reviewed_at,
+  };
+}
+
+// submit_application に渡す JSON（10.9）
+export function toApplicationJson(input: ApplicationInput) {
+  return {
+    spot_id: input.spotId,
+    shop_name: input.shopName.trim(),
+    introduction: input.introduction.trim(),
+    contact_name: input.contactName.trim(),
+    contact_email: input.contactEmail.trim(),
+    contact_phone: input.contactPhone.trim(),
+    campaign_draft: input.campaignDraft ? toCampaignColumns(input.campaignDraft) : null,
   };
 }

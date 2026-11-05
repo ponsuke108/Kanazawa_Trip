@@ -3,15 +3,24 @@ import { ApiError } from '@/api/errors';
 import { mockApi } from '@/api/mock/mockApi';
 import { call, maybeOne } from '@/api/supabaseCall';
 import { getSupabase } from '@/lib/supabase';
-import type { AuthUser } from '@/types/models';
+import type { AuthUser, UserRole } from '@/types/models';
 
 // 表示名は profiles から読む（登録時にトリガーで作られる、9.2）
 async function toAuthUser(id: string, email: string | undefined): Promise<AuthUser> {
   const profile = await maybeOne(
-    getSupabase().from('profiles').select('display_name').eq('id', id).maybeSingle(),
+    getSupabase().from('profiles').select('display_name, role').eq('id', id).maybeSingle(),
   );
-  // role（利用者の種類）は profiles に role を足す I-36 で読む。それまではすべて一般（BR-25）
-  return { id, email: email ?? '', displayName: profile?.display_name ?? '', role: 'user' };
+  // 利用者の種類（BR-25）。画面の出し分けに使う。守るのはデータベースの RLS と RPC
+  return {
+    id,
+    email: email ?? '',
+    displayName: profile?.display_name ?? '',
+    role: toRole(profile?.role),
+  };
+}
+
+function toRole(value: string | undefined): UserRole {
+  return value === 'official' || value === 'admin' ? value : 'user';
 }
 
 // BR-14：登録するとすぐにログイン状態になる（メール確認はオフ）

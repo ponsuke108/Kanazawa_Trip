@@ -16,6 +16,23 @@ export const queryKeys = {
     mine: ['posts', 'mine'] as const,
   },
   shared: (token: string) => ['shared', token] as const,
+  // （v11 第3段階。11.2）操作のあとは spots、shop、applications、admin 全体を無効にする
+  shop: {
+    all: ['shop'] as const,
+    mine: ['shop', 'mine'] as const,
+  },
+  applications: {
+    all: ['applications'] as const,
+    mine: ['applications', 'mine'] as const,
+  },
+  admin: {
+    all: ['admin'] as const,
+    applications: ['admin', 'applications'] as const,
+    application: (id: string) => ['admin', 'applications', id] as const,
+    shops: ['admin', 'shops'] as const,
+    posts: ['admin', 'posts'] as const,
+  },
+  reward: (rewardId: string) => ['shop', 'reward', rewardId] as const,
   plans: {
     all: ['plans'] as const,
     search: (tagIds: number[]) => ['plans', 'search', tagIds] as const,

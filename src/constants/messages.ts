@@ -126,6 +126,8 @@ export const UiMessages = {
   noMyPosts: 'まだ投稿がありません',
   postHidden: '管理者が非表示にしました',
   campaignJoined: 'キャンペーン参加',
+  campaignActive: 'キャンペーン中', // （v11）K47：ピン・S-05・S-07・スポットブロック
+  campaignHowTo: 'お店の近くからこのスポットに投稿すると受けられます', // （v11）S-05（BR-28）
   photoShownOnMap: '写真は地図のピンやスポット詳細に表示されます', // BR-21
   // （v11）リスト（BR-18、S-14、S-15）
   listNotFound: 'このリストは見つかりません',

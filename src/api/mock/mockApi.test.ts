@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockApi, resetMockState } from '@/api/mock/mockApi';
 
 // 要件定義書 9.7「このデータで確認できること」
@@ -200,5 +200,147 @@ describe('（v11）モックのリスト・投稿・共有', () => {
     mockApi.signInAsTaro();
     await mockApi.stopShareLink('mock-plan-2');
     expect(await mockApi.getSharedPlan(token)).toBeNull();
+  });
+});
+
+// （v11 第3段階）利用者の種類・お店・キャンペーン・特典（9.7、BR-25〜BR-29）
+describe('モックのお店とキャンペーン（9.7）', () => {
+  const shop = { lat: 36.557, lng: 136.648 }; // テスト茶房（スポット 100002）
+
+  beforeEach(() => {
+    // モックのキャンペーンは 2026-11-01〜2026-12-31。日付を期間の中に固定する
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-15T12:00:00+09:00'));
+    resetMockState();
+    mockApi.signInAsTaro();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('テスト茶房はキャンペーン中（地図の札・S-05）', async () => {
+    const spot = await mockApi.getSpot(100002);
+    expect(spot?.hasActiveCampaign).toBe(true);
+    expect(spot?.campaign?.title).toBe('投稿で抹茶ラテ割引');
+    expect(spot?.shopName).toBe('テスト茶房');
+  });
+
+  it('お店から100m以内で投稿すると特典が出て、2回目は出ない（BR-28）', async () => {
+    const near = { ...shop, accuracy: 20 };
+    const check = await mockApi.checkCampaignEligibility({ spotId: 100002, ...near });
+    expect(check.eligible).toBe(true);
+    const { path } = await mockApi.uploadSpotPostImage(
+      new File(['x'], 'a.jpg', { type: 'image/jpeg' }),
+    );
+    const first = await mockApi.saveSpotPost({
+      id: null,
+      spotId: 100002,
+      body: 'おいしかった',
+      imagePaths: [path],
+      position: near,
+    });
+    expect(first.rewardId).not.toBeNull();
+    const mine = await mockApi.getMySpotPosts();
+    expect(mine[0]?.isCampaign).toBe(true);
+    expect(mine[0]?.rewardId).toBe(first.rewardId);
+    const second = await mockApi.saveSpotPost({
+      id: null,
+      spotId: 100002,
+      body: 'また来た',
+      imagePaths: [path],
+      position: near,
+    });
+    expect(second.rewardId).toBeNull();
+    await mockApi.useReward(first.rewardId ?? '');
+    await expect(mockApi.useReward(first.rewardId ?? '')).rejects.toMatchObject({
+      code: 'CAMPAIGN_NOT_ELIGIBLE',
+    });
+  });
+
+  it('遠いとき・誤差が大きいときは対象でない（BR-28）', async () => {
+    const far = await mockApi.checkCampaignEligibility({
+      spotId: 100002,
+      lat: shop.lat + 0.002,
+      lng: shop.lng,
+      accuracy: 20,
+    });
+    expect(far.eligible).toBe(false);
+    expect(far.distanceM).toBeGreaterThan(100);
+    const blurry = await mockApi.checkCampaignEligibility({
+      spotId: 100002,
+      ...shop,
+      accuracy: 150,
+    });
+    expect(blurry.eligible).toBe(false);
+  });
+
+  it('一般の利用者は管理者の操作ができない（BR-25）', async () => {
+    await expect(mockApi.getApplications()).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it('申請 → 管理者の承認でお店とキャンペーンができ、操作が記録される（BR-26、BR-29）', async () => {
+    const { id } = await mockApi.submitApplication({
+      spotId: 1,
+      shopName: '確認の店',
+      introduction: '',
+      contactName: '太郎',
+      contactEmail: 'taro@example.com',
+      contactPhone: '076-000-0000',
+      campaignDraft: {
+        id: null,
+        title: '題名',
+        benefit: '特典',
+        notice: '',
+        description: '',
+        imagePath: null,
+        startsOn: '2026-11-10',
+        endsOn: '2026-11-30',
+      },
+    });
+    await expect(
+      mockApi.submitApplication({
+        spotId: 2,
+        shopName: '2つ目',
+        introduction: '',
+        contactName: 'x',
+        contactEmail: 'x@example.com',
+        contactPhone: '0',
+        campaignDraft: null,
+      }),
+    ).rejects.toMatchObject({ code: 'LIMIT_REACHED' });
+    expect((await mockApi.getMyApplication())?.status).toBe('pending');
+
+    mockApi.signInAs('mock-user-hanako');
+    const list = await mockApi.getApplications();
+    expect(list.map((a) => a.status).slice(0, 2)).toEqual(['pending', 'pending']);
+    await mockApi.reviewApplication({ id, approve: true });
+    expect((await mockApi.getSpot(1))?.hasActiveCampaign).toBe(true);
+    await mockApi.setShopStatus('mock-shop-1', 'suspended', '確認');
+    expect((await mockApi.getSpot(100002))?.hasActiveCampaign).toBe(false);
+    expect(mockApi.adminActionsForTest().map((a) => a.action)).toEqual([
+      'approve_application',
+      'suspend_shop',
+    ]);
+
+    mockApi.signInAsTaro();
+    expect((await mockApi.getCurrentUser())?.role).toBe('official');
+    expect((await mockApi.getMyShop())?.campaign?.title).toBe('題名');
+  });
+
+  it('お店は自分のお店のスポットに投稿できない（BR-28）', async () => {
+    mockApi.signInAs('mock-user-shop');
+    const { path } = await mockApi.uploadSpotPostImage(
+      new File(['x'], 'a.jpg', { type: 'image/jpeg' }),
+    );
+    await expect(
+      mockApi.saveSpotPost({
+        id: null,
+        spotId: 100002,
+        body: 'x',
+        imagePaths: [path],
+        position: null,
+      }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 });

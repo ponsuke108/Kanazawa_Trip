@@ -29,3 +29,8 @@ export function formatTitle(title: string): string {
 export function formatAuthor(displayName: string): string {
   return `${displayName}さんのプラン`;
 }
+
+// （v11）キャンペーンの期間（YYYY-MM-DD の2つ）を「2026/11/01〜2026/12/31」にする（BR-27）
+export function formatPeriod(startsOn: string, endsOn: string): string {
+  return `${startsOn.replaceAll('-', '/')}〜${endsOn.replaceAll('-', '/')}`;
+}

@@ -1,6 +1,7 @@
 import { USE_MOCK } from '@/api/config';
 import { ApiError } from '@/api/errors';
 import { sortSpots, toSpotFromSummary } from '@/api/mappers';
+import { fetchCampaign } from '@/api/campaigns';
 import { mockApi } from '@/api/mock/mockApi';
 import { maybeOne, one, rows, spotImageUrlOf } from '@/api/supabaseCall';
 import { getSupabase } from '@/lib/supabase';
@@ -17,7 +18,7 @@ export async function getSpots(): Promise<Spot[]> {
 }
 
 // （v11）スポット詳細（S-05、S-17）。使用中止のスポットも返す。見つからなければ null。
-// キャンペーン（campaign、shopName）は、お店とキャンペーンの表ができる I-36・I-37 で足す
+// キャンペーン中なら、そのキャンペーンとお店の名前も返す（BR-27）
 export async function getSpot(spotId: number): Promise<SpotDetail | null> {
   if (USE_MOCK) return mockApi.getSpot(spotId);
   if (!Number.isInteger(spotId) || spotId <= 0) return null;
@@ -25,7 +26,22 @@ export async function getSpot(spotId: number): Promise<SpotDetail | null> {
     getSupabase().from('spot_summaries').select('*').eq('id', spotId).maybeSingle(),
   );
   if (!row) return null;
-  return { ...toSpotFromSummary(row, spotImageUrlOf), campaign: null, shopName: null };
+  const [campaign, shop] = await Promise.all([
+    row.active_campaign_id ? fetchCampaign(row.active_campaign_id) : Promise.resolve(null),
+    maybeOne(
+      getSupabase()
+        .from('shops')
+        .select('name')
+        .eq('spot_id', spotId)
+        .eq('status', 'active')
+        .maybeSingle(),
+    ),
+  ]);
+  return {
+    ...toSpotFromSummary(row, spotImageUrlOf),
+    campaign,
+    shopName: shop?.name ?? null,
+  };
 }
 
 // （v11）場所の候補をスポットとして登録する（RPC register_spot、BR-20）。

@@ -273,7 +273,15 @@ export const MOCK_SHOP_USER: MockUser = {
   role: 'official',
 };
 
-export const mockUsers: MockUser[] = [MOCK_TARO, MOCK_HANAKO, MOCK_SHOP_USER];
+// 管理者の画面の確認用の、架空の申請者（9.7）。ログインには使わない
+export const MOCK_APPLICANT: MockUser = {
+  id: 'mock-user-applicant',
+  displayName: 'テスト雑貨店の人',
+  email: 'applicant@example.com',
+  role: 'user',
+};
+
+export const mockUsers: MockUser[] = [MOCK_TARO, MOCK_HANAKO, MOCK_SHOP_USER, MOCK_APPLICANT];
 
 // ブロックの定義。spot の transportMode は「そのスポットへ何で来たか」（BR-04）
 export type MockBlockSeed =
@@ -437,6 +445,7 @@ export const MOCK_SHOP = {
   spotId: 100002,
   ownerId: MOCK_SHOP_USER.id,
   name: 'テスト茶房',
+  introduction: 'にし茶屋街の近くの、モック専用の架空のお店です',
 };
 
 export const mockCampaign = {
@@ -445,13 +454,32 @@ export const mockCampaign = {
   shopName: MOCK_SHOP.name,
   title: '投稿で抹茶ラテ割引',
   benefit: '抹茶ラテ 100円引き',
-  notice: '',
-  description: '',
+  notice: 'お店で写真を撮って投稿すると、抹茶ラテが100円引きになります',
+  description: '特典は1人1回、受け取った日のうちに使えます。投稿の内容は自由です',
   imageUrl: null,
   startsOn: '2026-11-01',
   endsOn: '2026-12-31',
   status: 'active' as const,
 };
+
+// 管理者の画面の確認用の、審査中の申請（9.7）。連絡先は example.com の架空のもの
+export const mockApplications = [
+  {
+    id: 'mock-application-1',
+    userId: MOCK_APPLICANT.id,
+    spotId: 100001,
+    shopName: 'テスト雑貨店',
+    introduction: 'モック専用の架空の雑貨店です',
+    contactName: 'テスト 担当',
+    contactEmail: 'zakka@example.com',
+    contactPhone: '076-000-0000',
+    campaignDraft: null,
+    status: 'pending' as const,
+    rejectReason: null,
+    createdAt: '2026-11-04T10:00:00+09:00',
+    reviewedAt: null,
+  },
+];
 
 // 場所の検索（searchPlaces）のモックの候補。名前に入力の文字を含むものを返す
 export const mockPlaceCandidates = [
