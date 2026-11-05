@@ -32,7 +32,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               className={`${styles.toast} ${styles[t.type]}`}
               role={t.type === 'error' ? 'alert' : 'status'}
             >
-              {t.message}
+              <span>{t.message}</span>
+              {t.action && (
+                <button
+                  type="button"
+                  className={styles.action}
+                  onClick={() => {
+                    t.action?.onClick();
+                    setItems((prev) => prev.filter((x) => x.id !== t.id));
+                  }}
+                >
+                  {t.action.label}
+                </button>
+              )}
             </div>
           ))}
         </div>,

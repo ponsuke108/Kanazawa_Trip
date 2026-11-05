@@ -89,3 +89,8 @@
     border-radius: 0;
   }
 }
+
+/* 「ここに投稿」は横いっぱい */
+.actions > :last-child {
+  grid-column: 1 / -1;
+}

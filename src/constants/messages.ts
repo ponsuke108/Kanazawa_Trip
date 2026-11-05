@@ -47,6 +47,11 @@ export function addedToListMessage(listName: string): string {
   return `リスト「${listName}」に入れました`;
 }
 
+// （v11）S-04 の「スポットをリストに保存」のあと（6.4 S-04）
+export function savedToListMessage(listName: string): string {
+  return `リスト「${listName}」に保存しました`;
+}
+
 // 6.4 のトースト
 export const Toasts = {
   draftSaved: '下書きを保存しました',
@@ -57,6 +62,8 @@ export const Toasts = {
   loggedIn: 'ログインしました',
   signedUp: '登録しました',
   posted: '投稿しました', // （v11）S-17
+  removedFromList: '外しました', // （v11）S-15
+  renamed: '名前を変えました', // （v11）S-15
 } as const;
 
 // 6.4 S-12 の失敗と入力の誤り（BR-05）
@@ -95,6 +102,15 @@ export const UiMessages = {
   postHidden: '管理者が非表示にしました',
   campaignJoined: 'キャンペーン参加',
   photoShownOnMap: '写真は地図のピンやスポット詳細に表示されます', // BR-21
+  // （v11）リスト（BR-18、S-14、S-15）
+  listNotFound: 'このリストは見つかりません',
+  noListSpots: 'スポットがありません',
+  noLists: '行きたい場所をリストに保存すると、ここからプランを作れます',
+  listLimit: 'リストは20個まで作れます。使わないリストを削除してください',
+  listSpotLimit: '1つのリストに入れられるスポットは30か所までです',
+  listNameRule: '1〜30文字で入力してください',
+  needTwoSpots: '1つでも作れますが、公開にはスポットが2つ必要です',
+  inactiveSpot: '使用中止',
   homeLead: 'みんなの旅ノートから、金沢の旅を組み立てよう',
   minorRankingLead: '定番スポット以外を含むプランのランキングです',
 } as const;

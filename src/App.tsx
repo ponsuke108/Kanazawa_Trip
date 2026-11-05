@@ -18,6 +18,8 @@ import { NotFoundPage } from '@/pages/NotFound/NotFoundPage';
 import { SpotPage } from '@/pages/S05Spot/SpotPage';
 import { MapPage } from '@/pages/S13Map/MapPage';
 import { CreatePage } from '@/pages/S14Create/CreatePage';
+import { ListsPage } from '@/pages/S14Create/ListsPage';
+import { ListPage } from '@/pages/S15List/ListPage';
 import { SpotPostPage } from '@/pages/S17SpotPost/SpotPostPage';
 
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
@@ -46,6 +48,8 @@ const router = createBrowserRouter([
       // （v11）
       { path: '/map', element: auth(<MapPage />) },
       { path: '/create', element: auth(<CreatePage />) },
+      { path: '/lists', element: auth(<ListsPage />) },
+      { path: '/lists/:listId', element: auth(<ListPage />) },
       { path: '/spots/:spotId', element: auth(<SpotPage />) },
       { path: '/posts/new', element: auth(<SpotPostPage />) },
       { path: '/posts/:postId/edit', element: auth(<SpotPostPage />) },

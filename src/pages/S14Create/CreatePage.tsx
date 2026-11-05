@@ -3,10 +3,10 @@ import { AppLayout } from '@/components/common/AppLayout';
 import { Button } from '@/components/common/Button';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ActionIcons } from '@/lib/icons';
+import { ListsSection } from '@/pages/S14Create/ListsSection';
 import styles from './CreatePage.module.css';
 
 // S-14 作る（6.4、BR-18、K31）。下部タブ「作る」の画面。
-// 「リストから作る」（リストのカード、新しいリスト）は I-31 で足す
 export function CreatePage() {
   const navigate = useNavigate();
   return (
@@ -26,6 +26,8 @@ export function CreatePage() {
             地図にあるすべてのスポットから選んで作ります。リストに保存した場所は上に出ます
           </p>
         </section>
+
+        <ListsSection />
 
         <ul className={styles.others}>
           <li>

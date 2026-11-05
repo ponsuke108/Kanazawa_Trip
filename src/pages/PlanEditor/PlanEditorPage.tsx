@@ -35,8 +35,14 @@ export function PlanEditorPage() {
   const navigate = useNavigate();
   const step = parseStep(params.get('step'));
   const fromId = planId === null ? params.get('from') : null;
+  // （v11）リストから作る：/plans/new?step=blocks&list=:listId&spots=1,2,3（6.2、BR-18）
+  const listId = planId === null && fromId === null ? params.get('list') : null;
+  const spotIds = (params.get('spots') ?? '')
+    .split(',')
+    .map(Number)
+    .filter((n) => Number.isInteger(n) && n > 0);
 
-  const session = useEditorSession({ planId, fromId });
+  const session = useEditorSession({ planId, fromId, listId, spotIds });
   const { state, dispatch, phase, save } = session;
   const published = state.originalStatus === 'published';
   // 公開中のプランの編集では「下書き保存」を出さない（BR-09、11.4）

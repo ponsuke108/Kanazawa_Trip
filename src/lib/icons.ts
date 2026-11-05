@@ -3,6 +3,8 @@ import {
   ArrowLeft,
   ArrowRight,
   Bike,
+  Bookmark,
+  BookmarkPlus,
   Bus,
   Camera,
   Car,
@@ -29,6 +31,7 @@ import {
   Inbox,
   Landmark,
   Leaf,
+  ListPlus,
   LoaderCircle,
   LocateFixed,
   LogIn,
@@ -182,4 +185,11 @@ export const ShopIcons = {
 // （v11）スポットの投稿（要件定義書 7.3）。ここに投稿・投稿なし
 export const PostIcons = {
   post: Camera,
+} satisfies Record<string, LucideIcon>;
+
+// （v11）リスト（要件定義書 7.3）：リスト / リストに追加 / 新しいリスト・リストに保存
+export const ListIcons = {
+  list: Bookmark,
+  add: BookmarkPlus,
+  newList: ListPlus,
 } satisfies Record<string, LucideIcon>;

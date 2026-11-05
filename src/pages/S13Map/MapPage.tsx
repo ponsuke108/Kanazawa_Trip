@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys, STALE_TIME } from '@/api/queryKeys';
 import { getSpots } from '@/api/spots';
+import { AddToListSheet } from '@/components/common/AddToListSheet';
 import { AppLayout } from '@/components/common/AppLayout';
 import { Button } from '@/components/common/Button';
 import { IconButton } from '@/components/common/IconButton';
@@ -15,7 +16,7 @@ import { SpotSheet } from '@/components/map/SpotSheet';
 import { MapMessages } from '@/constants/messages';
 import { useResolveSpot } from '@/hooks/useResolveSpot';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, PostIcons } from '@/lib/icons';
+import { ActionIcons, ListIcons, PostIcons } from '@/lib/icons';
 import type { PlaceCandidate } from '@/types/models';
 import styles from './MapPage.module.css';
 
@@ -132,6 +133,7 @@ function CandidateSheet({
   const navigate = useNavigate();
   const toast = useToast();
   const resolve = useResolveSpot();
+  const [listOpen, setListOpen] = useState(false);
   return (
     <section className={styles.candidate} aria-label={`${candidate.name}の情報`}>
       <header className={styles.candidateHead}>
@@ -158,7 +160,15 @@ function CandidateSheet({
       >
         ここに投稿
       </Button>
+      <Button variant="secondary" icon={ListIcons.add} onClick={() => setListOpen(true)}>
+        リストに追加
+      </Button>
       <MapAttribution />
+      <AddToListSheet
+        spot={{ kind: 'candidate', candidate }}
+        open={listOpen}
+        onClose={() => setListOpen(false)}
+      />
     </section>
   );
 }

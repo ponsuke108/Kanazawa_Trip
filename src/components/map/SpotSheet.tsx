@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/api/queryKeys';
 import { getSpotPosts } from '@/api/spotPosts';
+import { AddToListSheet } from '@/components/common/AddToListSheet';
 import { Button } from '@/components/common/Button';
 import { IconButton } from '@/components/common/IconButton';
 import { isDemoSpot, SpotTypeLabels } from '@/constants/spots';
-import { ActionIcons, PostIcons } from '@/lib/icons';
+import { ActionIcons, ListIcons, PostIcons } from '@/lib/icons';
 import type { Spot } from '@/types/models';
 import styles from './SpotSheet.module.css';
 
@@ -17,9 +19,10 @@ type Props = {
 const MAX_PHOTOS = 5; // 6.4 S-13：投稿の写真は最大5枚を横に並べる
 
 // S-13 のピンのシート（6.4、7.6）：スポット名、種類のラベル、紹介文か住所、投稿の写真、
-// 「詳細」→ S-05、「ここに投稿」→ S-17。「リストに追加」は I-31 で足す
+// 「詳細」→ S-05、「リストに追加」→ リストを選ぶシート、「ここに投稿」→ S-17
 export function SpotSheet({ spot, onClose }: Props) {
   const navigate = useNavigate();
+  const [listOpen, setListOpen] = useState(false);
   const posts = useQuery({
     queryKey: [...queryKeys.spot.posts(spot.id), 'sheet'],
     queryFn: () => getSpotPosts({ spotId: spot.id, page: 0 }),
@@ -60,6 +63,14 @@ export function SpotSheet({ spot, onClose }: Props) {
           詳細
         </Button>
         <Button
+          variant="secondary"
+          icon={ListIcons.add}
+          disabled={!spot.isActive}
+          onClick={() => setListOpen(true)}
+        >
+          リストに追加
+        </Button>
+        <Button
           icon={PostIcons.post}
           disabled={!spot.isActive}
           onClick={() => navigate(`/posts/new?spot=${spot.id}`)}
@@ -67,6 +78,11 @@ export function SpotSheet({ spot, onClose }: Props) {
           ここに投稿
         </Button>
       </div>
+      <AddToListSheet
+        spot={{ kind: 'spot', spot }}
+        open={listOpen}
+        onClose={() => setListOpen(false)}
+      />
     </section>
   );
 }

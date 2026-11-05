@@ -3,6 +3,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useBlocker, useNavigate } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, isApiError } from '@/api/errors';
+import { getList } from '@/api/lists';
 import { getPlan, savePlan } from '@/api/plans';
 import { queryKeys } from '@/api/queryKeys';
 import { useToast } from '@/components/common/useToast';
@@ -10,6 +11,7 @@ import { Toasts } from '@/constants/messages';
 import { useCurrentUser } from '@/hooks/useAuth';
 import {
   emptyEditorState,
+  listToEditorState,
   planToEditorState,
   toSavePlanInput,
   validatePlan,
@@ -22,9 +24,15 @@ import type { PlanStatus, ValidationIssue } from '@/types/models';
 
 export type EditorPhase = 'loading' | 'restore' | 'ready' | 'notEditable' | 'error';
 
-type Args = { planId: string | null; fromId: string | null };
+// listId と spotIds：S-15 の「このリストでプランを作る」（/plans/new?list=:listId&spots=1,2,3。BR-18）
+type Args = {
+  planId: string | null;
+  fromId: string | null;
+  listId?: string | null;
+  spotIds?: number[];
+};
 
-export function useEditorSession({ planId, fromId }: Args) {
+export function useEditorSession({ planId, fromId, listId = null, spotIds = [] }: Args) {
   const user = useCurrentUser();
   const navigate = useNavigate();
   const toast = useToast();
@@ -51,11 +59,24 @@ export function useEditorSession({ planId, fromId }: Args) {
     staleTime: 0,
   });
 
+  // （v11）リストから作るときは、そのリストを読み込む
+  const fromList = planId === null && fromId === null && listId !== null;
+  const list = useQuery({
+    queryKey: queryKeys.lists.detail(listId ?? ''),
+    queryFn: () => getList(listId ?? ''),
+    enabled: fromList,
+    staleTime: 0,
+  });
+
   // 最初の状態を決める（描画中に1回だけ）。一時保存が残っていれば復元するか聞く（BR-15）
-  if (settled === 'pending' && (sourceId === null || source.isSuccess)) {
+  const sourceReady = fromList ? list.isSuccess : sourceId === null || source.isSuccess;
+  if (settled === 'pending' && sourceReady) {
     const plan = sourceId === null ? null : source.data;
     let base: EditorState | null;
-    if (sourceId === null) {
+    if (fromList) {
+      // 見つからない・他人のリストなら、空の新規作成にする
+      base = list.data ? listToEditorState(list.data, spotIds) : emptyEditorState();
+    } else if (sourceId === null) {
       base = emptyEditorState();
     } else if (!plan || (planId !== null && plan.author.id !== user.id)) {
       // 存在しないプラン、他人のプランの編集URLは開けない（6.4 S-06）
@@ -78,7 +99,7 @@ export function useEditorSession({ planId, fromId }: Args) {
   }
 
   const phase: EditorPhase =
-    settled === 'pending' ? (source.isError ? 'error' : 'loading') : settled;
+    settled === 'pending' ? (source.isError || list.isError ? 'error' : 'loading') : settled;
 
   const answerRestore = useCallback(
     (restore: boolean) => {
