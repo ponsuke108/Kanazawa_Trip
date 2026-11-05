@@ -27,6 +27,16 @@ export const Messages = {
     '直線距離です。実際の道のりや時間は、各区間の「経路を見る」で確かめてください', // 6.4 S-06 の i ボタン
 } as const;
 
+// （v11）S-18 全体のナビ（6.4、BR-23）
+export const NaviMessages = {
+  appNotice:
+    'スマホではGoogleマップのアプリで開いてください（ブラウザでは経由地が3か所までしか出ません）',
+  busNotice: 'バスは区間ごとに開いてください',
+  needTwoSpots: 'スポットが2つ以上のプランで使えます',
+  openWhole: '全体をGoogleマップで開く',
+  openRange: (from: number, to: number) => `${from}〜${to}番目を開く`,
+} as const;
+
 // （v11）S-16 場所を探す（6.4）
 export const PlaceSearchMessages = {
   placeholder: 'スポット名を入力',

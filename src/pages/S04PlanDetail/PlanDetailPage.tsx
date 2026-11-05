@@ -19,7 +19,7 @@ import { listErrorMessage } from '@/hooks/useListMutations';
 import { formatTitle } from '@/lib/format';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, ListIcons, RouteIcons, StateIcons } from '@/lib/icons';
+import { ActionIcons, BlockIcons, ListIcons, RouteIcons, StateIcons } from '@/lib/icons';
 import { LazyRouteMap } from '@/components/map/LazyMapView';
 import { formatKm, routeDistanceKm, toRouteStops } from '@/lib/route';
 import { LikeButton } from '@/pages/S04PlanDetail/LikeButton';
@@ -116,6 +116,13 @@ export function PlanDetailPage() {
             <PlanHeading plan={data} />
             <div className={styles.actions}>
               <LikeButton plan={data} own={own} />
+              {/* （v11）全体のナビ（BR-23）。下書きでも本人なら使える */}
+              <Button
+                icon={BlockIcons.directions}
+                onClick={() => navigate(`/plans/${data.id}/navi`)}
+              >
+                全体のナビ
+              </Button>
               <Button
                 variant="secondary"
                 icon={ActionIcons.copy}
