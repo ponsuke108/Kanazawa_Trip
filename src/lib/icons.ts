@@ -19,6 +19,8 @@ import {
   Coffee,
   Compass,
   Copy,
+  Link2,
+  Share2,
   EllipsisVertical,
   EyeOff,
   FilePen,
@@ -200,4 +202,10 @@ export const ListIcons = {
 export const RouteIcons = {
   info: Info,
   route: Route,
+} satisfies Record<string, LucideIcon>;
+
+// （v11）プランの共有（要件定義書 6.4 S-04、BR-30）：共有 / リンクをコピー
+export const ShareIcons = {
+  share: Share2,
+  link: Link2,
 } satisfies Record<string, LucideIcon>;

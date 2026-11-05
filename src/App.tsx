@@ -22,6 +22,7 @@ import { ListsPage } from '@/pages/S14Create/ListsPage';
 import { ListPage } from '@/pages/S15List/ListPage';
 import { SpotPostPage } from '@/pages/S17SpotPost/SpotPostPage';
 import { NaviPage } from '@/pages/S18Navi/NaviPage';
+import { SharedPlanPage } from '@/pages/S24Shared/SharedPlanPage';
 
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
 
@@ -38,6 +39,8 @@ const router = createBrowserRouter([
           </RedirectIfAuthed>
         ),
       },
+      // （v11）S-24 共有されたプラン：ログインしていなくても見られる（BR-30、8.3）
+      { path: '/shared/:token', element: <SharedPlanPage /> },
       { path: '/', element: auth(<HomePage />) },
       { path: '/search', element: auth(<SearchPage />) },
       { path: '/search/results', element: auth(<SearchResultsPage />) },
