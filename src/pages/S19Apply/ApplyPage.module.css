@@ -70,3 +70,12 @@
   border-radius: var(--radius-md);
   background: var(--color-surface);
 }
+
+/* PC：入力の画面は中央に幅640pxの列（7.8） */
+@media (min-width: 1024px) {
+  .main {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+}
