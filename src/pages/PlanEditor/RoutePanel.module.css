@@ -1,0 +1,137 @@
+/* S-06 の地図の部分（6.4、K54）。開いているときは画面の上に固定し、ブロック一覧だけがスクロールする */
+.route {
+  position: sticky;
+  top: var(--header-height);
+  z-index: var(--z-header);
+  margin: calc(var(--space-4) * -1) calc(var(--space-4) * -1) 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.panel {
+  position: relative;
+  height: 33dvh;
+}
+
+.route[data-open='false'] .panel {
+  display: none;
+}
+
+.route[data-open='true'] .strip {
+  display: none;
+}
+
+/* 左上の札：直線 約N.Nkm（並べ替えた直後だけ差） */
+.distance {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.shorter {
+  color: var(--color-success);
+}
+
+.longer {
+  color: var(--color-danger);
+}
+
+/* 右下：i と「地図を閉じる」（出典の上に置く） */
+.tools {
+  position: absolute;
+  right: var(--space-2);
+  bottom: calc(var(--space-6) + var(--space-1));
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+}
+
+.close {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.info {
+  position: absolute;
+  right: var(--space-2);
+  bottom: calc(var(--space-6) + var(--tap-min) + var(--space-2));
+  left: var(--space-2);
+  z-index: 3;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--font-size-sm);
+}
+
+/* 閉じたとき：細い帯（「直線 約N.Nkm」と「地図を開く」） */
+.strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0 var(--space-2) 0 var(--space-4);
+}
+
+.stripLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.openButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+/* PC：右の列に、上に固定して出す。地図を閉じる操作は出さない（7.8） */
+@media (min-width: 1024px) {
+  .route {
+    top: calc(var(--header-height) + var(--space-4));
+    margin: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .panel,
+  .route[data-open='false'] .panel {
+    display: block;
+    height: calc(100dvh - var(--header-height) - var(--space-6) * 3);
+  }
+
+  .strip,
+  .route[data-open='true'] .strip {
+    display: none;
+  }
+
+  .close {
+    display: none;
+  }
+}

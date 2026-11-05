@@ -43,7 +43,7 @@ export default defineConfig([
                 'maplibre-gl は src/components/map/ の中だけで使ってください（要件定義書 8.1）。',
             },
             {
-              group: ['@/components/map/MapView'],
+              group: ['@/components/map/MapView', '@/components/map/RouteMap'],
               message:
                 '地図は @/components/map/LazyMapView を使ってください（BR-24：地図を使う画面だけで読み込む）。',
             },

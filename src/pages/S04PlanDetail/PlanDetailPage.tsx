@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createListFromSpots } from '@/api/lists';
@@ -19,7 +19,9 @@ import { listErrorMessage } from '@/hooks/useListMutations';
 import { formatTitle } from '@/lib/format';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, ListIcons, StateIcons } from '@/lib/icons';
+import { ActionIcons, ListIcons, RouteIcons, StateIcons } from '@/lib/icons';
+import { LazyRouteMap } from '@/components/map/LazyMapView';
+import { formatKm, routeDistanceKm, toRouteStops } from '@/lib/route';
 import { LikeButton } from '@/pages/S04PlanDetail/LikeButton';
 import { PlanHeading } from '@/components/common/PlanHeading';
 import styles from './PlanDetailPage.module.css';
@@ -71,6 +73,9 @@ export function PlanDetailPage() {
   });
 
   const data = plan.data;
+  // （v11）経路順の地図（BR-22）。スマホ・タブレットは初めは閉じ、「経路順を地図で見る」で開く
+  const [routeOpen, setRouteOpen] = useState(false);
+  const stops = useMemo(() => toRouteStops(data?.blocks ?? []), [data?.blocks]);
   const own = data ? data.author.id === user.id : false;
 
   const menu: MenuItem[] = [];
@@ -135,6 +140,33 @@ export function PlanDetailPage() {
                 </Link>
                 をもとに作成
               </p>
+            )}
+            {stops.length > 0 && (
+              <section
+                className={`${styles.route} ${routeOpen ? styles.routeOpen : ''}`}
+                aria-label="経路順の地図"
+              >
+                <div className={styles.routeHead}>
+                  <Button
+                    variant="ghost"
+                    icon={RouteIcons.route}
+                    onClick={() => setRouteOpen((v) => !v)}
+                    aria-expanded={routeOpen}
+                    className={styles.routeToggle}
+                  >
+                    {routeOpen ? '地図を閉じる' : '経路順を地図で見る'}
+                  </Button>
+                  {stops.length > 1 && (
+                    <span className={styles.routeDistance}>
+                      直線 約{formatKm(routeDistanceKm(stops))}
+                    </span>
+                  )}
+                </div>
+                <div className={styles.routeMap}>
+                  {/* 閉じているときは隠しておく（PC は常に出す） */}
+                  <LazyRouteMap stops={stops} />
+                </div>
+              </section>
             )}
             <BlockList blocks={data.blocks} mode="view" />
           </>

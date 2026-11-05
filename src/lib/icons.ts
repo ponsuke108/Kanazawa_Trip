@@ -27,6 +27,7 @@ import {
   GripVertical,
   Heart,
   Image,
+  Info,
   ImagePlus,
   Inbox,
   Landmark,
@@ -44,6 +45,7 @@ import {
   Pencil,
   Plus,
   RotateCw,
+  Route,
   Save,
   Search,
   SearchX,
@@ -192,4 +194,10 @@ export const ListIcons = {
   list: Bookmark,
   add: BookmarkPlus,
   newList: ListPlus,
+} satisfies Record<string, LucideIcon>;
+
+// （v11）経路順の地図（要件定義書 7.3）：直線距離の説明 / 経路順を地図で見る
+export const RouteIcons = {
+  info: Info,
+  route: Route,
 } satisfies Record<string, LucideIcon>;
