@@ -37,6 +37,17 @@ export const NaviMessages = {
   openRange: (from: number, to: number) => `${from}〜${to}番目を開く`,
 } as const;
 
+// （v11）プランの共有（6.4 S-04・S-24、BR-30）
+export const ShareMessages = {
+  sheetTitle: 'プランを共有',
+  lead: '共有リンクを知っている人は、ログインしなくてもこのプランを見られます（見るだけ）。下書きのプランも共有できます',
+  stopLead:
+    '「共有を止める」と、これまでのリンクは見られなくなります。もう一度作ると別のリンクになります',
+  shareTitle: (title: string) => `旅ノート金沢のプラン「${title}」`,
+  notShared: 'このプランは共有されていません',
+  guestLead: '旅ノート金沢に登録すると、このプランをコピーして自分のプランを作れます',
+} as const;
+
 // （v11）S-16 場所を探す（6.4）
 export const PlaceSearchMessages = {
   placeholder: 'スポット名を入力',
@@ -76,6 +87,8 @@ export const Toasts = {
   posted: '投稿しました', // （v11）S-17
   removedFromList: '外しました', // （v11）S-15
   renamed: '名前を変えました', // （v11）S-15
+  linkCopied: 'リンクをコピーしました', // （v11）S-04 の共有
+  shareStopped: '共有を止めました', // （v11）S-04 の共有
 } as const;
 
 // 6.4 S-12 の失敗と入力の誤り（BR-05）

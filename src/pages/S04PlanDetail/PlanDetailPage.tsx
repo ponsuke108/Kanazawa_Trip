@@ -19,10 +19,18 @@ import { listErrorMessage } from '@/hooks/useListMutations';
 import { formatTitle } from '@/lib/format';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, BlockIcons, ListIcons, RouteIcons, StateIcons } from '@/lib/icons';
+import {
+  ActionIcons,
+  BlockIcons,
+  ListIcons,
+  RouteIcons,
+  ShareIcons,
+  StateIcons,
+} from '@/lib/icons';
 import { LazyRouteMap } from '@/components/map/LazyMapView';
 import { formatKm, routeDistanceKm, toRouteStops } from '@/lib/route';
 import { LikeButton } from '@/pages/S04PlanDetail/LikeButton';
+import { ShareSheet } from '@/pages/S04PlanDetail/ShareSheet';
 import { PlanHeading } from '@/components/common/PlanHeading';
 import styles from './PlanDetailPage.module.css';
 
@@ -34,6 +42,7 @@ export function PlanDetailPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [confirmUnpublish, setConfirmUnpublish] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const plan = useQuery({
     queryKey: queryKeys.plans.detail(planId),
@@ -139,6 +148,16 @@ export function PlanDetailPage() {
               >
                 スポットをリストに保存
               </Button>
+              {/* （v11）共有（BR-30）。作成者だけ */}
+              {own && (
+                <Button
+                  variant="secondary"
+                  icon={ShareIcons.share}
+                  onClick={() => setShareOpen(true)}
+                >
+                  共有
+                </Button>
+              )}
             </div>
             {data.sourcePlan && (
               <p className={styles.source}>
@@ -179,6 +198,14 @@ export function PlanDetailPage() {
           </>
         )}
       </main>
+      {data && own && (
+        <ShareSheet
+          open={shareOpen}
+          planId={data.id}
+          title={data.title}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
       <ConfirmDialog
         open={confirmUnpublish}
         title="非公開に戻す"
