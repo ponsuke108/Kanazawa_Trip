@@ -103,6 +103,25 @@ export const RewardMessages = {
   viewReward: '特典を見る',
 } as const;
 
+// （v11 第3段階）管理者の画面・申請の審査（6.6 S-21・S-22、BR-26、BR-29）
+export const AdminMessages = {
+  reasonOptional: '理由（任意。200文字まで）',
+  reasonRequired: '却下の理由（必須。200文字まで）。申請した人のマイページに表示されます',
+  approved: '承認しました',
+  rejected: '却下しました',
+  done: '変更しました',
+  noApplications: '申請はありません',
+  noShops: 'お店はありません',
+  noPosts: '投稿はありません',
+  deactivateConfirm:
+    'このスポットを使用中止にします。地図や検索に出なくなり、投稿もできなくなります。元に戻せません。',
+  deactivated: 'スポットを使用中止にしました',
+  applicationNotFound: 'この申請は見つかりません',
+  reviewed: (status: 'approved' | 'rejected') =>
+    status === 'approved' ? 'この申請は承認済みです' : 'この申請は却下済みです',
+  status: { active: '営業中', suspended: '停止中' },
+} as const;
+
 // （v11）S-16 場所を探す（6.4）
 export const PlaceSearchMessages = {
   placeholder: 'スポット名を入力',

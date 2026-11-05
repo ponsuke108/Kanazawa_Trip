@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { setSpotActive } from '@/api/admin';
 import { getPlansBySpot } from '@/api/plans';
 import { queryKeys } from '@/api/queryKeys';
 import { getSpotPosts } from '@/api/spotPosts';
@@ -18,7 +19,9 @@ import { PlanCardSkeletonList } from '@/components/common/PlanCardSkeleton';
 import { SpotPostCard } from '@/components/common/SpotPostCard';
 import { LazyMapView } from '@/components/map/LazyMapView';
 import { MapAttribution } from '@/components/map/MapAttribution';
-import { UiMessages } from '@/constants/messages';
+import { AdminMessages, UiMessages } from '@/constants/messages';
+import { useToast } from '@/components/common/useToast';
+import { ReasonDialog } from '@/pages/S21Admin/ReasonDialog';
 import { isDemoSpot, SpotTypeLabels } from '@/constants/spots';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
@@ -28,12 +31,29 @@ import styles from './SpotPage.module.css';
 
 const MAP_HEIGHT = '160px'; // 6.4 S-05：小さな地図の高さ
 
-// S-05 スポット詳細（6.4、F-41、BR-21、K37）。
-// キャンペーンの表示は I-37 で足す
+// S-05 スポット詳細（6.4、F-41、BR-21、K37）。キャンペーン中なら、そのキャンペーン（K47）。
+// （v11 第3段階）管理者には、右上のメニューに「スポットを使用中止にする」（6.6 S-21、BR-29）
 export function SpotPage() {
   const { spotId: raw = '' } = useParams();
   const spotId = Number(raw);
   const navigate = useNavigate();
+  const user = useCurrentUser();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const deactivate = useMutation({
+    mutationFn: (reason: string) => setSpotActive(spotId, false, reason),
+    onSuccess: async () => {
+      setDeactivateOpen(false);
+      toast.show({ type: 'success', message: AdminMessages.deactivated });
+      await Promise.all(
+        [queryKeys.spots, queryKeys.admin.all].map((queryKey) =>
+          queryClient.invalidateQueries({ queryKey }),
+        ),
+      );
+    },
+    onError: (err) => toast.show({ type: 'error', message: errorMessage(err) }),
+  });
 
   const spot = useQuery({
     queryKey: queryKeys.spot.detail(spotId),
@@ -43,7 +63,24 @@ export function SpotPage() {
 
   return (
     <AppLayout showTabBar>
-      <PageHeader title={data?.name ?? 'スポット'} />
+      <PageHeader
+        title={data?.name ?? 'スポット'}
+        right={
+          user.role === 'admin' && data?.isActive ? (
+            <DropdownMenu
+              label="管理者の操作"
+              items={[
+                {
+                  label: 'スポットを使用中止にする',
+                  icon: StateIcons.alert,
+                  danger: true,
+                  onSelect: () => setDeactivateOpen(true),
+                },
+              ]}
+            />
+          ) : undefined
+        }
+      />
       <main className={styles.main}>
         {spot.isPending ? (
           <PlanCardSkeletonList count={2} />
@@ -59,6 +96,16 @@ export function SpotPage() {
           <SpotDetailView spot={data} />
         )}
       </main>
+      <ReasonDialog
+        open={deactivateOpen}
+        title="スポットを使用中止にする"
+        message={AdminMessages.deactivateConfirm}
+        confirmLabel="使用中止にする"
+        danger
+        loading={deactivate.isPending}
+        onConfirm={(reason) => deactivate.mutate(reason)}
+        onCancel={() => setDeactivateOpen(false)}
+      />
     </AppLayout>
   );
 }

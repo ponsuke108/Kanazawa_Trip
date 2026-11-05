@@ -27,6 +27,8 @@ import { SharedPlanPage } from '@/pages/S24Shared/SharedPlanPage';
 import { ApplyPage } from '@/pages/S19Apply/ApplyPage';
 import { ShopPage } from '@/pages/S20Shop/ShopPage';
 import { RewardPage } from '@/pages/S23Reward/RewardPage';
+import { AdminPage } from '@/pages/S21Admin/AdminPage';
+import { ReviewPage } from '@/pages/S22Review/ReviewPage';
 import type { UserRole } from '@/types/models';
 
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
@@ -73,6 +75,9 @@ const router = createBrowserRouter([
       { path: '/official/apply', element: authRole('user', <ApplyPage />) },
       { path: '/official', element: authRole('official', <ShopPage />) },
       { path: '/rewards/:rewardId', element: auth(<RewardPage />) },
+      // （v11 第3段階）S-21・S-22 は管理者だけ（6.2）
+      { path: '/admin', element: authRole('admin', <AdminPage />) },
+      { path: '/admin/applications/:applicationId', element: authRole('admin', <ReviewPage />) },
       { path: '*', element: auth(<NotFoundPage />) },
     ],
   },

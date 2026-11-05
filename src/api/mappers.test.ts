@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  sortApplications,
   sortSpots,
   toBlocks,
   toListSummary,
@@ -10,6 +11,7 @@ import {
   type SpotRow,
   type SpotSummaryRow,
 } from '@/api/mappers';
+import type { ShopApplication } from '@/types/models';
 import { toApiError } from '@/api/errors';
 
 const url = (p: string) => `https://example.supabase.co/storage/v1/object/public/plan-images/${p}`;
@@ -273,5 +275,19 @@ describe('toApiError（10.2）', () => {
     expect(toApiError({ code: 'P0001', message: 'TITLE_REQUIRED' }).issues).toEqual([
       { code: 'TITLE_REQUIRED', message: 'タイトルを入力してください', step: 'info' },
     ]);
+  });
+});
+
+describe('sortApplications（6.6 S-21）', () => {
+  const app = (id: string, status: 'pending' | 'approved' | 'rejected', createdAt: string) =>
+    ({ id, status, createdAt }) as unknown as ShopApplication;
+  it('審査中を古い順、その下に審査済みを新しい順', () => {
+    const sorted = sortApplications([
+      app('p2', 'pending', '2026-11-03'),
+      app('r1', 'rejected', '2026-11-01'),
+      app('p1', 'pending', '2026-11-02'),
+      app('a2', 'approved', '2026-11-04'),
+    ]);
+    expect(sorted.map((a) => a.id)).toEqual(['p1', 'p2', 'a2', 'r1']);
   });
 });
