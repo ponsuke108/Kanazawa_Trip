@@ -4,6 +4,8 @@ import {
   campaignIssues,
   campaignPhase,
   emptyCampaignInput,
+  isRewardExpired,
+  toEligibilityView,
   todayJst,
 } from '@/lib/campaign';
 
@@ -54,5 +56,43 @@ describe('campaignPhase（6.6 S-20）', () => {
 describe('todayJst', () => {
   it('日本時間の日付になる（UTC の前日の15時は翌日）', () => {
     expect(todayJst(new Date('2026-11-04T15:30:00Z'))).toBe('2026-11-05');
+  });
+});
+
+describe('toEligibilityView（BR-28）', () => {
+  const campaign = { id: 'c' };
+  it('対象', () => {
+    expect(toEligibilityView({ eligible: true, distanceM: 30, campaign }, 20)).toEqual({
+      kind: 'eligible',
+    });
+  });
+  it('100mより遠いと「離れている」と距離', () => {
+    expect(toEligibilityView({ eligible: false, distanceM: 230, campaign }, 20)).toEqual({
+      kind: 'far',
+      distanceM: 230,
+    });
+  });
+  it('誤差が100mより大きい', () => {
+    expect(toEligibilityView({ eligible: false, distanceM: 40, campaign }, 150.4).kind).toBe(
+      'inaccurate',
+    );
+  });
+  it('近くて誤差も小さいのに対象でないのは、受け取り済み', () => {
+    expect(toEligibilityView({ eligible: false, distanceM: 10, campaign }, 10).kind).toBe(
+      'already',
+    );
+  });
+  it('キャンペーンが終わっていた', () => {
+    expect(toEligibilityView({ eligible: false, distanceM: 10, campaign: null }, 10).kind).toBe(
+      'noCampaign',
+    );
+  });
+});
+
+describe('isRewardExpired（BR-28）', () => {
+  it('受け取った日の 23:59:59（日本時間）を過ぎると切れる', () => {
+    const expiresAt = '2026-11-05T23:59:59+09:00';
+    expect(isRewardExpired(expiresAt, new Date('2026-11-05T23:59:00+09:00'))).toBe(false);
+    expect(isRewardExpired(expiresAt, new Date('2026-11-06T00:00:01+09:00'))).toBe(true);
   });
 });

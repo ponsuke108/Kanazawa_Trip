@@ -100,3 +100,35 @@ export function campaignToInput(c: Campaign, imagePath: string | null): Campaign
     endsOn: c.endsOn,
   };
 }
+
+// ---- 位置の確認（BR-28） ----
+
+export const ELIGIBLE_DISTANCE_M = 100; // お店から100m以内
+export const MAX_ACCURACY_M = 100; // 位置の誤差（精度）100m以下
+
+export type EligibilityView =
+  | { kind: 'eligible' }
+  | { kind: 'far'; distanceM: number }
+  | { kind: 'inaccurate'; accuracyM: number }
+  | { kind: 'already' }
+  | { kind: 'noCampaign' };
+
+// checkCampaignEligibility の結果を、S-17 で出す内容にする（6.4 S-17、BR-28）
+export function toEligibilityView(
+  result: { eligible: boolean; distanceM: number | null; campaign: unknown },
+  accuracyM: number,
+): EligibilityView {
+  if (result.eligible) return { kind: 'eligible' };
+  if (!result.campaign) return { kind: 'noCampaign' };
+  if (result.distanceM !== null && result.distanceM > ELIGIBLE_DISTANCE_M) {
+    return { kind: 'far', distanceM: result.distanceM };
+  }
+  if (accuracyM > MAX_ACCURACY_M) return { kind: 'inaccurate', accuracyM: Math.round(accuracyM) };
+  // 近くて誤差も小さいのに対象でない：すでに特典を受けている（1人1キャンペーン1回）
+  return { kind: 'already' };
+}
+
+// 特典は受け取った日のうち（日本時間の23:59まで）有効（BR-28）
+export function isRewardExpired(expiresAt: string, now = new Date()): boolean {
+  return now.getTime() > Date.parse(expiresAt);
+}

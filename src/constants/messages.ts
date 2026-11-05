@@ -77,6 +77,32 @@ export const ShopMessages = {
   noShop: 'お店が見つかりません',
 } as const;
 
+// （v11 第3段階）S-17 の位置の確認と S-23 の特典（6.4 S-17、6.6 S-23、BR-28）
+export const RewardMessages = {
+  campaignShop: 'キャンペーン中のお店です。お店の近くにいれば特典を受けられます',
+  locationUse: 'お店の近くにいるかを確かめるために現在地を使います。位置は保存しません',
+  checkButton: '現在地で確かめる',
+  checking: '現在地を確かめています',
+  eligible: '特典の対象です',
+  far: (m: number) => `お店から離れているため、特典の対象になりません（約${m}m）`,
+  inaccurate: (m: number) =>
+    `位置の誤差が大きいため（約${m}m）、確かめられませんでした。屋外や窓の近くでもう一度お試しください`,
+  already: 'このキャンペーンの特典は、すでに受け取っています',
+  noCampaign: 'このキャンペーンは終わりました',
+  denied: '位置の利用が許可されていないため、確かめられませんでした。ふつうの投稿はできます',
+  unavailable: '現在地を取れませんでした。ふつうの投稿はできます',
+  showToShop: '投稿すると特典の画面が出ます。お店の人に見せてください',
+  labelNotice: 'この投稿は「キャンペーン参加」と表示されます',
+  ownShop: '自分のお店のスポットには投稿できません',
+  validToday: '本日 23:59 まで有効',
+  useButton: 'お店の人が押してください：使用済みにする',
+  useConfirm: '使用済みにすると戻せません。お店の人が押してください。',
+  used: (at: string) => `使用済み（${at}）`,
+  expired: 'この特典の有効期限が切れました',
+  notViewable: 'この特典は見られません',
+  viewReward: '特典を見る',
+} as const;
+
 // （v11）S-16 場所を探す（6.4）
 export const PlaceSearchMessages = {
   placeholder: 'スポット名を入力',

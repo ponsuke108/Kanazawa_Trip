@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { checkCampaignEligibility } from '@/api/campaigns';
 import { isApiError } from '@/api/errors';
 import { queryKeys } from '@/api/queryKeys';
 import { deleteSpotPost, getSpotPost, saveSpotPost, spotPostImagePaths } from '@/api/spotPosts';
+import { getMyShop } from '@/api/shops';
 import { getSpot } from '@/api/spots';
 import { uploadSpotPostImage } from '@/api/storage';
 import { AppLayout } from '@/components/common/AppLayout';
 import { BottomActionBar } from '@/components/common/BottomActionBar';
 import { Button } from '@/components/common/Button';
+import { CampaignPanel } from '@/components/common/CampaignPanel';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { DropdownMenu } from '@/components/common/DropdownMenu';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -18,23 +21,33 @@ import { IconButton } from '@/components/common/IconButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useToast } from '@/components/common/useToast';
 import { PlaceSearch } from '@/components/map/PlaceSearch';
-import { Messages, Toasts, UiMessages } from '@/constants/messages';
+import { Messages, RewardMessages, Toasts, UiMessages } from '@/constants/messages';
 import { SPOT_POST_BODY_MAX, SPOT_POST_IMAGES_MAX } from '@/constants/spots';
+import { useCurrentUser } from '@/hooks/useAuth';
 import { useResolveSpot } from '@/hooks/useResolveSpot';
+import { toEligibilityView, type EligibilityView } from '@/lib/campaign';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, StateIcons } from '@/lib/icons';
-import type { SpotOrCandidate, SpotPost } from '@/types/models';
+import { ActionIcons, MapIcons, StateIcons } from '@/lib/icons';
+import { getCurrentPosition, type Position, type PositionError } from '@/lib/location';
+import type { Campaign, SpotOrCandidate, SpotPost } from '@/types/models';
 import styles from './SpotPostPage.module.css';
 
 type Photo = { path: string; url: string };
+
+// 位置の確認の状態（BR-28）
+type Check =
+  | { state: 'idle' }
+  | { state: 'checking' }
+  | { state: 'done'; view: EligibilityView; campaign: Campaign | null }
+  | { state: 'error'; error: PositionError | 'failed' };
 
 // 選んだスポットの表示名
 function nameOf(s: SpotOrCandidate): string {
   return s.kind === 'spot' ? s.spot.name : s.candidate.name;
 }
 
-// S-17 スポットの投稿（6.4、F-51、BR-13、BR-21）。/posts/new?spot=:spotId と /posts/:postId/edit。
-// キャンペーン中のお店の位置の確認（BR-28）は I-37 で足す
+// S-17 スポットの投稿（6.4、F-51、F-64、BR-13、BR-21、BR-28）。/posts/new?spot=:spotId と /posts/:postId/edit。
+// キャンペーン中のお店では、押したときだけ現在地を取って確かめる。位置は保存しない
 export function SpotPostPage() {
   const { postId } = useParams();
   const [params] = useSearchParams();
@@ -101,8 +114,16 @@ function SpotPostForm({ post, initialSpot }: FormProps) {
   const queryClient = useQueryClient();
   const resolveSpot = useResolveSpot();
   const editing = post !== null;
+  const user = useCurrentUser();
+  // お店は、自分のお店のスポットに投稿できない（BR-28）
+  const myShop = useQuery({
+    queryKey: queryKeys.shop.mine,
+    queryFn: getMyShop,
+    enabled: user.role === 'official',
+  });
 
   const [spot, setSpot] = useState<SpotOrCandidate | null>(initialSpot);
+  const [check, setCheck] = useState<Check>({ state: 'idle' });
   const [photos, setPhotos] = useState<Photo[]>(() => {
     if (!post) return [];
     const paths = spotPostImagePaths(post);
@@ -118,10 +139,21 @@ function SpotPostForm({ post, initialSpot }: FormProps) {
 
   // 使用中止のスポットには投稿できない（6.4 S-17）。編集のときはスポットを変えないので確かめない
   const inactive = !editing && spot?.kind === 'spot' && !spot.spot.isActive;
+  const ownShop = !editing && spot?.kind === 'spot' && myShop.data?.spot.id === spot.spot.id;
+  // キャンペーン中のお店のスポット（新しい投稿のときだけ。BR-28）
+  const campaignSpot = !editing && !ownShop && spot?.kind === 'spot' && spot.spot.hasActiveCampaign;
+  const eligible = check.state === 'done' && check.view.kind === 'eligible';
   const bodyLength = Array.from(body.trim()).length;
   const bodyOk = bodyLength >= 1 && bodyLength <= SPOT_POST_BODY_MAX;
   const hasSpot = editing || spot !== null;
-  const canSubmit = hasSpot && !inactive && photos.length >= 1 && bodyOk && uploading === 0;
+  const canSubmit =
+    hasSpot &&
+    !inactive &&
+    !ownShop &&
+    check.state !== 'checking' &&
+    photos.length >= 1 &&
+    bodyOk &&
+    uploading === 0;
 
   // 入力中に画面を離れようとしたら確認する
   const blocker = useBlocker(
@@ -135,13 +167,38 @@ function SpotPostForm({ post, initialSpot }: FormProps) {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [dirty]);
 
-  const afterSave = async (spotId: number) => {
+  const afterSave = async (spotId: number, rewardId: string | null = null) => {
     allowLeave.current = true;
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: queryKeys.spots }),
       queryClient.invalidateQueries({ queryKey: queryKeys.posts.mine }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.shop.all }),
     ]);
-    navigate(`/spots/${spotId}`, { replace: true });
+    // キャンペーンの対象者なら特典の画面（S-23）、そうでなければ S-05（履歴を置き換え）
+    navigate(rewardId ? `/rewards/${rewardId}` : `/spots/${spotId}`, { replace: true });
+  };
+
+  // 「現在地で確かめる」：押したときだけ現在地を取り、RPC で確かめる（BR-28）
+  const runCheck = async () => {
+    if (spot?.kind !== 'spot') return;
+    setCheck({ state: 'checking' });
+    let pos: Position;
+    try {
+      pos = await getCurrentPosition();
+    } catch (e) {
+      setCheck({ state: 'error', error: e as PositionError });
+      return;
+    }
+    try {
+      const result = await checkCampaignEligibility({ spotId: spot.spot.id, ...pos });
+      setCheck({
+        state: 'done',
+        view: toEligibilityView(result, pos.accuracy),
+        campaign: result.campaign,
+      });
+    } catch {
+      setCheck({ state: 'error', error: 'failed' });
+    }
   };
 
   const save = useMutation({
@@ -150,18 +207,28 @@ function SpotPostForm({ post, initialSpot }: FormProps) {
       const spotId = post
         ? post.spot.id
         : (await resolveSpot.mutateAsync(spot as SpotOrCandidate)).spotId;
-      await saveSpotPost({
+      // 対象と分かっていたら、投稿するときにもう一度現在地を取って渡す（確かめてから移動した場合に備える。
+      // 位置は保存しない。取れなければふつうの投稿になる。BR-28）
+      let position: Position | null = null;
+      if (eligible) {
+        try {
+          position = await getCurrentPosition();
+        } catch {
+          position = null;
+        }
+      }
+      const { rewardId } = await saveSpotPost({
         id: post?.id ?? null,
         spotId,
         body: body.trim(),
         imagePaths: photos.map((p) => p.path),
-        position: null,
+        position,
       });
-      return spotId;
+      return { spotId, rewardId };
     },
-    onSuccess: async (spotId) => {
+    onSuccess: async ({ spotId, rewardId }) => {
       toast.show({ type: 'success', message: editing ? Toasts.updated : Toasts.posted });
-      await afterSave(spotId);
+      await afterSave(spotId, rewardId);
     },
     onError: (err) => toast.show({ type: 'error', message: errorMessage(err) }),
   });
@@ -223,6 +290,16 @@ function SpotPostForm({ post, initialSpot }: FormProps) {
         }
       />
       <main className={styles.main}>
+        {/* 対象と分かったときだけ、上にキャンペーンを出す（BR-28） */}
+        {eligible && check.state === 'done' && check.campaign && (
+          <div className={styles.campaign}>
+            <CampaignPanel campaign={check.campaign}>
+              <p className={styles.campaignStrong}>{RewardMessages.showToShop}</p>
+              <p className={styles.notice}>{RewardMessages.labelNotice}</p>
+            </CampaignPanel>
+          </div>
+        )}
+
         <section className={styles.field} aria-labelledby="post-spot">
           <h2 id="post-spot" className={styles.label}>
             スポット
@@ -252,7 +329,32 @@ function SpotPostForm({ post, initialSpot }: FormProps) {
               {UiMessages.cannotPostSpot}
             </p>
           )}
+          {ownShop && (
+            <p className={styles.error} role="alert">
+              {RewardMessages.ownShop}
+            </p>
+          )}
         </section>
+
+        {campaignSpot && !eligible && (
+          <section className={styles.checkBox} aria-label="位置の確認">
+            <p className={styles.checkLead}>{RewardMessages.campaignShop}</p>
+            <p className={styles.notice}>{RewardMessages.locationUse}</p>
+            <Button
+              variant="secondary"
+              icon={MapIcons.locate}
+              loading={check.state === 'checking'}
+              onClick={() => void runCheck()}
+            >
+              {RewardMessages.checkButton}
+            </Button>
+            {check.state !== 'idle' && check.state !== 'checking' && (
+              <p className={styles.checkResult} role="status">
+                {checkMessage(check)}
+              </p>
+            )}
+          </section>
+        )}
 
         <section className={styles.field} aria-labelledby="post-photos">
           <div className={styles.labelRow}>
@@ -346,6 +448,7 @@ function SpotPostForm({ post, initialSpot }: FormProps) {
         onClose={() => setSearchOpen(false)}
         onSelect={(r) => {
           setSpot(r);
+          setCheck({ state: 'idle' });
           setDirty(true);
           setSearchOpen(false);
         }}
@@ -371,4 +474,24 @@ function SpotPostForm({ post, initialSpot }: FormProps) {
       />
     </AppLayout>
   );
+}
+
+// 位置の確認の結果の文言（6.4 S-17、BR-28）
+function checkMessage(check: Check): string {
+  if (check.state === 'error') {
+    return check.error === 'denied' ? RewardMessages.denied : RewardMessages.unavailable;
+  }
+  if (check.state !== 'done') return '';
+  switch (check.view.kind) {
+    case 'eligible':
+      return RewardMessages.eligible;
+    case 'far':
+      return RewardMessages.far(check.view.distanceM);
+    case 'inaccurate':
+      return RewardMessages.inaccurate(check.view.accuracyM);
+    case 'already':
+      return RewardMessages.already;
+    case 'noCampaign':
+      return RewardMessages.noCampaign;
+  }
 }

@@ -108,3 +108,36 @@
     margin: 0 auto;
   }
 }
+
+/* （v11 第3段階）位置の確認とキャンペーン（BR-28） */
+.campaign {
+  display: flex;
+  flex-direction: column;
+}
+
+.campaignStrong {
+  color: var(--color-campaign);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.checkBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-campaign);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.checkLead {
+  color: var(--color-campaign);
+  font-weight: 700;
+}
+
+.checkResult {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
