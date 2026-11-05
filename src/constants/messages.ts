@@ -23,6 +23,8 @@ export const Messages = {
   photoNotice:
     '人の顔がはっきり写った写真や、他の人が撮った写真は載せないでください。生成AIで作った画像は載せないでください',
   straightDistance: '直線距離です。実際の道のりは「経路を見る」で確かめてください',
+  straightDistanceDetail:
+    '直線距離です。実際の道のりや時間は、各区間の「経路を見る」で確かめてください', // 6.4 S-06 の i ボタン
 } as const;
 
 // （v11）S-16 場所を探す（6.4）

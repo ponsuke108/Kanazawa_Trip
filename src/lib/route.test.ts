@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { toRouteStops } from '@/lib/route';
+import { distanceKm } from '@/lib/geo';
+import { formatKmDiff, routeDistanceKm, toRouteStops } from '@/lib/route';
 import { testSpot } from '@/lib/testSpots';
 import type { Block } from '@/types/models';
 
-const station = testSpot({ id: 1, name: '金沢駅' });
+const station = testSpot({ id: 1, name: '金沢駅', lat: 36.578342, lng: 136.647983 });
 const omicho = testSpot({ id: 2, name: '近江町市場' });
-const kenrokuen = testSpot({ id: 5, name: '兼六園' });
+const kenrokuen = testSpot({ id: 5, name: '兼六園', lat: 36.562128, lng: 136.662652 });
 
 function spot(id: string, s: typeof station): Block {
   return { id, type: 'spot', spot: s, transportMode: null, imagePath: null, imageUrl: null };
@@ -46,5 +47,18 @@ describe('toRouteStops（BR-22）', () => {
 
   it('スポットがなければ空', () => {
     expect(toRouteStops([comment('c')])).toEqual([]);
+  });
+});
+
+describe('routeDistanceKm（BR-22）', () => {
+  it('番号の順に結んだ直線距離の合計。同じスポットに戻る分も数える', () => {
+    const stops = toRouteStops([spot('a', station), spot('b', kenrokuen), spot('c', station)]);
+    expect(routeDistanceKm(stops)).toBeCloseTo(distanceKm(station, kenrokuen) * 2, 10);
+    expect(routeDistanceKm(stops)).toBeGreaterThan(4);
+  });
+
+  it('差の書き方', () => {
+    expect(formatKmDiff(-0.83)).toBe('−0.8km');
+    expect(formatKmDiff(0.31)).toBe('+0.3km');
   });
 });

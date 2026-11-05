@@ -18,11 +18,64 @@
   font-size: var(--font-size-sm);
 }
 
-/* PC：いまは中央に幅720pxの列。右に経路順の地図を並べる形（7.8）は、地図ができてから（I-33）合わせる */
+/* （v11）経路順の地図（BR-22）。スマホ・タブレットは開け閉め、PC は右の列に上に固定（7.8） */
+.route {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.routeHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.routeDistance {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.routeMap {
+  display: none;
+  height: 240px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.routeOpen .routeMap {
+  display: block;
+}
+
+/* PC：左に情報とブロック、右に経路順の地図（上に固定）。開け閉めは出さない */
 @media (min-width: 1024px) {
   .main {
-    width: 100%;
-    max-width: 720px;
-    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-5);
+  }
+
+  .main > * {
+    grid-column: 1;
+  }
+
+  .main > .route {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-4));
+    grid-column: 2;
+    grid-row: 1 / span 20;
+  }
+
+  .routeToggle {
+    display: none;
+  }
+
+  .routeMap {
+    display: block;
+    height: calc(100dvh - var(--header-height) - var(--space-6) * 3);
   }
 }

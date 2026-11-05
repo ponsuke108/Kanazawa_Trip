@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, useState, type ReactNode } from 'react';
 import { MapError, MapLoading } from '@/components/map/MapStatus';
+import type { RouteMapProps } from '@/components/map/RouteMap';
 import type { MapViewProps } from '@/components/map/types';
 import styles from './LazyMapView.module.css';
 
@@ -27,6 +28,35 @@ export function LazyMapView(props: MapViewProps) {
     >
       <Suspense fallback={fallback}>
         <MapViewChunk {...props} />
+      </Suspense>
+    </ChunkErrorBoundary>
+  );
+}
+
+// （v11）経路順の地図（BR-22）も、地図を使う画面に入ったときだけ読み込む
+const RouteMapChunk = lazy(() =>
+  import('@/components/map/RouteMap').then((m) => ({ default: m.RouteMap })),
+);
+
+export function LazyRouteMap(props: RouteMapProps) {
+  const [retryKey, setRetryKey] = useState(0);
+  return (
+    <ChunkErrorBoundary
+      key={retryKey}
+      fallback={
+        <div className={styles.fill}>
+          <MapError onRetry={() => setRetryKey((k) => k + 1)} />
+        </div>
+      }
+    >
+      <Suspense
+        fallback={
+          <div className={styles.fill}>
+            <MapLoading />
+          </div>
+        }
+      >
+        <RouteMapChunk {...props} />
       </Suspense>
     </ChunkErrorBoundary>
   );

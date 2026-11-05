@@ -46,3 +46,46 @@
     margin: 0 auto;
   }
 }
+
+/* （v11）S-06：経路順の地図とブロック一覧。スマホ・タブレットは地図を上に固定、PC は左右（7.8） */
+.blocksLayout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.routeCol {
+  display: contents;
+}
+
+.blocksCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (min-width: 1024px) {
+  /* ブロック編集のときだけ列を広げる（左にブロック一覧 480px、右に地図） */
+  .main:has(.blocksLayout) {
+    max-width: 1200px;
+  }
+
+  .blocksLayout {
+    display: grid;
+    grid-template-columns: 480px minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-5);
+  }
+
+  .routeCol {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+  }
+
+  .blocksCol {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}

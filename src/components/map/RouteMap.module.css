@@ -1,0 +1,32 @@
+/* 経路順の地図（BR-22）。高さは親が決める */
+.wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-primary-weak);
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+/* 番号のピン：金（7.2 --color-route-line）の縁、白い地に番号 */
+.pin {
+  min-width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border: 3px solid var(--color-route-line);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pin:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
