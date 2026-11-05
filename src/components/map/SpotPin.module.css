@@ -26,6 +26,27 @@
   outline-offset: 2px;
 }
 
+/* （v11）リストに保存したスポット：大きくして、左上に Bookmark の札（6.4 S-07） */
+.highlighted {
+  width: calc(var(--tap-min) + var(--space-2));
+  height: calc(var(--tap-min) + var(--space-2));
+}
+
+.saved {
+  position: absolute;
+  top: calc(var(--space-2) * -1);
+  left: calc(var(--space-2) * -1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-surface);
+}
+
 .selected {
   z-index: 1;
   width: calc(var(--tap-min) + var(--space-3));

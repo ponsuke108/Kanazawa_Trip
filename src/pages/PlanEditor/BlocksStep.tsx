@@ -79,6 +79,7 @@ export function BlocksStep({ state, dispatch, showDraftSave, saving, onSaveDraft
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
         disabledSpotId={lastSpotId(state.blocks)}
+        initialListId={state.listId}
         onSelect={(spot) => {
           const key = newBlockKey();
           dispatch({ type: 'ADD_SPOT', spot, key });

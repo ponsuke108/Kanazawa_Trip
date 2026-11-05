@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { MapSpot } from '@/components/map/types';
-import { ShopIcons } from '@/lib/icons';
+import { ListIcons, ShopIcons } from '@/lib/icons';
 import styles from './SpotPin.module.css';
 
 type PinProps = {
@@ -13,16 +13,22 @@ type PinProps = {
 // 写真がない、または読み込めないときは縁の色だけの丸。キャンペーン中なら右上に札（Ticket）
 export function SpotPin({ spot, selected, onClick }: PinProps) {
   const Ticket = ShopIcons.campaign;
+  const Saved = ListIcons.list;
   return (
     <button
       type="button"
-      className={`${styles.pin} ${selected ? styles.selected : ''}`}
+      className={`${styles.pin} ${spot.highlighted ? styles.highlighted : ''} ${selected ? styles.selected : ''}`}
       data-type={spot.spotType}
       onClick={onClick}
       aria-label={spot.hasActiveCampaign ? `${spot.name}（キャンペーン中）` : spot.name}
       aria-pressed={selected}
     >
       <PinFace url={spot.latestImageUrl ?? null} />
+      {spot.highlighted && (
+        <span className={styles.saved} aria-hidden="true">
+          <Saved size={12} />
+        </span>
+      )}
       {spot.hasActiveCampaign && (
         <span className={styles.ticket} aria-hidden="true">
           <Ticket size={12} />
