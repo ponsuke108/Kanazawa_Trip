@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatAuthor, formatDate, formatRoute, formatTitle } from '@/lib/format';
+import { formatAuthor, formatDate, formatRoute, formatTitle, formatPeriod } from '@/lib/format';
 
 describe('formatDate（BR-12）', () => {
   it('日本時間の YYYY/MM/DD になる', () => {
@@ -32,5 +32,11 @@ describe('formatTitle・formatAuthor（BR-12）', () => {
   });
   it('作成者は「〇〇さんのプラン」', () => {
     expect(formatAuthor('ひろと')).toBe('ひろとさんのプラン');
+  });
+});
+
+describe('formatPeriod（BR-27）', () => {
+  it('期間を「〜」でつなぐ', () => {
+    expect(formatPeriod('2026-11-01', '2026-12-31')).toBe('2026/11/01〜2026/12/31');
   });
 });

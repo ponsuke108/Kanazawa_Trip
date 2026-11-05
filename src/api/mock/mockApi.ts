@@ -7,6 +7,7 @@ import { distanceKm, isInKanazawa } from '@/lib/geo';
 import {
   MOCK_SHOP,
   MOCK_TARO,
+  mockApplications,
   mockCampaign,
   mockLikes,
   mockLists,
@@ -20,9 +21,12 @@ import {
   type MockPlanSeed,
 } from '@/api/mock/data';
 import type {
+  ApplicationInput,
   AuthUser,
   Block,
   Campaign,
+  CampaignInput,
+  CampaignReward,
   ListDetail,
   ListSummary,
   PlaceCandidate,
@@ -31,11 +35,14 @@ import type {
   SavePlanInput,
   SaveSpotPostInput,
   SearchResult,
+  ShopApplication,
+  ShopDetail,
   Spot,
   SpotDetail,
   SpotPost,
   Tag,
   TransportMode,
+  UserRole,
 } from '@/types/models';
 
 const SESSION_KEY = 'travel-note:mock-session';
@@ -72,9 +79,53 @@ type StoredPost = {
   body: string;
   imagePaths: string[];
   isHidden: boolean;
+  campaignId: string | null; // （v11）キャンペーンで投稿したとき
   createdAt: string;
   updatedAt: string;
 };
+
+// （v11 第3段階）お店・キャンペーン・申請・特典（9.2）
+type StoredShop = {
+  id: string;
+  spotId: number;
+  ownerId: string;
+  name: string;
+  introduction: string;
+  status: 'active' | 'suspended';
+};
+type StoredCampaign = Omit<Campaign, 'shopName' | 'imageUrl'> & { imagePath: string | null };
+type StoredApplication = Omit<ShopApplication, 'spot'> & { userId: string; spotId: number };
+type StoredReward = {
+  id: string;
+  campaignId: string;
+  userId: string;
+  postId: string | null;
+  issuedAt: string;
+  distanceM: number;
+  usedAt: string | null;
+};
+type StoredAdminAction = {
+  adminId: string;
+  action: string;
+  targetId: string;
+  reason: string | null;
+  createdAt: string;
+};
+
+function seedShops(): StoredShop[] {
+  return [{ ...MOCK_SHOP, status: 'active' }];
+}
+
+function seedCampaigns(): StoredCampaign[] {
+  const { shopName, imageUrl, ...rest } = mockCampaign;
+  void shopName;
+  void imageUrl;
+  return [{ ...rest, imagePath: null }];
+}
+
+function seedApplications(): StoredApplication[] {
+  return mockApplications.map((a) => ({ ...a }));
+}
 
 function seedSpots(): Spot[] {
   return mockSpots.map((s) => ({ ...s }));
@@ -89,6 +140,7 @@ function seedPosts(): StoredPost[] {
     ...p,
     imagePaths: [],
     isHidden: false,
+    campaignId: null,
     updatedAt: p.createdAt,
   }));
 }
@@ -131,6 +183,13 @@ const state = {
   lists: seedLists(),
   posts: seedPosts(),
   shareTokens: new Map<string, string>(), // planId → 合言葉
+  // （v11 第3段階）
+  shops: seedShops(),
+  campaigns: seedCampaigns(),
+  applications: seedApplications(),
+  rewards: [] as StoredReward[],
+  adminActions: [] as StoredAdminAction[],
+  roles: new Map<string, UserRole>(), // 承認で変わった利用者の種類
 };
 
 // テスト用：状態を初期値に戻す
@@ -146,6 +205,12 @@ export function resetMockState(): void {
   state.lists = seedLists();
   state.posts = seedPosts();
   state.shareTokens.clear();
+  state.shops = seedShops();
+  state.campaigns = seedCampaigns();
+  state.applications = seedApplications();
+  state.rewards = [];
+  state.adminActions = [];
+  state.roles.clear();
   writeSession(null);
 }
 
@@ -194,11 +259,130 @@ function todayJst(): string {
   return new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Tokyo' });
 }
 
+// キャンペーンが active、お店が active、日本時間の今日が期間の中（I-36 の active_campaign_id と同じ）
 function activeCampaignOf(spotId: number): Campaign | null {
-  if (spotId !== MOCK_SHOP.spotId) return null;
+  const shop = state.shops.find((sh) => sh.spotId === spotId && sh.status === 'active');
+  if (!shop) return null;
   const today = todayJst();
-  const c = mockCampaign;
-  return c.status === 'active' && c.startsOn <= today && today <= c.endsOn ? { ...c } : null;
+  const c = state.campaigns.find(
+    (x) =>
+      x.shopId === shop.id && x.status === 'active' && x.startsOn <= today && today <= x.endsOn,
+  );
+  return c ? toCampaign(c) : null;
+}
+
+function toCampaign(c: StoredCampaign): Campaign {
+  const { imagePath, ...rest } = c;
+  return {
+    ...rest,
+    shopName: state.shops.find((sh) => sh.id === c.shopId)?.name ?? '',
+    imageUrl: imageUrl(imagePath),
+  };
+}
+
+function roleOf(userId: string): UserRole {
+  return state.roles.get(userId) ?? mockUsers.find((u) => u.id === userId)?.role ?? 'user';
+}
+
+// 特典は受け取った日のうち（日本時間の23:59まで）有効（BR-28）
+function rewardDateJst(issuedAt: string): string {
+  return new Date(issuedAt).toLocaleDateString('sv-SE', { timeZone: 'Asia/Tokyo' });
+}
+
+function isRewardValid(r: StoredReward): boolean {
+  return r.usedAt === null && rewardDateJst(r.issuedAt) === todayJst();
+}
+
+function toReward(r: StoredReward): CampaignReward | null {
+  const c = state.campaigns.find((x) => x.id === r.campaignId);
+  if (!c) return null;
+  return {
+    id: r.id,
+    campaign: toCampaign(c),
+    issuedAt: r.issuedAt,
+    expiresAt: `${rewardDateJst(r.issuedAt)}T23:59:59+09:00`,
+    usedAt: r.usedAt,
+  };
+}
+
+// check_campaign_eligibility と同じ判定（BR-28）
+function eligibilityOf(
+  userId: string,
+  spotId: number,
+  pos: { lat: number; lng: number; accuracy: number },
+): { eligible: boolean; distanceM: number | null; campaign: Campaign | null } {
+  const spot = state.spots.find((x) => x.id === spotId);
+  if (!spot) return { eligible: false, distanceM: null, campaign: null };
+  const distanceM = Math.round(distanceKm(pos, spot) * 1000);
+  const campaign = activeCampaignOf(spotId);
+  if (!campaign) return { eligible: false, distanceM, campaign: null };
+  const shop = state.shops.find((sh) => sh.spotId === spotId);
+  const eligible =
+    distanceM <= 100 &&
+    pos.accuracy <= 100 &&
+    shop?.ownerId !== userId &&
+    !state.rewards.some((r) => r.campaignId === campaign.id && r.userId === userId);
+  return { eligible, distanceM, campaign };
+}
+
+function requireAdmin(): AuthUser {
+  const user = requireUser();
+  if (roleOf(user.id) !== 'admin') throw new ApiError('FORBIDDEN');
+  return user;
+}
+
+function toApplication(a: StoredApplication): ShopApplication {
+  const { userId, spotId, ...rest } = a;
+  void userId;
+  return { ...rest, spot: { id: spotId, name: spotById(spotId).name } };
+}
+
+function toShopDetail(shop: StoredShop, viewerId: string): ShopDetail {
+  const campaigns = state.campaigns.filter((c) => c.shopId === shop.id && c.status !== 'ended');
+  const current = campaigns.find((c) => c.status === 'active') ?? campaigns[0] ?? null;
+  // 特典の数はお店の本人だけが読める（9.4 の RLS と同じ）
+  const rewards =
+    current && shop.ownerId === viewerId
+      ? state.rewards.filter((r) => r.campaignId === current.id)
+      : [];
+  return {
+    id: shop.id,
+    spot: { id: shop.spotId, name: spotById(shop.spotId).name },
+    name: shop.name,
+    introduction: shop.introduction,
+    status: shop.status,
+    campaign: current ? toCampaign(current) : null,
+    rewardCount: rewards.length,
+    usedRewardCount: rewards.filter((r) => r.usedAt !== null).length,
+  };
+}
+
+function recordAdmin(adminId: string, action: string, targetId: string, reason?: string | null) {
+  state.adminActions.push({
+    adminId,
+    action,
+    targetId,
+    reason: reason?.trim() || null,
+    createdAt: new Date().toISOString(),
+  });
+}
+
+// 期間は最長90日（BR-27）。題名などの文字数も確かめる
+function validCampaign(input: CampaignInput): boolean {
+  const start = Date.parse(input.startsOn);
+  const end = Date.parse(input.endsOn);
+  return (
+    input.title.trim().length >= 1 &&
+    input.title.trim().length <= 30 &&
+    input.benefit.trim().length >= 1 &&
+    input.benefit.trim().length <= 50 &&
+    input.notice.length <= 200 &&
+    input.description.length <= 500 &&
+    !Number.isNaN(start) &&
+    !Number.isNaN(end) &&
+    end >= start &&
+    end - start <= 90 * 86_400_000
+  );
 }
 
 // 投稿の数、ピンの写真（表示中の投稿のいちばん新しい写真）、キャンペーンを足す（spot_summaries と同じ）
@@ -242,7 +426,10 @@ function toListSummary(list: StoredList): ListSummary {
   };
 }
 
-function toPost(p: StoredPost): SpotPost {
+function toPost(p: StoredPost, withReward = false): SpotPost {
+  const reward = withReward
+    ? state.rewards.find((r) => r.postId === p.id && r.userId === p.userId && isRewardValid(r))
+    : undefined;
   return {
     id: p.id,
     spot: { id: p.spotId, name: spotById(p.spotId).name },
@@ -252,9 +439,9 @@ function toPost(p: StoredPost): SpotPost {
       const url = imageUrl(path);
       return url ? [url] : [];
     }),
-    isCampaign: false,
+    isCampaign: p.campaignId !== null,
     isHidden: p.isHidden,
-    rewardId: null,
+    rewardId: reward?.id ?? null,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
   };
@@ -609,6 +796,8 @@ export const mockApi = {
 
   async getCurrentUser(): Promise<AuthUser | null> {
     const user = currentUser();
+    // 承認で利用者の種類が変わったとき（モックの中だけ）
+    if (user && state.roles.has(user.id)) return { ...user, role: roleOf(user.id) };
     // 以前のモックで保存したログイン状態には role がないので、利用者の一覧から補う
     if (user && !user.role) {
       const found = mockUsers.find((u) => u.id === user.id);
@@ -624,7 +813,8 @@ export const mockApi = {
     requireUser();
     if (!state.spots.some((s) => s.id === spotId)) return null;
     const campaign = activeCampaignOf(spotId);
-    return { ...spotById(spotId), campaign, shopName: campaign ? MOCK_SHOP.name : null };
+    const shop = state.shops.find((sh) => sh.spotId === spotId && sh.status === 'active');
+    return { ...spotById(spotId), campaign, shopName: shop?.name ?? null };
   },
 
   // 9.7：3件の候補から、名前に入力の文字を含むものを返す。osm_ref が登録済みなら existingSpotId を入れる
@@ -785,7 +975,7 @@ export const mockApi = {
       .sort((a, b) => byTimeDesc(a.createdAt, b.createdAt) || a.id.localeCompare(b.id));
     const from = page * POST_PAGE_SIZE;
     return {
-      items: all.slice(from, from + POST_PAGE_SIZE).map(toPost),
+      items: all.slice(from, from + POST_PAGE_SIZE).map((p) => toPost(p)),
       hasMore: from + POST_PAGE_SIZE < all.length,
     };
   },
@@ -803,10 +993,10 @@ export const mockApi = {
     return state.posts
       .filter((p) => p.userId === user.id)
       .sort((a, b) => byTimeDesc(a.createdAt, b.createdAt))
-      .map(toPost);
+      .map((p) => toPost(p, true));
   },
 
-  // save_spot_post と同じ確かめ（10.9）。キャンペーンの特典の発行はモックでも I-37 で足す
+  // save_spot_post と同じ確かめ（10.9、BR-28）
   async saveSpotPost(input: SaveSpotPostInput): Promise<{ id: string; rewardId: string | null }> {
     await delay();
     const user = requireUser();
@@ -822,6 +1012,10 @@ export const mockApi = {
     if (input.id === null) {
       const spot = spotById(input.spotId);
       if (!spot.isActive) throw new ApiError('NOT_FOUND');
+      // お店は、自分のお店のスポットに投稿できない（BR-28）
+      if (state.shops.some((sh) => sh.spotId === spot.id && sh.ownerId === user.id)) {
+        throw new ApiError('FORBIDDEN');
+      }
       const post: StoredPost = {
         id: newId('mock-post'),
         userId: user.id,
@@ -829,10 +1023,29 @@ export const mockApi = {
         body,
         imagePaths: [...input.imagePaths],
         isHidden: false,
+        campaignId: null,
         createdAt: now,
         updatedAt: now,
       };
       state.posts.push(post);
+      // 投稿するときの位置で確かめ、対象なら特典を出す。位置は保存しない（BR-28）
+      if (input.position) {
+        const check = eligibilityOf(user.id, spot.id, input.position);
+        if (check.eligible && check.campaign && check.distanceM !== null) {
+          const reward: StoredReward = {
+            id: newId('mock-reward'),
+            campaignId: check.campaign.id,
+            userId: user.id,
+            postId: post.id,
+            issuedAt: now,
+            distanceM: check.distanceM,
+            usedAt: null,
+          };
+          state.rewards.push(reward);
+          post.campaignId = check.campaign.id;
+          return { id: post.id, rewardId: reward.id };
+        }
+      }
       return { id: post.id, rewardId: null };
     }
     const post = state.posts.find((p) => p.id === input.id);
@@ -913,6 +1126,289 @@ export const mockApi = {
       author: { id: '', displayName: detail.author.displayName },
       sourcePlan: null,
     };
+  },
+  // ---- （v11 第3段階）キャンペーンと特典（BR-27、BR-28） ----
+
+  async checkCampaignEligibility(input: {
+    spotId: number;
+    lat: number;
+    lng: number;
+    accuracy: number;
+  }): Promise<{ eligible: boolean; distanceM: number | null; campaign: Campaign | null }> {
+    await delay();
+    const user = requireUser();
+    return eligibilityOf(user.id, input.spotId, input);
+  },
+
+  async getReward(rewardId: string): Promise<CampaignReward | null> {
+    await delay();
+    const user = requireUser();
+    const r = state.rewards.find((x) => x.id === rewardId && x.userId === user.id);
+    return r ? toReward(r) : null;
+  },
+
+  async useReward(rewardId: string): Promise<void> {
+    await delay();
+    const user = requireUser();
+    const r = state.rewards.find((x) => x.id === rewardId && x.userId === user.id);
+    if (!r || !isRewardValid(r)) throw new ApiError('CAMPAIGN_NOT_ELIGIBLE');
+    r.usedAt = new Date().toISOString();
+  },
+
+  async saveCampaign(input: CampaignInput): Promise<{ id: string }> {
+    await delay();
+    const user = requireUser();
+    const shop = state.shops.find((sh) => sh.ownerId === user.id && sh.status === 'active');
+    if (!shop) throw new ApiError('FORBIDDEN');
+    if (!validCampaign(input)) throw new ApiError('UNKNOWN', 'CAMPAIGN_INVALID');
+    const fields = {
+      title: input.title.trim(),
+      benefit: input.benefit.trim(),
+      notice: input.notice,
+      description: input.description,
+      startsOn: input.startsOn,
+      endsOn: input.endsOn,
+      imagePath: input.imagePath,
+    };
+    if (input.id === null) {
+      if (state.campaigns.some((c) => c.shopId === shop.id && c.status === 'active')) {
+        throw new ApiError('LIMIT_REACHED');
+      }
+      const id = newId('mock-campaign');
+      state.campaigns.push({ id, shopId: shop.id, status: 'active', ...fields });
+      return { id };
+    }
+    const c = state.campaigns.find((x) => x.id === input.id && x.shopId === shop.id);
+    if (!c || c.status === 'stopped') throw new ApiError('FORBIDDEN');
+    Object.assign(c, fields);
+    return { id: c.id };
+  },
+
+  async endCampaign(campaignId: string): Promise<void> {
+    await delay();
+    const user = requireUser();
+    const shop = state.shops.find((sh) => sh.ownerId === user.id && sh.status === 'active');
+    const c = state.campaigns.find((x) => x.id === campaignId && x.shopId === shop?.id);
+    if (!c || c.status === 'stopped') throw new ApiError('FORBIDDEN');
+    c.status = 'ended';
+  },
+
+  async uploadCampaignImage(file: File): Promise<{ path: string; url: string }> {
+    return mockApi.uploadPlanImage(file);
+  },
+
+  // ---- （v11 第3段階）お店の申請とお店（BR-26、BR-27） ----
+
+  async getMyApplication(): Promise<ShopApplication | null> {
+    await delay();
+    const user = requireUser();
+    const mine = state.applications
+      .filter((a) => a.userId === user.id)
+      .sort((a, b) => byTimeDesc(a.createdAt, b.createdAt));
+    return mine[0] ? toApplication(mine[0]) : null;
+  },
+
+  async submitApplication(input: ApplicationInput): Promise<{ id: string }> {
+    await delay();
+    const user = requireUser();
+    if (roleOf(user.id) !== 'user') throw new ApiError('FORBIDDEN');
+    if (state.applications.some((a) => a.userId === user.id && a.status === 'pending')) {
+      throw new ApiError('LIMIT_REACHED');
+    }
+    const spot = state.spots.find((x) => x.id === input.spotId && x.isActive);
+    if (!spot) throw new ApiError('NOT_FOUND');
+    if (state.shops.some((sh) => sh.spotId === spot.id)) throw new ApiError('LIMIT_REACHED');
+    if (input.campaignDraft && !validCampaign(input.campaignDraft)) {
+      throw new ApiError('UNKNOWN', 'CAMPAIGN_INVALID');
+    }
+    const id = newId('mock-application');
+    state.applications.push({
+      id,
+      userId: user.id,
+      spotId: spot.id,
+      shopName: input.shopName.trim(),
+      introduction: input.introduction.trim(),
+      contactName: input.contactName.trim(),
+      contactEmail: input.contactEmail.trim(),
+      contactPhone: input.contactPhone.trim(),
+      campaignDraft: input.campaignDraft,
+      status: 'pending',
+      rejectReason: null,
+      createdAt: new Date().toISOString(),
+      reviewedAt: null,
+    });
+    return { id };
+  },
+
+  async getMyShop(): Promise<ShopDetail | null> {
+    await delay();
+    const user = requireUser();
+    const shop = state.shops.find((sh) => sh.ownerId === user.id);
+    return shop ? toShopDetail(shop, user.id) : null;
+  },
+
+  async updateShop(input: { name: string; introduction: string }): Promise<void> {
+    await delay();
+    const user = requireUser();
+    const shop = state.shops.find((sh) => sh.ownerId === user.id);
+    if (!shop) throw new ApiError('FORBIDDEN');
+    const name = input.name.trim();
+    if (name.length < 1 || name.length > 30 || input.introduction.length > 300) {
+      throw new ApiError('UNKNOWN', 'SHOP_INVALID');
+    }
+    shop.name = name;
+    shop.introduction = input.introduction.trim();
+  },
+
+  // ---- （v11 第3段階）管理者（BR-26、BR-29）。どの操作も記録する ----
+
+  async getApplications(): Promise<ShopApplication[]> {
+    await delay();
+    requireAdmin();
+    return [...state.applications]
+      .sort(
+        (a, b) =>
+          Number(b.status === 'pending') - Number(a.status === 'pending') ||
+          byTimeDesc(a.createdAt, b.createdAt),
+      )
+      .map(toApplication);
+  },
+
+  async getApplication(id: string): Promise<ShopApplication | null> {
+    await delay();
+    requireAdmin();
+    const a = state.applications.find((x) => x.id === id);
+    return a ? toApplication(a) : null;
+  },
+
+  async reviewApplication(input: { id: string; approve: boolean; reason?: string }): Promise<void> {
+    await delay();
+    const admin = requireAdmin();
+    const a = state.applications.find((x) => x.id === input.id);
+    if (!a) throw new ApiError('NOT_FOUND');
+    if (a.status !== 'pending') throw new ApiError('FORBIDDEN');
+    const reason = input.reason?.trim() ?? '';
+    if (reason.length > 200) throw new ApiError('UNKNOWN', 'REASON_INVALID');
+    const now = new Date().toISOString();
+    if (input.approve) {
+      if (state.shops.some((sh) => sh.spotId === a.spotId || sh.ownerId === a.userId)) {
+        throw new ApiError('LIMIT_REACHED');
+      }
+      const shopId = newId('mock-shop');
+      state.shops.push({
+        id: shopId,
+        spotId: a.spotId,
+        ownerId: a.userId,
+        name: a.shopName,
+        introduction: a.introduction,
+        status: 'active',
+      });
+      if (roleOf(a.userId) === 'user') state.roles.set(a.userId, 'official');
+      if (a.campaignDraft) {
+        const d = a.campaignDraft;
+        state.campaigns.push({
+          id: newId('mock-campaign'),
+          shopId,
+          status: 'active',
+          title: d.title,
+          benefit: d.benefit,
+          notice: d.notice,
+          description: d.description,
+          startsOn: d.startsOn,
+          endsOn: d.endsOn,
+          imagePath: d.imagePath,
+        });
+      }
+      Object.assign(a, { status: 'approved', reviewedAt: now, rejectReason: null });
+      recordAdmin(admin.id, 'approve_application', a.id, reason);
+    } else {
+      if (reason === '') throw new ApiError('UNKNOWN', 'REASON_REQUIRED');
+      Object.assign(a, { status: 'rejected', reviewedAt: now, rejectReason: reason });
+      recordAdmin(admin.id, 'reject_application', a.id, reason);
+    }
+  },
+
+  async getShops(): Promise<ShopDetail[]> {
+    await delay();
+    const admin = requireAdmin();
+    return state.shops.map((sh) => toShopDetail(sh, admin.id));
+  },
+
+  async setShopStatus(
+    shopId: string,
+    status: 'active' | 'suspended',
+    reason?: string,
+  ): Promise<void> {
+    await delay();
+    const admin = requireAdmin();
+    const shop = state.shops.find((sh) => sh.id === shopId);
+    if (!shop) throw new ApiError('NOT_FOUND');
+    shop.status = status;
+    recordAdmin(admin.id, status === 'suspended' ? 'suspend_shop' : 'resume_shop', shopId, reason);
+  },
+
+  async setCampaignStatus(
+    campaignId: string,
+    status: 'active' | 'stopped',
+    reason?: string,
+  ): Promise<void> {
+    await delay();
+    const admin = requireAdmin();
+    const c = state.campaigns.find((x) => x.id === campaignId);
+    if (!c) throw new ApiError('NOT_FOUND');
+    if (
+      status === 'active' &&
+      state.campaigns.some((x) => x.id !== c.id && x.shopId === c.shopId && x.status === 'active')
+    ) {
+      throw new ApiError('LIMIT_REACHED');
+    }
+    c.status = status;
+    recordAdmin(
+      admin.id,
+      status === 'stopped' ? 'stop_campaign' : 'resume_campaign',
+      campaignId,
+      reason,
+    );
+  },
+
+  async getAllSpotPosts({
+    page,
+  }: {
+    page: number;
+  }): Promise<{ items: SpotPost[]; hasMore: boolean }> {
+    await delay();
+    requireAdmin();
+    const all = [...state.posts].sort((a, b) => byTimeDesc(a.createdAt, b.createdAt));
+    const from = page * PAGE_SIZE;
+    return {
+      items: all.slice(from, from + PAGE_SIZE).map((p) => toPost(p)),
+      hasMore: all.length > from + PAGE_SIZE,
+    };
+  },
+
+  async setSpotPostHidden(postId: string, hidden: boolean, reason?: string): Promise<void> {
+    await delay();
+    const admin = requireAdmin();
+    const post = state.posts.find((p) => p.id === postId);
+    if (!post) throw new ApiError('NOT_FOUND');
+    post.isHidden = hidden;
+    recordAdmin(admin.id, hidden ? 'hide_post' : 'show_post', postId, reason);
+  },
+
+  // スポットの使用中止だけ（BR-29。再開はない）
+  async setSpotActive(spotId: number, active: boolean, reason?: string): Promise<void> {
+    await delay();
+    const admin = requireAdmin();
+    if (active) throw new ApiError('FORBIDDEN');
+    const spot = state.spots.find((x) => x.id === spotId);
+    if (!spot) throw new ApiError('NOT_FOUND');
+    spot.isActive = false;
+    recordAdmin(admin.id, 'deactivate_spot', String(spotId), reason);
+  },
+
+  // テスト用：管理者の操作の記録
+  adminActionsForTest(): StoredAdminAction[] {
+    return state.adminActions.map((a) => ({ ...a }));
   },
 };
 

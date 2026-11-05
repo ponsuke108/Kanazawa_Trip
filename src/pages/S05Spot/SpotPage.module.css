@@ -37,6 +37,22 @@
   font-weight: 600;
 }
 
+/* （v11）「キャンペーン中」（K47） */
+.campaignLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--color-campaign);
+  color: var(--color-campaign);
+}
+
+.campaignNote {
+  color: var(--color-campaign);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
 .mapLink {
   display: block;
   overflow: hidden;

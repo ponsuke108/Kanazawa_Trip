@@ -21,6 +21,7 @@ import {
 import { getSupabase, PLAN_IMAGES_BUCKET } from '@/lib/supabase';
 import type { Json } from '@/types/database';
 import type {
+  Block,
   PlanDetail,
   PlanStatus,
   PlanSummary,
@@ -115,8 +116,28 @@ export async function getPlan(planId: string): Promise<PlanDetail | null> {
     likeCount: summary?.like_count ?? 0,
     publishedAt: plan.published_at,
     updatedAt: plan.updated_at,
-    blocks: toBlocks(plan.plan_blocks as BlockRow[], imageUrlOf),
+    blocks: await withCampaignFlags(toBlocks(plan.plan_blocks as BlockRow[], imageUrlOf)),
   };
+}
+
+// （v11）プランのスポットブロックに「キャンペーン中」を出すため、spot_summaries の
+// active_campaign_id でキャンペーン中かを付ける（K47、BR-27）
+async function withCampaignFlags(blocks: Block[]): Promise<Block[]> {
+  const ids = [...new Set(blocks.flatMap((b) => (b.type === 'spot' ? [b.spot.id] : [])))];
+  if (ids.length === 0) return blocks;
+  const data = await fetchRows(
+    getSupabase()
+      .from('spot_summaries')
+      .select('id, active_campaign_id')
+      .in('id', ids)
+      .not('active_campaign_id', 'is', null),
+  );
+  const active = new Set(data.map((r) => r.id));
+  return blocks.map((b) =>
+    b.type === 'spot' && active.has(b.spot.id)
+      ? { ...b, spot: { ...b.spot, hasActiveCampaign: true } }
+      : b,
+  );
 }
 
 // RPC save_plan（10.5）。検証の失敗は VALIDATION の ApiError になる

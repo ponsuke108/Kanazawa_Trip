@@ -2,6 +2,7 @@
 import { USE_MOCK } from '@/api/config';
 import { ApiError } from '@/api/errors';
 import { toSaveSpotPostJson, toSpotPost, type SpotPostRow } from '@/api/mappers';
+import { validRewardIdsByPost } from '@/api/campaigns';
 import { mockApi } from '@/api/mock/mockApi';
 import { currentUserId, isUuid, maybeOne, one, rows, spotImageUrlOf } from '@/api/supabaseCall';
 import { getSupabase, SPOT_POST_IMAGES_BUCKET } from '@/lib/supabase';
@@ -10,8 +11,8 @@ import type { SaveSpotPostInput, SpotPost } from '@/types/models';
 
 const PAGE_SIZE = 20; // 10.3：20件ずつ
 
-const POST_COLUMNS =
-  'id, user_id, body, is_hidden, created_at, updated_at, spot:spots(id, name), author:profiles(display_name), images:spot_post_images(image_path, position)';
+export const POST_COLUMNS =
+  'id, user_id, body, is_hidden, campaign_id, created_at, updated_at, spot:spots(id, name), author:profiles(display_name), images:spot_post_images(image_path, position)';
 
 function toPosts(data: unknown): SpotPost[] {
   return (data as SpotPostRow[]).map((r) => toSpotPost(r, spotImageUrlOf));
@@ -58,10 +59,11 @@ export async function getSpotPost(postId: string): Promise<SpotPost | null> {
   return row ? (toPosts([row])[0] ?? null) : null;
 }
 
-// 自分の投稿（非表示を含む）を新しい順（S-11）。有効な特典の id は I-36 で足す
+// 自分の投稿（非表示を含む）を新しい順（S-11）。有効な特典の id を含む（BR-28）
 export async function getMySpotPosts(): Promise<SpotPost[]> {
   if (USE_MOCK) return mockApi.getMySpotPosts();
   const userId = await currentUserId();
+  const rewards = await validRewardIdsByPost(userId);
   const data = await rows(
     getSupabase()
       .from('spot_posts')
@@ -70,7 +72,9 @@ export async function getMySpotPosts(): Promise<SpotPost[]> {
       .order('created_at', { ascending: false })
       .order('id'),
   );
-  return toPosts(data);
+  return (data as SpotPostRow[]).map((r) =>
+    toSpotPost(r, spotImageUrlOf, rewards.get(r.id) ?? null),
+  );
 }
 
 // RPC save_spot_post（10.9、BR-21）。キャンペーン中のお店では、確かめた位置も渡す（BR-28）

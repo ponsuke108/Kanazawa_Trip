@@ -1,6 +1,7 @@
 // Supabase の呼び出しの共通処理：失敗したら ApiError を投げる（要件定義書 10.1、10.2）
 import { ApiError, toApiError } from '@/api/errors';
 import {
+  CAMPAIGN_IMAGES_BUCKET,
   getSupabase,
   PLAN_IMAGES_BUCKET,
   SPOT_COVERS_BUCKET,
@@ -74,6 +75,11 @@ export function spotImageUrlOf(path: string): string {
       .getPublicUrl(path.slice(coverPrefix.length)).data.publicUrl;
   }
   return getSupabase().storage.from(SPOT_POST_IMAGES_BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+// （v11 第3段階）キャンペーンの画像のパスを公開URLにする
+export function campaignImageUrlOf(path: string): string {
+  return getSupabase().storage.from(CAMPAIGN_IMAGES_BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
 // uuid の形でないID（存在しないURL）は問い合わせずに「見つからない」とする

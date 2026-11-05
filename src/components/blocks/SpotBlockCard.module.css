@@ -50,3 +50,17 @@
   object-fit: cover;
   border-radius: var(--radius-sm);
 }
+
+/* （v11）「キャンペーン中」のラベル（K47） */
+.campaign {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-campaign);
+  border-radius: var(--radius-full);
+  color: var(--color-campaign);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}

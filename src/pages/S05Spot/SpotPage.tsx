@@ -7,6 +7,7 @@ import { getSpotPosts } from '@/api/spotPosts';
 import { getSpot } from '@/api/spots';
 import { AddToListSheet } from '@/components/common/AddToListSheet';
 import { AppLayout } from '@/components/common/AppLayout';
+import { CampaignPanel } from '@/components/common/CampaignPanel';
 import { Button } from '@/components/common/Button';
 import { DropdownMenu } from '@/components/common/DropdownMenu';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -21,7 +22,7 @@ import { UiMessages } from '@/constants/messages';
 import { isDemoSpot, SpotTypeLabels } from '@/constants/spots';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
-import { ActionIcons, ListIcons, PostIcons, StateIcons } from '@/lib/icons';
+import { ActionIcons, ListIcons, PostIcons, ShopIcons, StateIcons } from '@/lib/icons';
 import type { SpotDetail } from '@/types/models';
 import styles from './SpotPage.module.css';
 
@@ -65,6 +66,7 @@ export function SpotPage() {
 function SpotDetailView({ spot }: { spot: SpotDetail }) {
   const navigate = useNavigate();
   const PostIcon = PostIcons.post;
+  const Ticket = ShopIcons.campaign;
   const [listOpen, setListOpen] = useState(false);
 
   return (
@@ -79,6 +81,12 @@ function SpotDetailView({ spot }: { spot: SpotDetail }) {
         <div className={styles.labels}>
           <span className={styles.label}>{SpotTypeLabels[spot.spotType]}</span>
           {isDemoSpot(spot.id) && <span className={styles.label}>デモ</span>}
+          {spot.campaign && (
+            <span className={`${styles.label} ${styles.campaignLabel}`}>
+              <Ticket size={14} aria-hidden="true" />
+              {UiMessages.campaignActive}
+            </span>
+          )}
         </div>
         {/* 押すと地図（S-13）でこのスポットを選んだ状態で開く */}
         <Link
@@ -92,6 +100,13 @@ function SpotDetailView({ spot }: { spot: SpotDetail }) {
         {spot.address && <p className={styles.sub}>{spot.address}</p>}
         {spot.area && <p className={styles.sub}>エリア：{spot.area}</p>}
       </section>
+
+      {/* （v11）キャンペーン中なら、そのキャンペーン（K47、BR-27、BR-28） */}
+      {spot.campaign && (
+        <CampaignPanel campaign={spot.campaign}>
+          <p className={styles.campaignNote}>{UiMessages.campaignHowTo}</p>
+        </CampaignPanel>
+      )}
 
       <div className={styles.actions}>
         <Button
