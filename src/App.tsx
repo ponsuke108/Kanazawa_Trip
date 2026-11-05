@@ -21,6 +21,7 @@ import { CreatePage } from '@/pages/S14Create/CreatePage';
 import { ListsPage } from '@/pages/S14Create/ListsPage';
 import { ListPage } from '@/pages/S15List/ListPage';
 import { SpotPostPage } from '@/pages/S17SpotPost/SpotPostPage';
+import { NaviPage } from '@/pages/S18Navi/NaviPage';
 
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
 
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
       { path: '/plans/new', element: auth(<PlanEditorPage />) },
       { path: '/plans/:planId', element: auth(<PlanDetailPage />) },
       { path: '/plans/:planId/edit', element: auth(<PlanEditorPage />) },
+      { path: '/plans/:planId/navi', element: auth(<NaviPage />) },
       { path: '/ranking', element: auth(<RankingPage />) },
       { path: '/mypage', element: auth(<MyPage />) },
       // （v11）
