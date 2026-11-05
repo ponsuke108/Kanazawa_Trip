@@ -25,6 +25,7 @@ import { tagsQuery } from '@/lib/tagParams';
 import type { PlanSummary, SpotPost } from '@/types/models';
 import { PlanTile } from './PlanTile';
 import { PostTile } from './PostTile';
+import { RoleEntry } from './RoleEntry';
 import { SnowScene } from './SnowScene';
 import styles from './MyPage.module.css';
 
@@ -214,6 +215,9 @@ export function MyPage() {
             </h1>
             <span className={styles.bubble}>{greeting(new Date().getHours())}</span>
           </section>
+
+          {/* （v11）お店・管理者の入口 */}
+          <RoleEntry role={user.role} />
 
           <button type="button" className={styles.search} onClick={() => navigate('/search')}>
             <Search size={20} aria-hidden="true" />

@@ -18,7 +18,7 @@ import {
   one,
   rows,
 } from '@/api/supabaseCall';
-import { getSupabase } from '@/lib/supabase';
+import { CAMPAIGN_IMAGES_BUCKET, getSupabase } from '@/lib/supabase';
 import type { Campaign, CampaignInput, CampaignReward } from '@/types/models';
 
 export const CAMPAIGN_COLUMNS =
@@ -149,4 +149,15 @@ function toLimitError(e: unknown): unknown {
     return new ApiError('LIMIT_REACHED');
   }
   return e;
+}
+
+// 変えるときに今の画像を残すため、表示用の URL から Storage のパスに戻す（Campaign は URL だけを持つ）
+export function campaignImagePath(campaign: Campaign): string | null {
+  if (USE_MOCK) return mockApi.campaignImagePath(campaign);
+  if (!campaign.imageUrl) return null;
+  const marker = `/${CAMPAIGN_IMAGES_BUCKET}/`;
+  const i = campaign.imageUrl.indexOf(marker);
+  return i >= 0
+    ? decodeURIComponent(campaign.imageUrl.slice(i + marker.length).split('?')[0] ?? '')
+    : null;
 }

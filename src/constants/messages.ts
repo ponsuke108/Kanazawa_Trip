@@ -48,6 +48,35 @@ export const ShareMessages = {
   guestLead: '旅ノート金沢に登録すると、このプランをコピーして自分のプランを作れます',
 } as const;
 
+// （v11 第3段階）お店の申請・お店の管理（6.6 S-19・S-20、BR-26〜BR-28）
+export const ShopMessages = {
+  applyLead:
+    '金沢市内のお店・施設の方は、申請して承認されると、キャンペーンを載せられます。審査は金沢市の担当者（管理者）が行います',
+  contactNotice: 'ほかの利用者には表示しません',
+  agreeNoRequest: '投稿の内容への頼み（良いことを書いてなど）をしない',
+  agreeImage: '画像は権利を持つものだけを使い、生成AIで作った画像を使わない',
+  applyConfirm: 'この内容で申請します。審査の結果はマイページに表示されます。',
+  applied: '申請しました',
+  pending: '審査中です',
+  pendingLead: '審査の結果はマイページに表示されます。しばらくお待ちください',
+  rejected: (reason: string | null) => `申請が却下されました${reason ? `（${reason}）` : ''}`,
+  spotTaken: 'このスポットには、すでにお店があります。別のスポットを選んでください',
+  imageNotice:
+    '画像は、お店が撮ったもの・権利を持つものだけを使ってください。生成AIで作った画像は使えません',
+  noContentRequest:
+    '特典は投稿の内容（良い・悪い）にかかわらず出ます。「良いことを書いてください」などの、投稿の内容への頼みは書かないでください',
+  suspended: '管理者がお店を停止しました。キャンペーンは表示されていません',
+  stopped: '管理者が停止しました。直しても再開できません（管理者が再開します）',
+  spotPositionNotice:
+    '特典の対象は、お店のスポットから100m以内で投稿した人です。スポットの位置が違うときは管理者に連絡してください',
+  endConfirm: 'このキャンペーンを終えます。終えたキャンペーンは再開できません。',
+  campaignSaved: 'キャンペーンを保存しました',
+  campaignEnded: 'キャンペーンを終えました',
+  shopSaved: 'お店の情報を変えました',
+  oneCampaign: 'キャンペーンは同時に1つまでです。今のキャンペーンを終えてから作ってください',
+  noShop: 'お店が見つかりません',
+} as const;
+
 // （v11）S-16 場所を探す（6.4）
 export const PlaceSearchMessages = {
   placeholder: 'スポット名を入力',

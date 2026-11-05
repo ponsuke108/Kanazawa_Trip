@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RedirectIfAuthed, RequireAuth } from '@/components/common/RequireAuth';
+import { RequireRole } from '@/components/common/RequireRole';
 import { RootLayout } from '@/components/common/RootLayout';
 import { ToastProvider } from '@/components/common/ToastProvider';
 import { AuthProvider } from '@/hooks/AuthProvider';
@@ -23,8 +24,17 @@ import { ListPage } from '@/pages/S15List/ListPage';
 import { SpotPostPage } from '@/pages/S17SpotPost/SpotPostPage';
 import { NaviPage } from '@/pages/S18Navi/NaviPage';
 import { SharedPlanPage } from '@/pages/S24Shared/SharedPlanPage';
+import { ApplyPage } from '@/pages/S19Apply/ApplyPage';
+import { ShopPage } from '@/pages/S20Shop/ShopPage';
+import type { UserRole } from '@/types/models';
 
 const auth = (page: ReactNode) => <RequireAuth>{page}</RequireAuth>;
+// （v11）利用者の種類で開ける画面（11.5、6.2）
+const authRole = (role: UserRole, page: ReactNode) => (
+  <RequireAuth>
+    <RequireRole role={role}>{page}</RequireRole>
+  </RequireAuth>
+);
 
 // URLと画面の対応（要件定義書 11.5）。/login 以外はすべてログイン必須（BR-14）
 const router = createBrowserRouter([
@@ -58,6 +68,9 @@ const router = createBrowserRouter([
       { path: '/spots/:spotId', element: auth(<SpotPage />) },
       { path: '/posts/new', element: auth(<SpotPostPage />) },
       { path: '/posts/:postId/edit', element: auth(<SpotPostPage />) },
+      // （v11 第3段階）S-19 は一般だけ、S-20 はお店だけ（6.2）
+      { path: '/official/apply', element: authRole('user', <ApplyPage />) },
+      { path: '/official', element: authRole('official', <ShopPage />) },
       { path: '*', element: auth(<NotFoundPage />) },
     ],
   },
