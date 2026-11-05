@@ -161,3 +161,9 @@ export function campaignImagePath(campaign: Campaign): string | null {
     ? decodeURIComponent(campaign.imageUrl.slice(i + marker.length).split('?')[0] ?? '')
     : null;
 }
+
+// 申請の最初のキャンペーン（下書き）の画像のパスを、表示用の URL にする（S-22）
+export function campaignImageUrl(path: string | null): string | null {
+  if (USE_MOCK) return mockApi.campaignImageUrl(path);
+  return path ? campaignImageUrlOf(path) : null;
+}

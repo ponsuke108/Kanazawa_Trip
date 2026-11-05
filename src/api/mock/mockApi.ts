@@ -2,6 +2,7 @@
 // 保存した内容は画面を再読み込みするまで覚えておく。ログイン状態だけは localStorage に保つ
 import { areaIndex } from '@/constants/areas';
 import { ApiError } from '@/api/errors';
+import { sortApplications } from '@/api/mappers';
 import { validatePlan } from '@/lib/blocks';
 import { distanceKm, isInKanazawa } from '@/lib/geo';
 import {
@@ -1068,6 +1069,11 @@ export const mockApi = {
   },
 
   // 表示用の URL から写真のパスに戻す（編集のとき）
+  // （v11 第3段階）キャンペーンの画像のパスを表示用の URL にする（S-22 の下書きのプレビュー）
+  campaignImageUrl(path: string | null): string | null {
+    return imageUrl(path);
+  },
+
   // （v11 第3段階）キャンペーンの画像の Storage のパス（変えるときに今の画像を残すため）
   campaignImagePath(campaign: Campaign): string | null {
     return state.campaigns.find((c) => c.id === campaign.id)?.imagePath ?? null;
@@ -1270,13 +1276,7 @@ export const mockApi = {
   async getApplications(): Promise<ShopApplication[]> {
     await delay();
     requireAdmin();
-    return [...state.applications]
-      .sort(
-        (a, b) =>
-          Number(b.status === 'pending') - Number(a.status === 'pending') ||
-          byTimeDesc(a.createdAt, b.createdAt),
-      )
-      .map(toApplication);
+    return sortApplications(state.applications.map(toApplication));
   },
 
   async getApplication(id: string): Promise<ShopApplication | null> {

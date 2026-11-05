@@ -2,7 +2,13 @@
 // 画面でも出し分けるが、守るのはデータベースの RLS と RPC（管理者でなければ FORBIDDEN）。
 // どの操作も RPC が admin_actions に記録する
 import { USE_MOCK } from '@/api/config';
-import { toApplication, toSpotPost, type ApplicationRow, type SpotPostRow } from '@/api/mappers';
+import {
+  sortApplications,
+  toApplication,
+  toSpotPost,
+  type ApplicationRow,
+  type SpotPostRow,
+} from '@/api/mappers';
 import { mockApi } from '@/api/mock/mockApi';
 import { APPLICATION_COLUMNS, SHOP_COLUMNS, toShopDetail } from '@/api/shops';
 import { POST_COLUMNS } from '@/api/spotPosts';
@@ -12,7 +18,7 @@ import type { ShopApplication, ShopDetail, SpotPost } from '@/types/models';
 
 const PAGE_SIZE = 20;
 
-// 申請の一覧：審査中を先に、新しい順（S-21）
+// 申請の一覧：審査中を古い順、その下に審査済みを新しい順（6.6 S-21）
 export async function getApplications(): Promise<ShopApplication[]> {
   if (USE_MOCK) return mockApi.getApplications();
   const data = await rows(
@@ -21,8 +27,7 @@ export async function getApplications(): Promise<ShopApplication[]> {
       .select(APPLICATION_COLUMNS)
       .order('created_at', { ascending: false }),
   );
-  const list = (data as unknown as ApplicationRow[]).map(toApplication);
-  return [...list].sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending'));
+  return sortApplications((data as unknown as ApplicationRow[]).map(toApplication));
 }
 
 export async function getApplication(id: string): Promise<ShopApplication | null> {

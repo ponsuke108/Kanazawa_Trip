@@ -413,3 +413,14 @@ export function toApplicationJson(input: ApplicationInput) {
     campaign_draft: input.campaignDraft ? toCampaignColumns(input.campaignDraft) : null,
   };
 }
+
+// 審査中を古い順、その下に審査済みを新しい順（6.6 S-21）
+export function sortApplications(list: ShopApplication[]): ShopApplication[] {
+  const pending = list
+    .filter((a) => a.status === 'pending')
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const reviewed = list
+    .filter((a) => a.status !== 'pending')
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return [...pending, ...reviewed];
+}
