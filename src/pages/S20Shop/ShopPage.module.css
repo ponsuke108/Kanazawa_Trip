@@ -1,0 +1,77 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-4);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.heading {
+  font-size: var(--font-size-lg);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.shopName {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.link {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.sub {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-xs);
+}
+
+.phase {
+  font-weight: 700;
+}
+
+.alert {
+  padding: var(--space-3);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.stats {
+  display: flex;
+  gap: var(--space-5);
+  font-size: var(--font-size-sm);
+}
+
+.stats strong {
+  font-size: var(--font-size-lg);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

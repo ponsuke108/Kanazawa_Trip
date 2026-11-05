@@ -53,3 +53,10 @@
   color: var(--color-danger);
   font-size: var(--font-size-sm);
 }
+
+/* （v11）複数行の入力欄（TextAreaField） */
+.textarea {
+  padding: var(--space-2) var(--space-3);
+  line-height: 1.6;
+  resize: vertical;
+}

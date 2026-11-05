@@ -134,6 +134,19 @@
   box-shadow: var(--shadow-snow-soft);
 }
 
+/* （v11）お店・管理者の入口。却下されたときは理由を上に出す */
+.roleBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.roleRejected {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
 /* ---- 切り替え（SegmentedControl）を、すりガラスの札に見せる ---- */
 .tabs [role='tablist'] {
   /* （v11）3つになったので、幅が足りないときは折り返す */

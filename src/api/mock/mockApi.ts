@@ -1068,6 +1068,11 @@ export const mockApi = {
   },
 
   // 表示用の URL から写真のパスに戻す（編集のとき）
+  // （v11 第3段階）キャンペーンの画像の Storage のパス（変えるときに今の画像を残すため）
+  campaignImagePath(campaign: Campaign): string | null {
+    return state.campaigns.find((c) => c.id === campaign.id)?.imagePath ?? null;
+  },
+
   spotPostImagePaths(post: SpotPost): string[] {
     const stored = state.posts.find((p) => p.id === post.id);
     return stored ? [...stored.imagePaths] : [];
