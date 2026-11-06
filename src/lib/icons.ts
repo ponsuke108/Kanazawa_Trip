@@ -22,6 +22,7 @@ import {
   Link2,
   Share2,
   EllipsisVertical,
+  Eye,
   EyeOff,
   FilePen,
   Footprints,
@@ -162,6 +163,8 @@ export const ActionIcons = {
   search: Search,
   create: CirclePlus,
   mypage: CircleUser,
+  showPassword: Eye, // S-12 のパスワードを見せる（7.3）
+  hidePassword: EyeOff, // S-12 のパスワードを隠す
 } satisfies Record<string, LucideIcon>;
 
 // 状態
@@ -175,7 +178,7 @@ export const StateIcons = {
   trophy: Trophy,
   spot: MapPin,
   heart: Heart,
-  snow: Snowflake, // S-11 の飾り（要件定義書 7.3、7.7）
+  snow: Snowflake, // S-11・S-12 の飾り（要件定義書 7.3、7.7）
 } satisfies Record<string, LucideIcon>;
 
 // （v11）お店・管理者（要件定義書 7.3）。キャンペーン中のお店のピンの札は campaign

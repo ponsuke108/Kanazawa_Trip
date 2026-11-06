@@ -1,7 +1,7 @@
 import { StateIcons } from '@/lib/icons';
 import styles from './SnowScene.module.css';
 
-// 背景：夕暮れの雪の茶屋街。空、両側の町家の格子、提灯の灯り、降り続ける雪（このページで唯一ずっと動くもの）
+// 背景：夕暮れの雪の茶屋街。空、両側の町家の格子、提灯の灯り、降り続ける雪（画面で唯一ずっと動くもの）。S-11 と S-12 で使う（7.7）
 export function SnowScene() {
   const Flake = StateIcons.snow;
   return (
