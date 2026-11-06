@@ -60,7 +60,7 @@ export function MapPage() {
     [spots.data, selectedId],
   );
 
-  // K68：写真のピンがない場所は、指すピンを出す。「定番以外だけ」で隠れているスポットも同じ
+  // K69：写真のピンがない場所は、指すピンを出す。「定番以外だけ」で隠れているスポットも同じ
   const targetPin = useMemo(
     () => targetPinOf(selected, candidate, new Set(pins.map((s) => s.id))),
     [selected, candidate, pins],
@@ -123,7 +123,7 @@ export function MapPage() {
         onClose={() => setSearchOpen(false)}
         onSelect={(r) => {
           setSearchOpen(false);
-          // K68：選んだ場所へ動かす。座標は S-16 の結果（このサイトのスポットか Nominatim）のもの
+          // K69：選んだ場所へ動かす。座標は S-16 の結果（このサイトのスポットか Nominatim）のもの
           const { lat, lng } = r.kind === 'spot' ? r.spot : r.candidate;
           setFocus({ lat, lng });
           if (r.kind === 'spot') selectSpot(r.spot.id);

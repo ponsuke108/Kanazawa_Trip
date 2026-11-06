@@ -256,7 +256,7 @@ export function MapView({
     });
   }, [selectedSpotId, spotsById, status, focus]);
 
-  // （K68）シートに隠れない範囲の中央へ動かす
+  // （K69）シートに隠れない範囲の中央へ動かす
   const moveToVisibleCenter = useCallback(({ lat, lng }: MapPoint) => {
     const map = mapRef.current;
     if (!map) return;
@@ -270,12 +270,12 @@ export function MapView({
     });
   }, []);
 
-  // （K68）検索で選んだ場所へ動かす。ピンがもう見えていても、同じ場所をもう一度選んでも動かす
+  // （K69）検索で選んだ場所へ動かす。ピンがもう見えていても、同じ場所をもう一度選んでも動かす
   useEffect(() => {
     if (status === 'ready' && focus) moveToVisibleCenter(focus);
   }, [focus, status, moveToVisibleCenter]);
 
-  // （K68）写真のピンがない場所を指す。共有した URL で開いたときも見えるように、そこへ動かす
+  // （K69）写真のピンがない場所を指す。共有した URL で開いたときも見えるように、そこへ動かす
   const [targetPinEl] = useState(() => {
     const el = document.createElement('div');
     el.className = styles.targetMarker ?? '';

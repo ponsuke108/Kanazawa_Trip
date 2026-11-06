@@ -110,7 +110,7 @@
   text-align: center;
 }
 
-/* 写真のピンがない場所を指すピン（K68）。先の尖った形で、写真のピンと見分ける */
+/* 写真のピンがない場所を指すピン（K69）。先の尖った形で、写真のピンと見分ける */
 .target {
   display: block;
   color: var(--color-surface);

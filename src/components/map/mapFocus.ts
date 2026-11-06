@@ -7,7 +7,7 @@ const SIDE_SHEET_WIDTH_PX = 400;
 // 見える範囲の中央に近い。シートの高さは写真の読み込みで変わるので、測らずに決める
 const BOTTOM_SHEET_SHIFT_RATIO = 0.15;
 
-// シートに隠れない範囲の中央が、地図の中央からどれだけずれているか（K68）。maplibre-gl の offset に渡す
+// シートに隠れない範囲の中央が、地図の中央からどれだけずれているか（K69）。maplibre-gl の offset に渡す
 export function visibleCenterOffset(height: number, sideSheet: boolean): [number, number] {
   if (sideSheet) return [-SIDE_SHEET_WIDTH_PX / 2, 0];
   return [0, -height * BOTTOM_SHEET_SHIFT_RATIO];
@@ -15,7 +15,7 @@ export function visibleCenterOffset(height: number, sideSheet: boolean): [number
 
 type Place = MapTargetPin & { id?: number };
 
-// 写真のピンがない場所だけを指すピンにする（K68、BR-24）。写真のピンがあるスポットは、そのピンを使う
+// 写真のピンがない場所だけを指すピンにする（K69、BR-24）。写真のピンがあるスポットは、そのピンを使う
 export function targetPinOf(
   selected: Place | null,
   candidate: Place | null,

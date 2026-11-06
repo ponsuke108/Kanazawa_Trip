@@ -64,7 +64,7 @@ export function ClusterPin({ spot, count, onClick }: ClusterProps) {
   );
 }
 
-// 写真のピンがない場所を指すピン（K68）。押せない。名前や操作はシートに出す
+// 写真のピンがない場所を指すピン（K69）。押せない。名前や操作はシートに出す
 export function TargetPin({ name }: { name: string }) {
   const Pin = MapIcons.targetPin;
   return (
