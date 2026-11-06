@@ -1,180 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap');
+
 .sp {
-  --ink: #3a2418;
-  --muted: #6b4a38;
-  --accent: #b84a25;
-  --sel: #fce9d8;
-  --line: rgba(120, 80, 50, 0.22);
+  /* この画面で使う色(あとで variables.css に移す) */
+  --sp-bg: #f5ede1;
+  --sp-surface: #fcf8f1;
+  --sp-border: #e6d7c3;
+  --sp-tag-border: #dfcdb7;
+  --sp-divider: #eadcc8;
+  --sp-text: #3b2a20;
+  --sp-tag-text: #5a4333;
+  --sp-sub: #7a6454;
+  --sp-heading: #5b3420;
+  --sp-accent: #b4532a;
+  --sp-accent-contrast: #fff8f0;
+  --sp-primary: #6b3e26;
+  --sp-primary-contrast: #fff3e3;
+  --sp-tone-1: #b4532a;
+  --sp-tone-2: #c07a3a;
+  --sp-tone-3: #8c6a3f;
+  --sp-tone-4: #6e4a38;
+  --sp-tone-5: #a65e3a;
+
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #f7ecdd 0%, #f0dcc2 50%, #e5c29c 100%);
-  color: var(--ink);
-  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--sp-bg);
+  color: var(--sp-text);
+  font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
 }
+
+/* ヘッダー */
 .sp-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  height: 56px;
+  height: 64px;
   padding: 0 24px;
-  background: rgba(255, 250, 242, 0.92);
-  border-bottom: 1px solid rgba(120, 80, 50, 0.15);
-}
-.sp-header > * {
-  width: 100px;
-}
-.sp-header h1 {
-  width: auto;
-  margin: 0;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
+  border-bottom: 1px solid var(--sp-border);
 }
 .sp-brand {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 13px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
   letter-spacing: 0.12em;
-  color: #8a4b2a;
+  color: var(--sp-heading);
 }
+.sp-header h1 {
+  margin: 0;
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.2em;
+  color: var(--sp-text);
+}
+
+/* 本文 */
 .sp-main {
   flex: 1;
-  padding: 28px 24px 0;
-}
-.sp-hint {
-  margin: 0 0 30px;
-  font-size: 13px;
-  font-weight: 300;
-  line-height: 1.9;
-  letter-spacing: 0.05em;
-  color: var(--muted);
-}
-.sp-label {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 0 0 14px;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.24em;
-  color: #7a5a45;
-}
-.sp-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
-.sp-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 34px;
-}
-.sp-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 58px;
-  padding: 0 14px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.6);
-  color: #4a3326;
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-}
-.sp-card svg {
-  color: #8a6a52;
-}
-.sp-card-label {
-  flex: 1;
-  font-size: 14px;
-  font-weight: 300;
-  letter-spacing: 0.06em;
-}
-.sp-ring {
-  width: 18px;
-  height: 18px;
-  box-sizing: border-box;
-  border-radius: 50%;
-  border: 1px solid rgba(120, 80, 50, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-}
-.sp-card.on {
-  background: var(--sel);
-  border-color: var(--accent);
-  color: var(--ink);
-}
-.sp-card.on svg {
-  color: var(--accent);
-}
-.sp-card.on .sp-card-label {
-  font-weight: 400;
-}
-.sp-card.on .sp-ring {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-.sp-seg {
-  display: flex;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.6);
-  overflow: hidden;
-}
-.sp-seg button {
-  flex: 1;
-  height: 76px;
+  padding: 28px 20px 8px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+.sp-hint {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.9;
+  letter-spacing: 0.06em;
+  color: var(--sp-sub);
+}
+.sp-panel {
+  background: var(--sp-surface);
+  border: 1px solid var(--sp-border);
+  border-radius: 24px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.sp-label {
+  margin: 0;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--sp-heading);
+}
+.sp-label::before {
+  content: '';
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--sp-accent);
+}
+.sp-divider {
+  width: 100%;
+  height: 1px;
+  margin: 8px 0;
   border: 0;
-  background: transparent;
-  color: #4a3326;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 300;
-  letter-spacing: 0.1em;
+  background: var(--sp-divider);
+}
+
+/* タグ(テーマ・天気共通) */
+.sp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.sp-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 18px 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--sp-tag-border);
+  background: var(--sp-surface);
+  color: var(--sp-tag-text);
+  font:
+    400 15px 'Zen Kaku Gothic New',
+    'Noto Sans JP',
+    sans-serif;
+  letter-spacing: 0.06em;
   cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 }
-.sp-seg button + button {
-  border-left: 1px solid rgba(120, 80, 50, 0.2);
+.sp-card:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
 }
-.sp-seg button.on {
-  background: var(--sel);
-  color: var(--ink);
-  font-weight: 400;
+.sp-card:nth-child(5n + 1) svg {
+  color: var(--sp-tone-1);
 }
-.sp-seg button.on svg {
-  color: var(--accent);
+.sp-card:nth-child(5n + 2) svg {
+  color: var(--sp-tone-2);
 }
+.sp-card:nth-child(5n + 3) svg {
+  color: var(--sp-tone-3);
+}
+.sp-card:nth-child(5n + 4) svg {
+  color: var(--sp-tone-4);
+}
+.sp-card:nth-child(5n + 5) svg {
+  color: var(--sp-tone-5);
+}
+
+/* 選択中(アイコン色より後ろに書く) */
+.sp-card.on {
+  background: var(--sp-accent);
+  border-color: var(--sp-accent);
+  color: var(--sp-accent-contrast);
+}
+.sp-card.on svg {
+  color: var(--sp-accent-contrast);
+}
+
+/* 下部ボタン */
 .sp-cta {
   position: sticky;
   bottom: 0;
-  padding: 16px 24px;
+  padding: 16px 20px 20px;
+  background: linear-gradient(to top, var(--sp-bg) 70%, transparent);
 }
 .sp-cta button {
   width: 100%;
-  height: 54px;
+  height: 56px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sp-primary);
+  color: var(--sp-primary-contrast);
+  font:
+    500 16px 'Zen Kaku Gothic New',
+    'Noto Sans JP',
+    sans-serif;
+  letter-spacing: 0.2em;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  border: 0;
-  border-radius: 27px;
-  background: var(--accent);
-  color: #fff6ea;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 16px;
-  letter-spacing: 0.14em;
-  box-shadow: 0 6px 18px rgba(120, 50, 20, 0.3);
+  gap: 12px;
   cursor: pointer;
+  box-shadow: 0 6px 16px rgba(107, 62, 38, 0.22);
 }

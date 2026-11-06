@@ -13,7 +13,6 @@ import {
   CloudRain,
   Cloud,
   Search,
-  Check,
 } from 'lucide-react';
 import './search.css';
 
@@ -59,42 +58,45 @@ export default function S02Search({ onSearch }: Props) {
           どれか1つでも合うプランが見つかります。
         </p>
 
-        <h2 className="sp-label">テーマ</h2>
-        <div className="sp-grid">
-          {THEMES.map(({ id, label, Icon }) => {
-            const on = themes.includes(id);
-            return (
-              <button
-                key={id}
-                className={`sp-card ${on ? 'on' : ''}`}
-                aria-pressed={on}
-                onClick={() => toggle(themes, setThemes, id)}
-              >
-                <Icon size={20} strokeWidth={1.4} />
-                <span className="sp-card-label">{label}</span>
-                <span className="sp-ring">{on && <Check size={11} strokeWidth={2.4} />}</span>
-              </button>
-            );
-          })}
-        </div>
+        <section className="sp-panel">
+          <h2 className="sp-label">テーマ</h2>
+          <div className="sp-tags">
+            {THEMES.map(({ id, label, Icon }) => {
+              const on = themes.includes(id);
+              return (
+                <button
+                  key={id}
+                  className={`sp-card ${on ? 'on' : ''}`}
+                  aria-pressed={on}
+                  onClick={() => toggle(themes, setThemes, id)}
+                >
+                  <Icon size={20} strokeWidth={1.5} />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
 
-        <h2 className="sp-label">天気</h2>
-        <div className="sp-seg">
-          {WEATHER.map(({ id, label, Icon }) => {
-            const on = weather.includes(id);
-            return (
-              <button
-                key={id}
-                className={on ? 'on' : ''}
-                aria-pressed={on}
-                onClick={() => toggle(weather, setWeather, id)}
-              >
-                <Icon size={22} strokeWidth={1.4} />
-                <span>{label}</span>
-              </button>
-            );
-          })}
-        </div>
+          <hr className="sp-divider" />
+
+          <h2 className="sp-label">天気</h2>
+          <div className="sp-tags">
+            {WEATHER.map(({ id, label, Icon }) => {
+              const on = weather.includes(id);
+              return (
+                <button
+                  key={id}
+                  className={`sp-card ${on ? 'on' : ''}`}
+                  aria-pressed={on}
+                  onClick={() => toggle(weather, setWeather, id)}
+                >
+                  <Icon size={20} strokeWidth={1.5} />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
       </main>
 
       <div className="sp-cta">
