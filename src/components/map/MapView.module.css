@@ -11,6 +11,12 @@
   inset: 0;
 }
 
+/* 写真のピンがない場所を指すピン（K69）。近くの写真のピンより手前に出す */
+.targetMarker {
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* 現在地のボタン：右下（出典の上） */
 .locate {
   position: absolute;

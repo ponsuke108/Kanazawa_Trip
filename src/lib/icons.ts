@@ -87,6 +87,7 @@ export const MapIcons = {
   map: MapIcon,
   locate: LocateFixed,
   ranking: Trophy,
+  targetPin: MapPin,
 } satisfies Record<string, LucideIcon>;
 
 // ブロック

@@ -8,6 +8,9 @@ export type MapSpot = Pick<Spot, 'id' | 'name' | 'lat' | 'lng' | 'spotType'> & {
   highlighted?: boolean; // （v11）リストに保存したスポット：ピンを大きくし Bookmark の札を付ける（6.4 S-07）
 };
 
+export type MapPoint = { lat: number; lng: number };
+export type MapTargetPin = MapPoint & { name: string };
+
 export type MapViewProps = {
   spots: MapSpot[];
   selectedSpotId?: number | null;
@@ -15,5 +18,7 @@ export type MapViewProps = {
   interactive?: boolean; // false なら動かせない（S-05 の小さな地図）
   fitToSpots?: boolean; // スポットがすべて入るように合わせる
   edgeZoom?: boolean; // （K66）スマホで左右の画面の端を縦になぞって拡大・縮小する（S-13）
+  targetPin?: MapTargetPin | null; // （K69）写真のピンがない場所を指すピン。出たらそこへ動かす（S-13）
+  focus?: MapPoint | null; // （K69）新しい値を渡すたびに、そこへ動かす（S-13 の検索）
   height: string; // CSS の高さ（'160px'、'100%' など）。高さのある親の中に置く
 };
