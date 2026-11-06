@@ -31,6 +31,8 @@ const MODES: Array<{ value: Mode; label: string }> = [
 // お茶を点てる絵の長さ（7.7）。スキップしなければ、ログインがすぐ終わってもここまでは見せる
 const BREW_MS = 3700;
 const SERVE_MS = 800;
+// 表示名の欄が開く長さ（LoginPage.module.css の .nameSlot と同じ）。開き終えたらボタンが見える位置まで動かす
+const MODE_MS = 250;
 
 // 待つ。skip に入れた関数を呼ぶと、待つのをやめてすぐ進む（お茶の絵をタップしてスキップするとき）
 function skippableWait(ms: number, skip: { current: () => void }): Promise<void> {
@@ -76,6 +78,7 @@ export function LoginPage() {
   const mode: Mode = params.get('mode') === 'signup' ? 'signup' : 'login';
   const navigate = useNavigate();
   const toast = useToast();
+  const cardRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { setUser } = useAuth();
 
@@ -110,6 +113,18 @@ export function LoginPage() {
     setParams(p, { replace: true });
     setErrors({});
     setFormError(null);
+    // 新規登録は欄が1つ増えて、スマホでは「登録する」が画面の外に出ることがある
+    if (next === 'signup') {
+      const still = reducedMotion();
+      window.setTimeout(
+        () =>
+          cardRef.current?.scrollIntoView({
+            block: 'nearest',
+            behavior: still ? 'auto' : 'smooth',
+          }),
+        still ? 0 : MODE_MS,
+      );
+    }
   };
 
   const submit = async (e: FormEvent) => {
@@ -194,6 +209,7 @@ export function LoginPage() {
           </div>
           {/* 入力はすりガラスの箱の中。共通部品はそのまま使い、色だけ箱の中で変える（7.7） */}
           <div
+            ref={cardRef}
             className={`${styles.card} ${failed === 0 ? '' : failed % 2 === 0 ? styles.shakeA : styles.shakeB}`}
           >
             <SegmentedControl
@@ -202,22 +218,27 @@ export function LoginPage() {
               onChange={changeMode}
               label="ログインか新規登録か"
             />
-            {/* 切り替えたら入力欄を出し直す（key）ので、入力欄がふわっと入れ替わる */}
-            <form key={mode} className={styles.form} onSubmit={submit} noValidate>
-              {mode === 'signup' && (
-                <TextField
-                  label="表示名"
-                  value={displayName}
-                  onChange={(e) => edit('displayName', setDisplayName)(e.target.value)}
-                  error={errors.displayName}
-                  hint="20文字以内。プランに「〇〇さんのプラン」と表示されます"
-                  autoComplete="nickname"
-                  maxLength={40}
-                  name="displayName"
-                  enterKeyHint="next"
-                  onKeyDown={nextOnEnter('email')}
-                />
-              )}
+            {/* 切り替えても入力欄は出し直さない。入力した内容とカーソルを残し、表示名の欄だけを開閉する */}
+            <form className={styles.form} onSubmit={submit} noValidate>
+              <div
+                className={`${styles.nameSlot} ${mode === 'signup' ? styles.nameOpen : ''}`}
+                inert={mode !== 'signup'}
+              >
+                <div className={styles.nameInner}>
+                  <TextField
+                    label="表示名"
+                    value={displayName}
+                    onChange={(e) => edit('displayName', setDisplayName)(e.target.value)}
+                    error={errors.displayName}
+                    hint="20文字以内。プランに「〇〇さんのプラン」と表示されます"
+                    autoComplete="nickname"
+                    maxLength={40}
+                    name="displayName"
+                    enterKeyHint="next"
+                    onKeyDown={nextOnEnter('email')}
+                  />
+                </div>
+              </div>
               <TextField
                 label="メールアドレス"
                 type="email"

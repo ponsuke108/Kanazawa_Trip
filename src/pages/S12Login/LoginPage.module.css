@@ -308,9 +308,34 @@
   animation: stamp 0.35s 1.8s ease-out both;
 }
 
-/* 切り替えたとき：入力欄をさっと入れ替える */
-.form {
-  animation: fade 0.2s ease-out;
+/* 切り替えたとき：表示名の欄だけを開閉する。閉じているときは form の gap も打ち消す */
+.nameSlot {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-bottom: calc(-1 * var(--space-4));
+  opacity: 0;
+  transition:
+    grid-template-rows 0.25s ease-out,
+    margin-bottom 0.25s ease-out,
+    opacity 0.25s ease-out;
+}
+
+.nameOpen {
+  grid-template-rows: 1fr;
+  margin-bottom: 0;
+  opacity: 1;
+}
+
+/* 入力欄のまわりの光（4px）が切れないように、その分だけ内側に余白をとる */
+.nameInner {
+  min-height: 0;
+  margin: calc(-1 * var(--space-1));
+  padding: var(--space-1);
+  overflow: hidden;
+}
+
+.form [id$='-hint'] {
+  animation: fade 0.25s ease-out both;
 }
 
 /* 入力の誤り：そっと出す */
@@ -417,7 +442,7 @@
   .title > span:not(.seal),
   .lead > span,
   .seal,
-  .form,
+  .form [id$='-hint'],
   .form [id$='-error'],
   .shakeA,
   .shakeB {
@@ -428,6 +453,7 @@
   .card input,
   .card [role='tab'],
   .card [role='tablist']::before,
+  .nameSlot,
   .reveal {
     transition: none;
   }
