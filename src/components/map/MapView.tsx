@@ -14,7 +14,7 @@ import { repSpotId, toFeatureCollection } from '@/components/map/spotsGeoJson';
 import { isEdgeStart, MOBILE_MEDIA, TAP_SLOP_PX, zoomFromDrag } from '@/components/map/edgeZoom';
 import type { MapSpot, MapViewProps } from '@/components/map/types';
 import { KanazawaCenter, MapMaxBounds } from '@/lib/geo';
-import { createZoomFollower } from '@/components/map/zoomMotion';
+import { createZoomFollower, REDUCED_MOTION_MEDIA } from '@/components/map/zoomMotion';
 import styles from './MapView.module.css';
 
 const SOURCE_ID = 'spots';
@@ -23,7 +23,6 @@ const SPOT_ZOOM = 15; // スポットが1つのときの拡大
 const CLUSTER_RADIUS = 48; // この距離（画面の px）より近いピンを写真の束にする
 const CLUSTER_MAX_ZOOM = 16; // これより拡大したら束にしない
 const FIT_PADDING = 56;
-const REDUCED_MOTION_MEDIA = '(prefers-reduced-motion: reduce)';
 
 type PinItem =
   | { key: string; kind: 'spot'; el: HTMLElement; spotId: number }

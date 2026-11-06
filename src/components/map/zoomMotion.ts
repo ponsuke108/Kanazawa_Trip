@@ -1,4 +1,5 @@
 // （K70）端ズームのなめらかな動き。指の動きで決まるズームへ、毎コマ少しずつ近づける。指を離しても止まるまで続く
+export const REDUCED_MOTION_MEDIA = '(prefers-reduced-motion: reduce)'; // この設定のときは動きなしで変える
 const FOLLOW_TAU_MS = 60; // この時間で、残りの約 63% を進む
 const SETTLE_ZOOM = 0.002; // これより近づいたら止める
 const MAX_FRAME_MS = 50; // タブが裏にあったあとなどで、1コマが長くなっても飛ばない
