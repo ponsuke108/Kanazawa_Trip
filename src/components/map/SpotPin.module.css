@@ -109,3 +109,15 @@
   line-height: 1.5;
   text-align: center;
 }
+
+/* 写真のピンがない場所を指すピン（K69）。先の尖った形で、写真のピンと見分ける */
+.target {
+  display: block;
+  color: var(--color-surface);
+  pointer-events: none;
+}
+
+.target svg {
+  display: block;
+  fill: var(--color-accent);
+}
