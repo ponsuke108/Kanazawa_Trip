@@ -6,7 +6,7 @@
 //
 // 作った SQL は、Supabase 管理画面の SQL Editor に貼り付けるか psql で実行する。
 // 中身は id をキーにした upsert（あれば更新、なければ追加）で、削除はしない。
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -29,9 +29,37 @@ const COLUMNS = [
   'source',
   'added_by',
   'checked',
+  // （v11）ここから下は任意（basis は定番で必須）。basis はデータベースに入れず、記録として残す（9.6）
+  'osm_ref',
+  'place_kind',
+  'address',
+  'cover_image',
+  'basis',
 ];
-const REQUIRED = COLUMNS.filter((c) => c !== 'google_place_id' && c !== 'sort_order');
+const OPTIONAL = [
+  'google_place_id',
+  'sort_order',
+  'osm_ref',
+  'place_kind',
+  'address',
+  'cover_image',
+  'basis',
+];
+const REQUIRED = COLUMNS.filter((c) => !OPTIONAL.includes(c));
 const SPOT_TYPES = ['major', 'minor', 'hub'];
+// 場所の種類（9.8。src/lib/places.ts の toPlaceKind と同じ）
+const PLACE_KINDS = [
+  '観光名所',
+  '博物館・美術館',
+  '寺社',
+  '飲食店',
+  'お店',
+  '公園・庭園',
+  '史跡',
+  '建物',
+  '場所',
+];
+const MAX_ADDRESS = 100;
 // 金沢市の付近（9.6）
 const LAT = [36.4, 36.7];
 const LNG = [136.5, 136.9];
@@ -92,8 +120,22 @@ function sqlText(s) {
   return `'${s.replace(/'/g, "''")}'`;
 }
 
+function sqlTextOrNull(s) {
+  return s ? sqlText(s) : 'null';
+}
+
+// basis の記号の意味（19.4 の情報源一覧）。列名は code,name,url,checked_on,range
+function loadSourceCodes() {
+  const path = resolve(ROOT, 'supabase/data/spot-sources.csv');
+  if (!existsSync(path)) return null;
+  const rows = parseCsv(readFileSync(path, 'utf8'));
+  return rows.slice(1).map((r) => r.cells[0].trim());
+}
+
 function main() {
   const areas = loadAreas();
+  const sourceCodes = loadSourceCodes();
+  const warnings = [];
   const rows = parseCsv(readFileSync(input, 'utf8'));
   const errors = [];
   const fail = (line, msg) => errors.push(`${line}行目：${msg}`);
@@ -113,6 +155,7 @@ function main() {
   const spots = [];
   const seenIds = new Map();
   const seenNames = new Map();
+  const seenOsmRefs = new Map();
   for (const { line, cells } of rows.slice(1)) {
     if (cells.length !== COLUMNS.length) {
       fail(line, `列の数が ${cells.length} 個です（${COLUMNS.length} 個のはず）`);
@@ -153,6 +196,32 @@ function main() {
     if (!['TRUE', 'FALSE'].includes(r.is_active.toUpperCase()))
       fail(line, 'is_active は TRUE か FALSE です');
 
+    // （v11）9.6 の段階3、19.4
+    if (r.spot_type === 'major' && r.basis === '') fail(line, '定番なのに basis が空です');
+    if (r.basis !== '') {
+      const codes = r.basis.split('/');
+      const unknown = sourceCodes ? codes.filter((c) => !sourceCodes.includes(c)) : [];
+      if (unknown.length > 0)
+        fail(line, `basis の「${unknown.join('、')}」は情報源一覧にありません`);
+      // K60 の基準（情報源の半分以上）に届かない行は、止めずに知らせる
+      if (r.spot_type === 'major' && sourceCodes && codes.length * 2 < sourceCodes.length) {
+        warnings.push(
+          `${line}行目：${r.name} は情報源 ${sourceCodes.length} つのうち ${codes.length} つです`,
+        );
+      }
+    }
+    if (r.place_kind !== '' && !PLACE_KINDS.includes(r.place_kind)) {
+      fail(line, `place_kind「${r.place_kind}」は 9.8 の一覧にありません`);
+    }
+    if (r.address.length > MAX_ADDRESS) fail(line, `address は ${MAX_ADDRESS} 文字までです`);
+    if (r.osm_ref !== '') {
+      if (!/^(node|way|relation)\/\d+$/.test(r.osm_ref))
+        fail(line, `osm_ref「${r.osm_ref}」は node/123 の形にしてください`);
+      if (seenOsmRefs.has(r.osm_ref))
+        fail(line, `osm_ref「${r.osm_ref}」が ${seenOsmRefs.get(r.osm_ref)}行目と重複しています`);
+      seenOsmRefs.set(r.osm_ref, line);
+    }
+
     if (r.id !== '') seenIds.set(r.id, line);
     if (r.name !== '') seenNames.set(r.name, line);
     if (errors.length === before) spots.push({ ...r, lat, lng });
@@ -170,7 +239,10 @@ function main() {
       (s) =>
         `  (${Number(s.id)}, ${sqlText(s.name)}, ${sqlText(s.description)}, ${s.lat}, ${s.lng}, ` +
         `${s.google_place_id ? sqlText(s.google_place_id) : 'null'}, ${sqlText(s.spot_type)}, ` +
-        `${sqlText(s.area)}, ${s.is_active.toUpperCase() === 'TRUE'}, ${s.sort_order === '' ? 0 : Number(s.sort_order)})`,
+        `${sqlText(s.area)}, ${s.is_active.toUpperCase() === 'TRUE'}, ${s.sort_order === '' ? 0 : Number(s.sort_order)}, ` +
+        `'curated', ${sqlTextOrNull(s.osm_ref)}, ${sqlTextOrNull(s.address)}, ${sqlTextOrNull(s.place_kind)}, ` +
+        // チームの写真は spot-covers/{id}.jpg（9.4）。拡張子はファイルによらず jpg
+        `${s.cover_image ? sqlText(`spot-covers/${Number(s.id)}.jpg`) : 'null'})`,
     )
     .join(',\n');
 
@@ -178,20 +250,26 @@ function main() {
 -- 元のファイル：${input.slice(ROOT.length + 1).replace(/\\/g, '/')}（${spots.length}件）
 -- id をキーにした upsert。削除はしない（BR-17）。使わなくなったスポットは CSV の is_active を FALSE にする
 insert into public.spots
-  (id, name, description, lat, lng, google_place_id, spot_type, area, is_active, sort_order)
+  (id, name, description, lat, lng, google_place_id, spot_type, area, is_active, sort_order,
+   source, osm_ref, address, place_kind, cover_image_path)
 values
 ${values}
 on conflict (id) do update
   set name = excluded.name, description = excluded.description, lat = excluded.lat,
       lng = excluded.lng, google_place_id = excluded.google_place_id,
       spot_type = excluded.spot_type, area = excluded.area,
-      is_active = excluded.is_active, sort_order = excluded.sort_order;
+      is_active = excluded.is_active, sort_order = excluded.sort_order,
+      source = excluded.source, osm_ref = excluded.osm_ref, address = excluded.address,
+      place_kind = excluded.place_kind,
+      -- CSV に写真がない行では、すでに付けた写真を消さない
+      cover_image_path = coalesce(excluded.cover_image_path, public.spots.cover_image_path);
 
 select count(*) as spot_count from public.spots;
 `;
   mkdirSync(dirname(output), { recursive: true });
   writeFileSync(output, sql);
   console.log(`${spots.length}件のスポットから ${output.slice(ROOT.length + 1)} を作りました。`);
+  for (const w of warnings) console.log(`確かめてください（K60 の基準に届きません）：${w}`);
 }
 
 main();

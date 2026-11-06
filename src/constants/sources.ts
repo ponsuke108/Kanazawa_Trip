@@ -2,9 +2,14 @@
 // オープンデータを取り込んだら（P-03、P-04）、その名前と提供元をここに追加する
 export const DataSources: Array<{ label: string; name: string; url?: string }> = [
   {
-    label: 'スポットの位置・定番スポットの基準',
+    label: 'スポットの位置',
     name: '金沢市観光公式サイト「金沢旅物語」（金沢市観光協会）',
     url: 'https://www.kanazawa-kankoukyoukai.or.jp/',
+  },
+  {
+    // K60：数えた情報源は supabase/data/spot-sources.csv
+    label: '定番スポットの基準',
+    name: '金沢旅物語、ほっと石川旅ねっと、じゃらんnet、るるぶトラベル、楽天トラベル、JAL SKYWARD+ のおすすめの一覧（2026年11月に確認）',
   },
   {
     label: 'スポットの名称・位置（一部）',
