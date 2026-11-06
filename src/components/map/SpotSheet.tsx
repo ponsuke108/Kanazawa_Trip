@@ -6,6 +6,7 @@ import { getSpotPosts } from '@/api/spotPosts';
 import { AddToListSheet } from '@/components/common/AddToListSheet';
 import { Button } from '@/components/common/Button';
 import { IconButton } from '@/components/common/IconButton';
+import { SpotPhotoCredit } from '@/components/common/SpotPhotoCredit';
 import { isDemoSpot, SpotTypeLabels } from '@/constants/spots';
 import { ActionIcons, ListIcons, PostIcons } from '@/lib/icons';
 import type { Spot } from '@/types/models';
@@ -55,8 +56,11 @@ export function SpotSheet({ spot, onClose }: Props) {
           ))}
         </ul>
       ) : spot.latestImageUrl ? (
-        // 投稿がまだなく、チームの写真だけがあるスポット（K50）
-        <img src={spot.latestImageUrl} alt={`${spot.name}の写真`} className={styles.photo} />
+        // 投稿がまだなく、チームの写真か出典つきの写真だけがあるスポット（K50、K65）
+        <div className={styles.cover}>
+          <img src={spot.latestImageUrl} alt={`${spot.name}の写真`} className={styles.photo} />
+          <SpotPhotoCredit spot={spot} />
+        </div>
       ) : null}
       <div className={styles.actions}>
         <Button variant="secondary" onClick={() => navigate(`/spots/${spot.id}`)}>

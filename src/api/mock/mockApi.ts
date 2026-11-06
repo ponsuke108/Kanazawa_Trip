@@ -3,6 +3,7 @@
 import { areaIndex } from '@/constants/areas';
 import { ApiError } from '@/api/errors';
 import { sortApplications } from '@/api/mappers';
+import { spotPhotoUrl } from '@/constants/spotPhotos';
 import { validatePlan } from '@/lib/blocks';
 import { distanceKm, isInKanazawa } from '@/lib/geo';
 import {
@@ -395,7 +396,7 @@ function withSummary(spot: Spot): Spot {
   return {
     ...spot,
     postCount: posts.length,
-    latestImageUrl: imageUrl(latestPath),
+    latestImageUrl: imageUrl(latestPath) ?? spotPhotoUrl(spot.id), // K65
     hasActiveCampaign: activeCampaignOf(spot.id) !== null,
   };
 }
