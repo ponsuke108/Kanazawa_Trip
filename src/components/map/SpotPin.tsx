@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import type { MapSpot } from '@/components/map/types';
-import { ListIcons, ShopIcons } from '@/lib/icons';
+import { ListIcons, MapIcons, ShopIcons } from '@/lib/icons';
 import styles from './SpotPin.module.css';
+
+export const TARGET_PIN_SIZE = 44; // 写真のピンと同じ大きさ（--tap-min）
 
 type PinProps = {
   spot: MapSpot;
@@ -59,6 +61,16 @@ export function ClusterPin({ spot, count, onClick }: ClusterProps) {
         +{count - 1}
       </span>
     </button>
+  );
+}
+
+// 写真のピンがない場所を指すピン（K69）。押せない。名前や操作はシートに出す
+export function TargetPin({ name }: { name: string }) {
+  const Pin = MapIcons.targetPin;
+  return (
+    <span className={styles.target} role="img" aria-label={`${name}の位置`}>
+      <Pin size={TARGET_PIN_SIZE} aria-hidden="true" />
+    </span>
   );
 }
 
