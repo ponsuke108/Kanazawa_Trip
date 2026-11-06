@@ -104,6 +104,26 @@
   padding-top: var(--space-5);
 }
 
+/* マスコット「ちょうちんねこ」：ひとことの左下に、ちょこんと座る。
+   48×48 のドット絵が横に5コマ並んだ画像（まん中、まん中、しっぽ左、しっぽ右、目を開けた）を、
+   ドットがにじまないように2倍（96×96）で出す */
+.mascot {
+  display: block;
+  flex-shrink: 0;
+  align-self: flex-end;
+  width: calc(var(--space-6) * 3);
+  height: calc(var(--space-6) * 3);
+}
+
+.mascotSprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url('../../assets/mascot/chochin-neko-sheet.png') 0 0 / calc(var(--space-6) * 15) 100%
+    no-repeat;
+  image-rendering: pixelated;
+}
+
 /* ---- すりガラスの箱：切り替えと入力欄。中の共通部品の色を箱の中だけ変える ---- */
 .card {
   --color-primary: var(--color-snow-accent);
@@ -308,6 +328,19 @@
   animation: stamp 0.35s 1.8s ease-out both;
 }
 
+/* ちょうちんねこ：顔を出したあとは、お茶の中でふわふわ浮かびながら、
+   しっぽのちょうちんを左右にゆらし、ときどき目をぱちっと開ける（雪のほかに、ずっと動くのはこれだけ。K68） */
+.mascotSprite {
+  animation:
+    sway 4.8s 2.7s step-end infinite,
+    bob 1.2s 2.7s step-end infinite;
+}
+
+/* 落款を押したあと、ちょうちんねこがぴょこっと顔を出す（一度だけ） */
+.mascot {
+  animation: peek 0.5s 2.2s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
 /* 切り替えたとき：表示名の欄だけを開閉する。閉じているときは form の gap も打ち消す */
 .nameSlot {
   display: grid;
@@ -402,6 +435,89 @@
   }
 }
 
+@keyframes sway {
+  0% {
+    background-position-x: 0;
+  }
+
+  6.25% {
+    background-position-x: calc(var(--space-6) * -9);
+  }
+
+  12.5% {
+    background-position-x: 0;
+  }
+
+  18.75% {
+    background-position-x: calc(var(--space-6) * -6);
+  }
+
+  25% {
+    background-position-x: 0;
+  }
+
+  31.25% {
+    background-position-x: calc(var(--space-6) * -9);
+  }
+
+  37.5% {
+    background-position-x: 0;
+  }
+
+  43.75% {
+    background-position-x: calc(var(--space-6) * -6);
+  }
+
+  50% {
+    background-position-x: 0;
+  }
+
+  56.25% {
+    background-position-x: calc(var(--space-6) * -9);
+  }
+
+  62.5% {
+    background-position-x: 0;
+  }
+
+  68.75% {
+    background-position-x: calc(var(--space-6) * -6);
+  }
+
+  75% {
+    background-position-x: 0;
+  }
+
+  81.25% {
+    background-position-x: 0;
+  }
+
+  87.5% {
+    background-position-x: calc(var(--space-6) * -12);
+  }
+
+  93.75% {
+    background-position-x: 0;
+  }
+}
+
+@keyframes bob {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes peek {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.8);
+  }
+}
+
 @keyframes fade {
   from {
     opacity: 0;
@@ -445,7 +561,9 @@
   .form [id$='-hint'],
   .form [id$='-error'],
   .shakeA,
-  .shakeB {
+  .shakeB,
+  .mascot,
+  .mascotSprite {
     animation: none;
   }
 

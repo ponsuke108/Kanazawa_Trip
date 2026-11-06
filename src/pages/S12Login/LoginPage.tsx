@@ -206,6 +206,11 @@ export function LoginPage() {
                 <span key={line}>{line}</span>
               ))}
             </p>
+            {/* マスコット「ちょうちんねこ」。メンバーが Aseprite で手で描いたドット絵（7.7、K64、K68）。
+                5コマの画像をコマ送りして、しっぽをゆらし、ときどき目を開ける。飾りなので読み上げない */}
+            <span className={styles.mascot} aria-hidden="true">
+              <span className={styles.mascotSprite} />
+            </span>
           </div>
           {/* 入力はすりガラスの箱の中。共通部品はそのまま使い、色だけ箱の中で変える（7.7） */}
           <div
