@@ -14,6 +14,7 @@ import { repSpotId, toFeatureCollection } from '@/components/map/spotsGeoJson';
 import { isEdgeStart, MOBILE_MEDIA, TAP_SLOP_PX, zoomFromDrag } from '@/components/map/edgeZoom';
 import type { MapSpot, MapViewProps } from '@/components/map/types';
 import { KanazawaCenter, MapMaxBounds } from '@/lib/geo';
+import { createZoomFollower } from '@/components/map/zoomMotion';
 import styles from './MapView.module.css';
 
 const SOURCE_ID = 'spots';
@@ -22,6 +23,7 @@ const SPOT_ZOOM = 15; // スポットが1つのときの拡大
 const CLUSTER_RADIUS = 48; // この距離（画面の px）より近いピンを写真の束にする
 const CLUSTER_MAX_ZOOM = 16; // これより拡大したら束にしない
 const FIT_PADDING = 56;
+const REDUCED_MOTION_MEDIA = '(prefers-reduced-motion: reduce)';
 
 type PinItem =
   | { key: string; kind: 'spot'; el: HTMLElement; spotId: number }
@@ -165,10 +167,13 @@ export function MapView({
     const container = containerRef.current;
     if (!edgeZoom || !interactive || status !== 'ready' || !container) return;
     let drag: { id: number; startY: number; startZoom: number; moved: boolean } | null = null;
+    // （K70）指に少し遅れてなめらかに追う。指を離しても、目標に着くまで動く
+    const follower = createZoomFollower((zoom) => mapRef.current?.jumpTo({ zoom }));
 
     const onStart = (e: TouchEvent) => {
       const map = mapRef.current;
       const touch = e.touches[0];
+      follower.stop(); // 動いている途中で次の操作が始まったら、そこで止める
       if (e.touches.length !== 1) {
         drag = null; // 2本目の指が置かれたら、ふつうのピンチに任せる
         return;
@@ -197,7 +202,9 @@ export function MapView({
       // なぞり始めたら preventDefault する。ブラウザは click を出さないので、ピンは押されない
       e.preventDefault();
       drag.moved = true;
-      map.jumpTo({ zoom: zoomFromDrag(drag.startZoom, drag.startY, touch.clientY) });
+      const zoom = zoomFromDrag(drag.startZoom, drag.startY, touch.clientY);
+      if (window.matchMedia(REDUCED_MOTION_MEDIA).matches) map.jumpTo({ zoom });
+      else follower.moveTo(zoom, map.getZoom());
     };
     const onEnd = (e: TouchEvent) => {
       if (!drag) return;
@@ -213,6 +220,7 @@ export function MapView({
     container.addEventListener('touchend', onEnd, capture);
     container.addEventListener('touchcancel', onEnd, capture);
     return () => {
+      follower.stop();
       container.removeEventListener('touchstart', onStart, capture);
       container.removeEventListener('touchmove', onMove, capture);
       container.removeEventListener('touchend', onEnd, capture);
