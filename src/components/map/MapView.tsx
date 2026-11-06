@@ -11,6 +11,7 @@ import { isInKanazawa } from '@/lib/geo';
 import { MapIcons } from '@/lib/icons';
 import { ClusterPin, SpotPin } from '@/components/map/SpotPin';
 import { repSpotId, toFeatureCollection } from '@/components/map/spotsGeoJson';
+import { isEdgeStart, MOBILE_MEDIA, TAP_SLOP_PX, zoomFromDrag } from '@/components/map/edgeZoom';
 import type { MapSpot, MapViewProps } from '@/components/map/types';
 import { KanazawaCenter, MapMaxBounds } from '@/lib/geo';
 import styles from './MapView.module.css';
@@ -41,6 +42,7 @@ export function MapView({
   onSelectSpot,
   interactive = true,
   fitToSpots = false,
+  edgeZoom = false,
   height,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -157,6 +159,66 @@ export function MapView({
       mapRef.current = null;
     };
   }, [interactive, reloadKey, syncMarkers]);
+
+  // （K66）スマホで左右の端を縦になぞると拡大・縮小する。maplibre-gl より先に受け取り、地図は動かさない
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!edgeZoom || !interactive || status !== 'ready' || !container) return;
+    let drag: { id: number; startY: number; startZoom: number; moved: boolean } | null = null;
+
+    const onStart = (e: TouchEvent) => {
+      const map = mapRef.current;
+      const touch = e.touches[0];
+      if (e.touches.length !== 1) {
+        drag = null; // 2本目の指が置かれたら、ふつうのピンチに任せる
+        return;
+      }
+      if (!map || !touch || !window.matchMedia(MOBILE_MEDIA).matches) return;
+      const target = e.target instanceof Element ? e.target : null;
+      if (target?.closest('.maplibregl-ctrl')) return; // 出典の表示などは押せるようにしておく
+      const { left, width } = container.getBoundingClientRect();
+      if (!isEdgeStart(touch.clientX, left, width)) return;
+      drag = {
+        id: touch.identifier,
+        startY: touch.clientY,
+        startZoom: map.getZoom(),
+        moved: false,
+      };
+      e.stopPropagation();
+    };
+    const onMove = (e: TouchEvent) => {
+      const map = mapRef.current;
+      if (!drag || !map) return;
+      const id = drag.id;
+      const touch = [...e.touches].find((t) => t.identifier === id);
+      if (!touch) return;
+      e.stopPropagation();
+      if (!drag.moved && Math.abs(touch.clientY - drag.startY) < TAP_SLOP_PX) return;
+      // なぞり始めたら preventDefault する。ブラウザは click を出さないので、ピンは押されない
+      e.preventDefault();
+      drag.moved = true;
+      map.jumpTo({ zoom: zoomFromDrag(drag.startZoom, drag.startY, touch.clientY) });
+    };
+    const onEnd = (e: TouchEvent) => {
+      if (!drag) return;
+      const id = drag.id;
+      if ([...e.changedTouches].some((t) => t.identifier === id)) drag = null;
+      e.stopPropagation();
+    };
+
+    const capture = { capture: true };
+    const activeCapture = { capture: true, passive: false };
+    container.addEventListener('touchstart', onStart, activeCapture);
+    container.addEventListener('touchmove', onMove, activeCapture);
+    container.addEventListener('touchend', onEnd, capture);
+    container.addEventListener('touchcancel', onEnd, capture);
+    return () => {
+      container.removeEventListener('touchstart', onStart, capture);
+      container.removeEventListener('touchmove', onMove, capture);
+      container.removeEventListener('touchend', onEnd, capture);
+      container.removeEventListener('touchcancel', onEnd, capture);
+    };
+  }, [edgeZoom, interactive, status]);
 
   // スポットを地図に入れる
   useEffect(() => {

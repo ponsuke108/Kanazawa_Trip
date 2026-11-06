@@ -14,5 +14,6 @@ export type MapViewProps = {
   onSelectSpot?: (spotId: number) => void;
   interactive?: boolean; // false なら動かせない（S-05 の小さな地図）
   fitToSpots?: boolean; // スポットがすべて入るように合わせる
+  edgeZoom?: boolean; // （K66）スマホで左右の画面の端を縦になぞって拡大・縮小する（S-13）
   height: string; // CSS の高さ（'160px'、'100%' など）。高さのある親の中に置く
 };

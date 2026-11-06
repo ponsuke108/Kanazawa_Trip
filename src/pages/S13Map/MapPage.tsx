@@ -84,6 +84,7 @@ export function MapPage() {
           spots={pins}
           selectedSpotId={selectedId}
           onSelectSpot={selectSpot}
+          edgeZoom
           height="100%"
         />
         <div className={styles.controls}>
