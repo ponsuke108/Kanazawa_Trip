@@ -11,8 +11,10 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { useToast } from '@/components/common/useToast';
 import { LazyMapView } from '@/components/map/LazyMapView';
 import { MapAttribution } from '@/components/map/MapAttribution';
+import { targetPinOf } from '@/components/map/mapFocus';
 import { PlaceSearch } from '@/components/map/PlaceSearch';
 import { SpotSheet } from '@/components/map/SpotSheet';
+import type { MapPoint } from '@/components/map/types';
 import { MapMessages } from '@/constants/messages';
 import { useResolveSpot } from '@/hooks/useResolveSpot';
 import { errorMessage } from '@/lib/errorMessage';
@@ -27,6 +29,7 @@ export function MapPage() {
   const toast = useToast();
   const [searchOpen, setSearchOpen] = useState(false);
   const [candidate, setCandidate] = useState<PlaceCandidate | null>(null);
+  const [focus, setFocus] = useState<MapPoint | null>(null);
 
   const minorOnly = params.get('minor') === '1';
   const spotParam = Number(params.get('spot'));
@@ -57,6 +60,12 @@ export function MapPage() {
     [spots.data, selectedId],
   );
 
+  // K68：写真のピンがない場所は、指すピンを出す。「定番以外だけ」で隠れているスポットも同じ
+  const targetPin = useMemo(
+    () => targetPinOf(selected, candidate, new Set(pins.map((s) => s.id))),
+    [selected, candidate, pins],
+  );
+
   const update = (change: (p: URLSearchParams) => void, replace: boolean) =>
     setParams(
       (prev) => {
@@ -85,6 +94,8 @@ export function MapPage() {
           selectedSpotId={selectedId}
           onSelectSpot={selectSpot}
           edgeZoom
+          targetPin={targetPin}
+          focus={focus}
           height="100%"
         />
         <div className={styles.controls}>
@@ -112,6 +123,9 @@ export function MapPage() {
         onClose={() => setSearchOpen(false)}
         onSelect={(r) => {
           setSearchOpen(false);
+          // K68：選んだ場所へ動かす。座標は S-16 の結果（このサイトのスポットか Nominatim）のもの
+          const { lat, lng } = r.kind === 'spot' ? r.spot : r.candidate;
+          setFocus({ lat, lng });
           if (r.kind === 'spot') selectSpot(r.spot.id);
           else {
             closeSheet();

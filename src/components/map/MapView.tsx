@@ -9,10 +9,11 @@ import { IconButton } from '@/components/common/IconButton';
 import { MapMessages } from '@/constants/messages';
 import { isInKanazawa } from '@/lib/geo';
 import { MapIcons } from '@/lib/icons';
-import { ClusterPin, SpotPin } from '@/components/map/SpotPin';
+import { ClusterPin, SpotPin, TARGET_PIN_SIZE, TargetPin } from '@/components/map/SpotPin';
 import { repSpotId, toFeatureCollection } from '@/components/map/spotsGeoJson';
 import { isEdgeStart, MOBILE_MEDIA, TAP_SLOP_PX, zoomFromDrag } from '@/components/map/edgeZoom';
-import type { MapSpot, MapViewProps } from '@/components/map/types';
+import { SIDE_SHEET_MEDIA, visibleCenterOffset } from '@/components/map/mapFocus';
+import type { MapPoint, MapSpot, MapViewProps } from '@/components/map/types';
 import { KanazawaCenter, MapMaxBounds } from '@/lib/geo';
 import styles from './MapView.module.css';
 
@@ -22,6 +23,8 @@ const SPOT_ZOOM = 15; // スポットが1つのときの拡大
 const CLUSTER_RADIUS = 48; // この距離（画面の px）より近いピンを写真の束にする
 const CLUSTER_MAX_ZOOM = 16; // これより拡大したら束にしない
 const FIT_PADDING = 56;
+const FOCUS_ZOOM = CLUSTER_MAX_ZOOM + 1; // 検索で選んだ場所へ動くときの拡大。束にならない大きさ
+const TARGET_PIN_TIP_RATIO = 1 / 12; // MapPin の先は、アイコンの下の端より 1/12 だけ上にある
 
 type PinItem =
   | { key: string; kind: 'spot'; el: HTMLElement; spotId: number }
@@ -43,6 +46,8 @@ export function MapView({
   interactive = true,
   fitToSpots = false,
   edgeZoom = false,
+  targetPin = null,
+  focus = null,
   height,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -244,11 +249,55 @@ export function MapView({
     if (status !== 'ready' || !map || selectedSpotId === null) return;
     const spot = spotsById.get(selectedSpotId);
     if (!spot || markersRef.current.has(`s${spot.id}`)) return;
+    if (focus?.lat === spot.lat && focus.lng === spot.lng) return; // 検索で選んだときは下の focus で動く
     map.easeTo({
       center: [spot.lng, spot.lat],
       zoom: Math.max(map.getZoom(), CLUSTER_MAX_ZOOM + 1),
     });
-  }, [selectedSpotId, spotsById, status]);
+  }, [selectedSpotId, spotsById, status, focus]);
+
+  // （K68）シートに隠れない範囲の中央へ動かす
+  const moveToVisibleCenter = useCallback(({ lat, lng }: MapPoint) => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.easeTo({
+      center: [lng, lat],
+      zoom: Math.max(map.getZoom(), FOCUS_ZOOM),
+      offset: visibleCenterOffset(
+        map.getContainer().clientHeight,
+        window.matchMedia(SIDE_SHEET_MEDIA).matches,
+      ),
+    });
+  }, []);
+
+  // （K68）検索で選んだ場所へ動かす。ピンがもう見えていても、同じ場所をもう一度選んでも動かす
+  useEffect(() => {
+    if (status === 'ready' && focus) moveToVisibleCenter(focus);
+  }, [focus, status, moveToVisibleCenter]);
+
+  // （K68）写真のピンがない場所を指す。共有した URL で開いたときも見えるように、そこへ動かす
+  const [targetPinEl] = useState(() => {
+    const el = document.createElement('div');
+    el.className = styles.targetMarker ?? '';
+    return el;
+  });
+  const targetLat = targetPin?.lat;
+  const targetLng = targetPin?.lng;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (status !== 'ready' || !map || targetLat === undefined || targetLng === undefined) return;
+    const marker = new Marker({
+      element: targetPinEl,
+      anchor: 'bottom',
+      offset: [0, TARGET_PIN_SIZE * TARGET_PIN_TIP_RATIO],
+    })
+      .setLngLat([targetLng, targetLat])
+      .addTo(map);
+    moveToVisibleCenter({ lat: targetLat, lng: targetLng });
+    return () => {
+      marker.remove();
+    };
+  }, [targetLat, targetLng, status, targetPinEl, moveToVisibleCenter]);
 
   // 現在地（6.4 S-13）：押したときだけ端末の現在地を使い、金沢市の中なら移動する。保存も送信もしない
   const toast = useToast();
@@ -313,6 +362,7 @@ export function MapView({
           item.key,
         );
       })}
+      {targetPin && createPortal(<TargetPin name={targetPin.name} />, targetPinEl)}
       {interactive && status === 'ready' && (
         <div className={styles.locate}>
           <IconButton icon={MapIcons.locate} label="現在地" disabled={locating} onClick={locate} />
