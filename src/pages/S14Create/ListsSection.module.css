@@ -21,20 +21,21 @@
   gap: var(--space-3);
 }
 
-/* タブレットは2列、PC は3列（7.8 の一覧） */
+/* タブレットは2列、PC は3列（7.8 の一覧）。置かれた幅で列の数を決める：
+   「作る」（幅640pxの列）では2列、リストの一覧（/lists）では3列 */
 @media (min-width: 768px) {
   .list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 
+  /* 列の幅より中身（長いスポット名）が広くても、はみ出して隣のカードに重ならないようにする */
   .list > li {
     display: grid;
+    min-width: 0;
   }
-}
 
-@media (min-width: 1024px) {
-  .list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .list > li > * {
+    min-width: 0;
   }
 }
