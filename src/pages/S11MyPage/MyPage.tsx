@@ -24,9 +24,9 @@ import { ActionIcons, PostIcons, renderTagIcon, StateIcons } from '@/lib/icons';
 import { tagsQuery } from '@/lib/tagParams';
 import type { PlanSummary, SpotPost } from '@/types/models';
 import { PlanTile } from './PlanTile';
+import { SnowScene } from '@/components/common/SnowScene';
 import { PostTile } from './PostTile';
 import { RoleEntry } from './RoleEntry';
-import { SnowScene } from './SnowScene';
 import styles from './MyPage.module.css';
 
 type Tab = 'mine' | 'liked' | 'posts';
