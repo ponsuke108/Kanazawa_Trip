@@ -18,6 +18,7 @@ import { errorMessage } from '@/lib/errorMessage';
 import { ActionIcons, StateIcons } from '@/lib/icons';
 import { safeRedirect } from '@/lib/redirect';
 import { validateAuth, type AuthErrors } from '@/pages/S12Login/validateAuth';
+import chochinNeko from '@/assets/mascot/chochin-neko.png';
 import { TeaScene, type TeaState } from './TeaScene';
 import styles from './LoginPage.module.css';
 
@@ -191,6 +192,8 @@ export function LoginPage() {
                 <span key={line}>{line}</span>
               ))}
             </p>
+            {/* マスコット「ちょうちんねこ」。メンバーが Aseprite で手で描いたドット絵（7.7、I-43）。飾りなので読み上げない */}
+            <img className={styles.mascot} src={chochinNeko} alt="" width={96} height={96} />
           </div>
           {/* 入力はすりガラスの箱の中。共通部品はそのまま使い、色だけ箱の中で変える（7.7） */}
           <div
