@@ -100,3 +100,19 @@
     margin: 0 auto;
   }
 }
+
+.photoFigure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  object-fit: cover;
+}

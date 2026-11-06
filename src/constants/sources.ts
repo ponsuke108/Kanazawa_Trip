@@ -11,4 +11,10 @@ export const DataSources: Array<{ label: string; name: string; url?: string }> =
     name: '金沢市オープンデータ「文化財一覧」「公園一覧」（金沢市、CC BY）を加工して作成',
     url: 'https://catalog-data.city.kanazawa.ishikawa.jp/',
   },
+  {
+    // （K65）作者とライセンスは、それぞれのスポットの画面に出す
+    label: 'スポットの写真（一部）',
+    name: 'Wikimedia Commons（金沢市のオープン画像データほか。縮小して使用。作者とライセンスは各スポットの画面に表示）',
+    url: 'https://commons.wikimedia.org/wiki/Category:Open_Image_Data_of_Kanawaza_City',
+  },
 ];

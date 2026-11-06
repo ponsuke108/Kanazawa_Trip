@@ -16,12 +16,14 @@ import { ErrorState } from '@/components/common/ErrorState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PlanCard } from '@/components/common/PlanCard';
 import { PlanCardSkeletonList } from '@/components/common/PlanCardSkeleton';
+import { SpotPhotoCredit } from '@/components/common/SpotPhotoCredit';
 import { SpotPostCard } from '@/components/common/SpotPostCard';
 import { LazyMapView } from '@/components/map/LazyMapView';
 import { MapAttribution } from '@/components/map/MapAttribution';
 import { AdminMessages, UiMessages } from '@/constants/messages';
 import { useToast } from '@/components/common/useToast';
 import { ReasonDialog } from '@/pages/S21Admin/ReasonDialog';
+import { spotPhotoCredit } from '@/constants/spotPhotos';
 import { isDemoSpot, SpotTypeLabels } from '@/constants/spots';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errorMessage';
@@ -143,6 +145,20 @@ function SpotDetailView({ spot }: { spot: SpotDetail }) {
         >
           <LazyMapView spots={[spot]} interactive={false} fitToSpots height={MAP_HEIGHT} />
         </Link>
+        {/* （K65）出典つきの写真を出しているときは、写真と作者を見せる */}
+        {spotPhotoCredit(spot) && spot.latestImageUrl && (
+          <figure className={styles.photoFigure}>
+            <img
+              src={spot.latestImageUrl}
+              alt={`${spot.name}の写真`}
+              loading="lazy"
+              className={styles.photo}
+            />
+            <figcaption>
+              <SpotPhotoCredit spot={spot} />
+            </figcaption>
+          </figure>
+        )}
         {spot.description && <p className={styles.description}>{spot.description}</p>}
         {spot.address && <p className={styles.sub}>{spot.address}</p>}
         {spot.area && <p className={styles.sub}>エリア：{spot.area}</p>}

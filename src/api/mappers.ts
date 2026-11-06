@@ -1,4 +1,5 @@
 // データベースの snake_case と画面の camelCase の変換（要件定義書 10.1）
+import { spotPhotoUrl } from '@/constants/spotPhotos';
 import { areaIndex } from '@/constants/areas';
 import type { Database } from '@/types/database';
 import type {
@@ -83,7 +84,8 @@ export function toSpotFromSummary(r: SpotSummaryRow, imageUrlOf: ImageUrlOf): Sp
     address: r.address,
     placeKind: r.place_kind,
     postCount: r.post_count ?? 0,
-    latestImageUrl: r.latest_image_path ? imageUrlOf(r.latest_image_path) : null,
+    // 投稿の写真・チームの写真がなければ、出典つきの写真（K65）を使う
+    latestImageUrl: r.latest_image_path ? imageUrlOf(r.latest_image_path) : spotPhotoUrl(r.id ?? 0),
     hasActiveCampaign: r.active_campaign_id !== null,
   };
 }
