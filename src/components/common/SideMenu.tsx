@@ -8,7 +8,7 @@ import styles from './SideMenu.module.css';
 export function SideMenu() {
   const { pathname } = useLocation();
   return (
-    <nav className={styles.menu} aria-label="メインメニュー">
+    <nav className={styles.menu} aria-label="メインメニュー" data-theme="default">
       <Link to="/" className={styles.site} aria-label="旅ノート金沢 ホームへ">
         <Logo size="lg" />
       </Link>

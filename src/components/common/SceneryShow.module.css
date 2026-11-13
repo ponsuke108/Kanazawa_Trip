@@ -92,6 +92,17 @@
   white-space: nowrap;
 }
 
+/* （v19）PC で左のメニュー（幅220px）を出す画面では、メニューの右の部分にだけ出す */
+@media (min-width: 1024px) {
+  .besideMenu {
+    left: 220px;
+  }
+
+  .besideMenu .caption {
+    max-width: calc((100vw - 220px - var(--shiori-width)) / 2 - var(--space-5) * 2);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .photo {
     transition: none;

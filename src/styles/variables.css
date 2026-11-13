@@ -173,3 +173,22 @@
     'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo,
     sans-serif;
 }
+
+/* （v19）しおりの見た目の画面でも、PC の左のメニュー（data-theme="default"）は、ほかの画面と同じ色と書体のままにする */
+:root[data-theme='shiori'] [data-theme='default'] {
+  --color-primary: #2b4c7e;
+  --color-primary-weak: #e8eef6;
+  --color-accent: #b8892b;
+  --color-text: #1f2a37;
+  --color-text-sub: #5b6675;
+  --color-border: #d5dce4;
+  --color-bg: #f7f8fa;
+  --color-surface: #ffffff;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --font-family:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, 'Noto Sans JP',
+    'Noto Sans CJK JP', sans-serif;
+
+  font-family: var(--font-family);
+}
