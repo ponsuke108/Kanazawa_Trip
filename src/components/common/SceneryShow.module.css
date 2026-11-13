@@ -1,10 +1,21 @@
-/* （v18）名所の写真のスライドショー（7.9）。画面全体の背面に固定する */
+/* （v18）名所の写真のスライドショー（7.9） */
 .show {
+  overflow: hidden;
+  background: var(--color-shiori-backdrop);
+}
+
+/* 背面：タブレットの幅で、画面全体の背面に固定する */
+.backdrop {
   position: fixed;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
-  background: var(--color-shiori-backdrop);
+}
+
+/* （v20）帯：PC の S-14 の上に、横長に置く */
+.banner {
+  position: relative;
+  height: 320px;
+  border-radius: var(--radius-shiori);
 }
 
 /* 写真は重ねておき、今の1枚だけを浮かび上がらせる（クロスフェード）。出ているあいだ少しずつ寄る */
@@ -92,15 +103,11 @@
   white-space: nowrap;
 }
 
-/* （v19）PC で左のメニュー（幅220px）を出す画面では、メニューの右の部分にだけ出す */
-@media (min-width: 1024px) {
-  .besideMenu {
-    left: 220px;
-  }
-
-  .besideMenu .caption {
-    max-width: calc((100vw - 220px - var(--shiori-width)) / 2 - var(--space-5) * 2);
-  }
+/* 帯の中では、右下の箱を帯の幅に合わせる */
+.banner .caption {
+  right: var(--space-4);
+  bottom: var(--space-4);
+  max-width: 50%;
 }
 
 @media (prefers-reduced-motion: reduce) {
