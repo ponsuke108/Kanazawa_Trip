@@ -78,15 +78,15 @@ export type { LucideIcon };
 export const TabIcons = {
   map: MapIcon,
   search: Search,
+  ranking: Trophy, // （K71）
   create: CirclePlus,
   mypage: CircleUser,
 } satisfies Record<string, LucideIcon>;
 
-// （v11）地図：地図で探す・現在地。ランキングを見る（S-01、S-02）
+// （v11）地図：地図で探す・現在地（S-01、S-02）。ランキングは下部タブ（K71）
 export const MapIcons = {
   map: MapIcon,
   locate: LocateFixed,
-  ranking: Trophy,
   targetPin: MapPin,
 } satisfies Record<string, LucideIcon>;
 
