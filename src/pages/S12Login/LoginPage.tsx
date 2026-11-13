@@ -4,6 +4,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { signIn, signUp } from '@/api/auth';
 import { isApiError } from '@/api/errors';
 import { AppLayout } from '@/components/common/AppLayout';
+import { MascotSprite } from '@/components/common/MascotSprite';
+import { Ochaneko } from '@/constants/ochaneko';
 import { Button } from '@/components/common/Button';
 import { IconButton } from '@/components/common/IconButton';
 import { Logo } from '@/components/common/Logo';
@@ -206,11 +208,14 @@ export function LoginPage() {
                 <span key={line}>{line}</span>
               ))}
             </p>
-            {/* マスコット「ちょうちんねこ」。メンバーが Aseprite で手で描いたドット絵（7.7、K64、K68）。
-                5コマの画像をコマ送りして、しっぽをゆらし、ときどき目を開ける。飾りなので読み上げない */}
-            <span className={styles.mascot} aria-hidden="true">
-              <span className={styles.mascotSprite} />
-            </span>
+            {/* （v21）マスコット「おちゃねこ」（7.7、K64、K68、K73）。上に名前と役割、下にドット絵 */}
+            <figure className={styles.mascot}>
+              <figcaption className={styles.mascotCaption}>
+                <span className={styles.mascotName}>{Ochaneko.name}</span>
+                <span className={styles.mascotRole}>{Ochaneko.role}</span>
+              </figcaption>
+              <MascotSprite />
+            </figure>
           </div>
           {/* 入力はすりガラスの箱の中。共通部品はそのまま使い、色だけ箱の中で変える（7.7） */}
           <div

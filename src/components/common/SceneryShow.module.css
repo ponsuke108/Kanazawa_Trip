@@ -1,21 +1,14 @@
-/* （v18）名所の写真のスライドショー（7.9） */
-.show {
-  overflow: hidden;
-  background: var(--color-shiori-backdrop);
+/* （v18）名所の写真のスライドショー（7.9）。写真は画面全体の背面に固定する */
+.wrap {
+  display: contents;
 }
 
-/* 背面：タブレットの幅で、画面全体の背面に固定する */
-.backdrop {
+.show {
   position: fixed;
   inset: 0;
   z-index: 0;
-}
-
-/* （v20）帯：PC の S-14 の上に、横長に置く */
-.banner {
-  position: relative;
-  height: 320px;
-  border-radius: var(--radius-shiori);
+  overflow: hidden;
+  background: var(--color-shiori-backdrop);
 }
 
 /* 写真は重ねておき、今の1枚だけを浮かび上がらせる（クロスフェード）。出ているあいだ少しずつ寄る */
@@ -40,7 +33,8 @@
 
 /* 右下：スポットの名前、出典、切り替えのボタン。列（420px）の右の余白に収める */
 .caption {
-  position: absolute;
+  position: fixed;
+  z-index: var(--z-header);
   right: var(--space-5);
   bottom: var(--space-5);
   display: flex;
@@ -103,11 +97,22 @@
   white-space: nowrap;
 }
 
-/* 帯の中では、右下の箱を帯の幅に合わせる */
-.banner .caption {
-  right: var(--space-4);
-  bottom: var(--space-4);
-  max-width: 50%;
+/* （v21）PC：左のメニューの右の部分にだけ出す。右下の箱は小さくまとめる（内容に重なるため） */
+@media (min-width: 1024px) {
+  .besideMenu {
+    left: 220px;
+  }
+
+  .caption {
+    right: var(--space-4);
+    bottom: var(--space-4);
+    max-width: 320px;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .name {
+    font-size: var(--font-size-md);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

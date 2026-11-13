@@ -1,0 +1,63 @@
+/* （v21）おちゃねこのドット絵（7.7、7.10）。48×48 のコマが横に5つ並んだ画像
+   （まん中、まん中、しっぽ左、しっぽ右、目を開けた）を、--mascot-size の大きさで出す */
+.sprite {
+  --mascot-size: calc(var(--space-6) * 3);
+
+  display: block;
+  width: var(--mascot-size);
+  height: var(--mascot-size);
+  background: url('../../assets/mascot/chochin-neko-sheet.png') 0 0 / calc(var(--mascot-size) * 5)
+    100% no-repeat;
+  image-rendering: pixelated;
+  animation:
+    sway 4.8s step-end infinite,
+    bob 1.2s step-end infinite;
+}
+
+/* しっぽを左右にゆらし、最後に一度だけ目を開ける */
+@keyframes sway {
+  0%,
+  12.5%,
+  25%,
+  37.5%,
+  50%,
+  62.5%,
+  75%,
+  81.25%,
+  93.75% {
+    background-position-x: 0;
+  }
+
+  6.25%,
+  31.25%,
+  56.25% {
+    background-position-x: calc(var(--mascot-size) * -3);
+  }
+
+  18.75%,
+  43.75%,
+  68.75% {
+    background-position-x: calc(var(--mascot-size) * -2);
+  }
+
+  87.5% {
+    background-position-x: calc(var(--mascot-size) * -4);
+  }
+}
+
+/* お茶の中でふわふわ浮かぶ */
+@keyframes bob {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite {
+    animation: none;
+  }
+}

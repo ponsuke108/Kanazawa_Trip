@@ -1,8 +1,10 @@
 import { useContext, useEffect, type ReactNode } from 'react';
 import { BottomTabBar } from '@/components/common/BottomTabBar';
+import { OchanekoGuide } from '@/components/common/OchanekoGuide';
 import { SceneryShow } from '@/components/common/SceneryShow';
 import { SideMenu } from '@/components/common/SideMenu';
 import { ToastContext } from '@/components/common/toastContext';
+import { useAuth } from '@/hooks/useAuth';
 import styles from './AppLayout.module.css';
 
 type Props = {
@@ -20,6 +22,15 @@ type Props = {
 // 下部タブを出す画面では、PC のときだけ下部タブの代わりに左の縦のメニュー（幅220px）を出す
 export function AppLayout({ showTabBar, bottomBar = false, shiori = false, children }: Props) {
   const toast = useContext(ToastContext);
+  const { user } = useAuth();
+  // （v21）ログインしていれば、左下におちゃねこを出す（7.10、K73）
+  const guide = user ? (
+    <OchanekoGuide
+      above={
+        showTabBar && bottomBar ? 'both' : showTabBar ? 'tabbar' : bottomBar ? 'actionbar' : 'none'
+      }
+    />
+  ) : null;
   useEffect(() => {
     toast?.setTabBarVisible(showTabBar);
   }, [toast, showTabBar]);
@@ -47,11 +58,12 @@ export function AppLayout({ showTabBar, bottomBar = false, shiori = false, child
     return (
       <div className={`${styles.shioriRoot} ${showTabBar ? styles.withSideMenu : ''}`}>
         {showTabBar && <SideMenu />}
-        <SceneryShow variant="backdrop" />
+        <SceneryShow besideMenu={showTabBar} />
         <div className={classes}>
           {children}
           {showTabBar && <BottomTabBar />}
         </div>
+        {guide}
       </div>
     );
   }
@@ -62,6 +74,7 @@ export function AppLayout({ showTabBar, bottomBar = false, shiori = false, child
         {children}
         {showTabBar && <BottomTabBar />}
       </div>
+      {guide}
     </div>
   );
 }

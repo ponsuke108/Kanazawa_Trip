@@ -13,12 +13,9 @@ const SCENES: { spotId: number; name: string }[] = [
 ];
 
 const INTERVAL_MS = 3000;
-// 背面（backdrop）：タブレットの幅だけ、列（420px）の両側に写真を見せる。
-// 帯（banner）：PC（1024px 以上）の S-14 の上に、横長の帯で見せる（v20）。合わない幅では写真を読み込まない
-const MEDIA = {
-  backdrop: '(min-width: 768px) and (max-width: 1023px)',
-  banner: '(min-width: 1024px)',
-} as const;
+// タブレットと PC（768px 以上）で、画面の背面に出す。地を半透明にして写真を透かして見せる（v21）。
+// スマホでは写真を読み込まない
+const MEDIA = '(min-width: 768px)';
 
 function useMedia(query: string): boolean {
   const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
@@ -31,8 +28,9 @@ function useMedia(query: string): boolean {
   return matches;
 }
 
-export function SceneryShow({ variant }: { variant: 'backdrop' | 'banner' }) {
-  const wide = useMedia(MEDIA[variant]);
+// besideMenu：PC で左のメニュー（幅220px）を出す画面では、その右の部分にだけ出す（v19）
+export function SceneryShow({ besideMenu = false }: { besideMenu?: boolean }) {
+  const wide = useMedia(MEDIA);
   const reduce = useMedia('(prefers-reduced-motion: reduce)');
   const [index, setIndex] = useState(0);
   // 動きを減らす設定のときは、初めから止めておく（ボタンで切り替えはできる）
@@ -54,15 +52,18 @@ export function SceneryShow({ variant }: { variant: 'backdrop' | 'banner' }) {
   const go = (step: number) => setIndex((i) => (i + step + SCENES.length) % SCENES.length);
 
   return (
-    <section className={`${styles.show} ${styles[variant]}`} aria-label="金沢の名所の写真">
-      {SCENES.map((s, i) => (
-        <img
-          key={s.spotId}
-          src={spotPhotoUrl(s.spotId) ?? ''}
-          alt=""
-          className={`${styles.photo} ${i === index ? styles.on : ''}`}
-        />
-      ))}
+    // 写真は画面のいちばん後ろ、右下の箱は内容（半透明の和紙）より前に出して押せるようにする（v21）
+    <section className={styles.wrap} aria-label="金沢の名所の写真">
+      <div className={`${styles.show} ${besideMenu ? styles.besideMenu : ''}`}>
+        {SCENES.map((s, i) => (
+          <img
+            key={s.spotId}
+            src={spotPhotoUrl(s.spotId) ?? ''}
+            alt=""
+            className={`${styles.photo} ${i === index ? styles.on : ''}`}
+          />
+        ))}
+      </div>
       <div className={styles.caption}>
         <p className={styles.name} aria-live={paused ? 'polite' : 'off'}>
           {scene.name}

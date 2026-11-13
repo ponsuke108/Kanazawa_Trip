@@ -47,6 +47,7 @@
   --color-shiori-gold-light: #e6cf98; /* しおりラインの明るいところ */
   --color-shiori-gold-dark: #9c7a3a; /* しおりラインの暗いところ */
   --color-shiori-fleck: rgb(197 160 89 / 0.35); /* 和紙に散らした金箔 */
+  --color-shiori-veil: rgb(247 244 236 / 0.76); /* （v21）背面の写真を透かす、半透明の和紙 */
   --color-shiori-enji-1: #7a1c1c; /* 加賀臙脂：下部タブのグラデーション（上） */
   --color-shiori-enji-2: #591212; /* 同（下） */
   --color-shiori-on-enji: #fbf3e4; /* 臙脂の上の文字 */
