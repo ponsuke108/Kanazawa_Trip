@@ -5,6 +5,49 @@
   padding: var(--space-4);
 }
 
+/* （v18）作成の段階：一 旅程 ― 二 投稿情報 ― 三 確認（7.9） */
+.steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-sub);
+}
+
+.stepMark {
+  display: inline-flex;
+  align-items: center;
+}
+
+.stepText {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  padding-bottom: var(--space-1);
+  border-bottom: 2px solid transparent;
+}
+
+/* 段階の間の小さな金のひし形（「一」と見分けやすいよう、線にしない） */
+.stepMark + .stepMark::before {
+  content: '';
+  width: var(--space-1);
+  height: var(--space-1);
+  margin-right: var(--space-2);
+  background: var(--color-accent);
+  transform: rotate(45deg);
+}
+
+.stepCurrent {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.stepCurrent .stepText {
+  border-bottom-color: var(--color-accent);
+}
+
 .counter {
   padding-right: var(--space-3);
   color: var(--color-text-sub);
@@ -38,16 +81,7 @@
   text-align: center;
 }
 
-/* PC：入力の画面は中央に幅640pxの列（7.8） */
-@media (min-width: 1024px) {
-  .main {
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-  }
-}
-
-/* （v11）S-06：経路順の地図とブロック一覧。スマホ・タブレットは地図を上に固定、PC は左右（7.8） */
+/* （v11）S-06：経路順の地図とブロック一覧。地図を上に固定する（v18：しおりの見た目で、どの幅でも420pxの列。7.9） */
 .blocksLayout {
   display: flex;
   flex-direction: column;
@@ -62,30 +96,4 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-}
-
-@media (min-width: 1024px) {
-  /* ブロック編集のときだけ列を広げる（左にブロック一覧 480px、右に地図） */
-  .main:has(.blocksLayout) {
-    max-width: 1200px;
-  }
-
-  .blocksLayout {
-    display: grid;
-    grid-template-columns: 480px minmax(0, 1fr);
-    align-items: start;
-    gap: var(--space-5);
-  }
-
-  .routeCol {
-    display: block;
-    grid-column: 2;
-    grid-row: 1;
-    align-self: stretch;
-  }
-
-  .blocksCol {
-    grid-column: 1;
-    grid-row: 1;
-  }
 }

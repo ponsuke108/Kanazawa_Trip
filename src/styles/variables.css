@@ -36,6 +36,35 @@
   --color-campaign: #c4553a; /* キャンペーンの札とラベル（朱） */
   --color-list-highlight: #fff6e0; /* S-07 の「すべて」タブで、リストに保存したスポットの行の背景（薄い金） */
 
+  /* （v18）旅のしおりの見た目（要件定義書 7.2、7.9）。加賀五彩をもとにした色 */
+  --color-washi: #f7f4ec; /* 和紙の地 */
+  --color-shu: #b5452f; /* 朱：コメントのしるし、S-09 の判子 */
+  --color-accent-text: #86661c; /* 金の文字（金の地の色は文字には薄いので、文字はこちら。4.5:1 以上） */
+  --color-shiori-kaishi: #fffefa; /* 懐紙：カードの地 */
+  --color-shiori-ai-1: #254670; /* 加賀藍のボタンのグラデーション（上） */
+  --color-shiori-ai-2: #162b47; /* 同（下） */
+  --color-shiori-gold: #c5a059; /* 金箔：枠、しおりライン、下部タブの線 */
+  --color-shiori-gold-light: #e6cf98; /* しおりラインの明るいところ */
+  --color-shiori-gold-dark: #9c7a3a; /* しおりラインの暗いところ */
+  --color-shiori-fleck: rgb(197 160 89 / 0.35); /* 和紙に散らした金箔 */
+  --color-shiori-enji-1: #7a1c1c; /* 加賀臙脂：下部タブのグラデーション（上） */
+  --color-shiori-enji-2: #591212; /* 同（下） */
+  --color-shiori-on-enji: #fbf3e4; /* 臙脂の上の文字 */
+  --color-shiori-on-enji-sub: #e9d9c0; /* 臙脂の上の、選んでいないタブの文字 */
+  --color-shiori-dash: #d5cfc2; /* 行の区切りの点線 */
+  --color-shiori-backdrop: #1b1a17; /* 写真の読み込み前の、画面の背面 */
+  --color-shiori-caption: rgb(20 18 14 / 0.72); /* 写真の上の文字の下敷き */
+  --color-shiori-caption-text: #fbf3e4;
+  --radius-shiori: 6px; /* 障子や漆器のような控えめな角丸 */
+  --shiori-width: 420px; /* しおりの見た目の画面の列の幅 */
+  --color-tea-ohi: #9b5524; /* S-14 の茶碗（大樋焼の飴色の釉薬） */
+  --color-tea-ohi-dark: #4f2412; /* 茶碗の口の中と高台 */
+  --color-tea-ohi-rim: #c27a3a; /* 茶碗の口と、釉薬が流れたすじ */
+  --color-tea-matcha: #6e8a34; /* お抹茶 */
+  --color-tea-foam: #b5c97a; /* お抹茶の泡 */
+  --color-tea-gold: #d4a944; /* 金箔 */
+  --color-tea-steam: rgb(91 102 117 / 0.45); /* 湯気の線 */
+
   /* マイページ（S-11）の雪の茶屋街の見た目（要件定義書 7.2、7.7） */
   --color-snow-sky-1: #2c2e5c; /* 夕暮れの空（上） */
   --color-snow-sky-2: #4c4c86;
@@ -83,7 +112,8 @@
   --radius-lg: 16px; /* 写真のカード、すりガラスの箱 */
   --font-size-2xl: 28px; /* 名前、大きい写真のタイトル */
   --font-family-mincho:
-    'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'BIZ UDPMincho', 'Noto Serif JP', serif; /* 見出しの明朝（Webフォントは読み込まない） */
+    'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'BIZ UDPMincho',
+    'Noto Serif JP', serif; /* 見出しの明朝（v18：Shippori Mincho を同梱して読み込む） */
 
   /* 余白 */
   --space-1: 4px;
@@ -121,4 +151,25 @@
   --z-sheet: 30;
   --z-dialog: 40;
   --z-toast: 50;
+}
+
+/* （v18）旅のしおりの見た目（要件定義書 7.9）。S-14 と S-06〜S-09 を開いているあいだ、
+   AppLayout が <html data-theme="shiori"> にし、共通の変数を加賀五彩の値に置きかえる */
+:root[data-theme='shiori'] {
+  --color-primary: #1e3a5f; /* 加賀藍 */
+  --color-primary-weak: #ecf0f4; /* 利休鼠の文字が 4.5:1 以上になる薄い藍 */
+  --color-accent: #c5a059; /* 金箔（線と飾りだけ。文字は --color-accent-text） */
+  --color-accent-text: #86661c;
+  --color-text: #2b2b2b; /* 墨 */
+  --color-text-sub: #6e6a63; /* 利休鼠 */
+  --color-border: #e2ddd2;
+  --color-bg: #f7f4ec;
+  --color-surface: #fffefa; /* 懐紙 */
+  --color-comment-bg: #f3ecdd;
+  --color-route-line: #c5a059;
+  --radius-sm: var(--radius-shiori);
+  --radius-md: var(--radius-shiori);
+  --font-family:
+    'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo,
+    sans-serif;
 }

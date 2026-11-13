@@ -120,9 +120,12 @@ export function PlanEditorPage() {
   }
 
   return (
-    <AppLayout showTabBar={false} bottomBar={phase === 'ready'}>
+    <AppLayout showTabBar={false} bottomBar={phase === 'ready'} shiori>
       <PageHeader title={title} onBack={onBack} right={counter} />
-      <main className={styles.main}>{body}</main>
+      <main className={styles.main}>
+        {phase === 'ready' && <StepMarks current={step} />}
+        {body}
+      </main>
 
       <ConfirmDialog
         open={phase === 'restore'}
@@ -142,5 +145,31 @@ export function PlanEditorPage() {
         onCancel={() => session.blocker.reset?.()}
       />
     </AppLayout>
+  );
+}
+
+// （v18）作成の段階（7.9）。押して移る操作はなく、今どこにいるかを見せるだけ
+const STEP_MARKS: { step: Step; numeral: string; label: string }[] = [
+  { step: 'blocks', numeral: '一', label: '旅程' },
+  { step: 'info', numeral: '二', label: '投稿情報' },
+  { step: 'confirm', numeral: '三', label: '確認' },
+];
+
+function StepMarks({ current }: { current: Step }) {
+  return (
+    <ol className={styles.steps} aria-label="作成の段階">
+      {STEP_MARKS.map((m) => (
+        <li
+          key={m.step}
+          className={`${styles.stepMark} ${m.step === current ? styles.stepCurrent : ''}`}
+          aria-current={m.step === current ? 'step' : undefined}
+        >
+          <span className={styles.stepText}>
+            <span aria-hidden="true">{m.numeral}</span>
+            {m.label}
+          </span>
+        </li>
+      ))}
+    </ol>
   );
 }

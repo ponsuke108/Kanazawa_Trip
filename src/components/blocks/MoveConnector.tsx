@@ -13,7 +13,7 @@ type Props = {
   onChange?: (mode: TransportMode) => void; // 編集モード：移動手段を変える
 };
 
-// 移動手段ブロック（7.5、BR-04、BR-16）：カードにしない。縦の点線と丸いラベル、「経路を見る」
+// 移動手段ブロック（7.5、BR-04、BR-16）：カードにしない。縦の墨の線と小さな札、「経路を見る」
 export function MoveConnector({ block, mode, onChange }: Props) {
   const [choosing, setChoosing] = useState(false);
   const Icon = TransportIcons[block.mode];

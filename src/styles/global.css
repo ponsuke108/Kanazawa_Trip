@@ -62,3 +62,12 @@ img {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
+/* （v18）旅のしおりの見た目（7.9）：見出しは明朝。列の外は写真のスライドショーの下地 */
+:root[data-theme='shiori'] body {
+  background: var(--color-shiori-backdrop);
+}
+
+:root[data-theme='shiori'] :is(h1, h2, h3) {
+  font-family: var(--font-family-mincho);
+}

@@ -14,10 +14,12 @@
 .icon {
   flex-shrink: 0;
   margin-top: calc(var(--space-1) / 2);
-  color: var(--color-text-sub);
+  color: var(--color-shu); /* （v18）朱のしるし */
 }
 
 .body {
+  font-family: var(--font-family-mincho); /* （v18）短冊のように明朝で */
+  line-height: 1.7;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }

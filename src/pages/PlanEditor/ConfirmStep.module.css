@@ -43,3 +43,54 @@
   flex-direction: column;
   gap: var(--space-4);
 }
+
+/* （v18）旅のしおりの表紙（7.9） */
+.shiori {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-accent);
+}
+
+.shioriCaption {
+  color: var(--color-text-sub);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.3em;
+}
+
+.shioriHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.shioriHead > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.shioriHead h2 {
+  font-family: var(--font-family-mincho);
+}
+
+/* 判子：朱の角の丸い四角に、白い明朝の「金沢」を縦に */
+.seal {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  padding: var(--space-1) 0;
+  border-radius: var(--space-1);
+  background: var(--color-shu);
+  color: var(--color-surface);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.2;
+  writing-mode: vertical-rl;
+  transform: rotate(-4deg);
+}

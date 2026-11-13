@@ -8,8 +8,9 @@
   max-width: 480px;
   height: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
+  /* （v18）加賀臙脂の地と、上の金箔の線（7.9。全画面） */
+  border-top: 2px solid var(--color-shiori-gold);
+  background: linear-gradient(180deg, var(--color-shiori-enji-1), var(--color-shiori-enji-2));
   transform: translateX(-50%);
 }
 
@@ -21,18 +22,31 @@
   justify-content: center;
   gap: calc(var(--space-1) / 2);
   min-height: var(--tap-min);
-  color: var(--color-text-sub);
+  color: var(--color-shiori-on-enji-sub);
   text-decoration: none;
 }
 
+.tab:focus-visible {
+  outline: 2px solid var(--color-shiori-gold);
+  outline-offset: -4px;
+}
+
 .active {
-  color: var(--color-primary);
+  color: var(--color-shiori-on-enji);
   font-weight: 700;
 }
 
 .label {
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-xs);
   line-height: 1.2;
+}
+
+/* 選んでいるタブの名前の下に、金箔の線 */
+.active .label {
+  border-bottom-color: var(--color-shiori-gold);
 }
 
 /* タブレットは内容の幅（720px）に合わせる。PC は左の縦のメニュー（SideMenu）に替える（7.8） */
@@ -46,4 +60,10 @@
   .bar {
     display: none;
   }
+}
+
+/* （v18）しおりの見た目の画面では、PC でも下部タブを列（420px）の幅で出す（7.9） */
+:global(:root[data-theme='shiori']) .bar {
+  display: flex;
+  max-width: var(--shiori-width);
 }

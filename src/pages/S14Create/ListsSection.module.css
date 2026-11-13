@@ -11,8 +11,21 @@
   gap: var(--space-2);
 }
 
+/* （v18）明朝の見出しと、前に小さな金のひし形（7.9） */
 .heading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-lg);
+}
+
+.heading::before {
+  content: '';
+  width: var(--space-2);
+  height: var(--space-2);
+  background: var(--color-accent);
+  transform: rotate(45deg);
 }
 
 .list {

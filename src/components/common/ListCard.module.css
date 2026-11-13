@@ -45,3 +45,30 @@
   color: var(--color-text-sub);
   font-size: var(--font-size-xs);
 }
+
+/* （v18）しおりの見た目（7.9）：左端に幅6pxの金箔のしおりライン、明朝の名前 */
+:global(:root[data-theme='shiori']) .card {
+  position: relative;
+  overflow: hidden;
+  padding-left: calc(var(--space-4) + 6px);
+}
+
+:global(:root[data-theme='shiori']) .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 6px;
+  background: linear-gradient(
+    180deg,
+    var(--color-shiori-gold-light),
+    var(--color-shiori-gold) 45%,
+    var(--color-shiori-gold-dark)
+  );
+}
+
+:global(:root[data-theme='shiori']) .name {
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-md);
+}

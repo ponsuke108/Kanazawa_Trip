@@ -38,15 +38,27 @@ export type BlockEditHandlers = {
 type Props =
   { blocks: Block[]; mode: 'view' } | ({ blocks: Block[]; mode: 'edit' } & BlockEditHandlers);
 
+// （v18）スポットだけを数えた順番（コメントは飛ばす）。経路順の地図のピンの番号と同じ（BR-22、toRouteStops）
+function spotNumbers(blocks: Block[]): Map<string, number> {
+  const numbers = new Map<string, number>();
+  for (const b of blocks) {
+    if (b.type === 'spot') numbers.set(b.id, numbers.size + 1);
+  }
+  return numbers;
+}
+
 // ブロック一覧（7.5、7.6）。状態は持たず、操作は引数の関数で親に知らせる
 export function BlockList(props: Props) {
   if (props.mode === 'view') {
+    const numbers = spotNumbers(props.blocks);
     return (
       <ol className={styles.list}>
         {toDisplayBlocks(props.blocks).map((b) => (
           <li key={b.type === 'move' ? b.key : b.id}>
             {b.type === 'move' && <MoveConnector block={b} mode="view" />}
-            {b.type === 'spot' && <SpotBlockCard block={b} mode="view" />}
+            {b.type === 'spot' && (
+              <SpotBlockCard block={b} mode="view" number={numbers.get(b.id)} />
+            )}
             {b.type === 'comment' && <CommentBlockCard block={b} mode="view" />}
           </li>
         ))}
@@ -94,6 +106,7 @@ function EditableBlockList({
 
   // ドラッグ中は移動手段ブロックを出さない（並べ替えた後に BR-04 で付け直す）
   const display = activeId ? blocks : toDisplayBlocks(blocks);
+  const numbers = spotNumbers(blocks);
 
   return (
     <DndContext
@@ -124,6 +137,7 @@ function EditableBlockList({
                     <SpotBlockCard
                       block={b}
                       mode="edit"
+                      number={numbers.get(b.id)}
                       controls={{ ...controlsFor(b.id), dragHandle }}
                     />
                   ) : (
