@@ -1,4 +1,4 @@
-/* S-07 スポット選択（6.4）。（v18）しおりの見た目で、どの幅でも中央に幅420pxの画面いっぱいの列（7.9） */
+/* S-07 スポット選択（6.4）。スマホ・タブレットは中央に幅420pxの画面いっぱいの列（v18、7.9）、PC は中央の大きなダイアログ（幅960px。7.8） */
 .backdrop {
   position: fixed;
   inset: 0;
@@ -377,4 +377,32 @@
 .pinName {
   font-family: var(--font-family-mincho);
   font-weight: 700;
+}
+
+/* PC：大きなダイアログ（幅960px）。左に一覧、右に地図を並べ、切り替えは出さない（7.8） */
+@media (min-width: 1024px) {
+  .backdrop {
+    align-items: center;
+    padding: var(--space-6);
+  }
+
+  .dialog {
+    max-width: 960px;
+    height: min(100%, 860px);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .viewToggle {
+    display: none;
+  }
+
+  .showList .mapPane,
+  .showMap .listPane {
+    display: block;
+  }
+
+  .mapPane {
+    border-left: 1px solid var(--color-border);
+  }
 }

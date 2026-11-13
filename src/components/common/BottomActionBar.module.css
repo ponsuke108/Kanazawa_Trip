@@ -46,9 +46,13 @@
   }
 }
 
-/* （v18）しおりの見た目の画面では、どの幅でも列（420px）に合わせる（7.9） */
+/* （v18）しおりの見た目の画面では、スマホ・タブレットは列（420px）に合わせる（7.9）。PC はいつもの幅（640px） */
 :global(:root[data-theme='shiori']) .bar {
   max-width: var(--shiori-width);
-  border-right: 0;
-  border-left: 0;
+}
+
+@media (min-width: 1024px) {
+  :global(:root[data-theme='shiori']) .bar {
+    max-width: 640px;
+  }
 }
