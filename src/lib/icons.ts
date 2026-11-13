@@ -1,6 +1,10 @@
 // アイコンと意味の対応（要件定義書 7.3）。各画面はここから使う。新しい対応もここに追加する
 import {
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Pause,
+  Play,
   ArrowRight,
   Bike,
   Bookmark,
@@ -212,4 +216,12 @@ export const RouteIcons = {
 export const ShareIcons = {
   share: Share2,
   link: Link2,
+} satisfies Record<string, LucideIcon>;
+
+// （v18）S-14、S-06〜S-09 の背面の、名所の写真のスライドショー（7.9）
+export const SceneryIcons = {
+  prev: ChevronLeft,
+  next: ChevronRight,
+  pause: Pause,
+  play: Play,
 } satisfies Record<string, LucideIcon>;

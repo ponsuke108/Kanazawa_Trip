@@ -53,3 +53,43 @@
     padding-left: 220px;
   }
 }
+
+/* （v18）旅のしおりの見た目（7.9）。どの幅でも幅420pxの列を中央に置く。
+   地は和紙の色に、金箔を散らした細かな点を重ねる（画像は使わない） */
+.shioriRoot {
+  position: relative;
+  min-height: 100dvh;
+}
+
+.column.shiori {
+  position: relative;
+  z-index: 1;
+  max-width: var(--shiori-width);
+  background-color: var(--color-washi);
+  background-image:
+    radial-gradient(circle at 18% 22%, var(--color-shiori-fleck) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 63% 9%, var(--color-shiori-fleck) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 82% 58%, var(--color-shiori-fleck) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 37% 74%, var(--color-shiori-fleck) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 8% 91%, var(--color-shiori-fleck) 0 1px, transparent 1.5px);
+  background-size:
+    150px 150px,
+    210px 210px,
+    170px 170px,
+    260px 260px,
+    190px 190px;
+}
+
+/* PC でも下部タブの高さの分をあけたままにする（左のメニューにしないため） */
+@media (min-width: 1024px) {
+  .column.shiori.withTabBar {
+    padding-bottom: calc(var(--tabbar-height) + var(--space-6) + env(safe-area-inset-bottom));
+  }
+
+  .column.shiori.withTabBar.withBottomBar {
+    padding-bottom: calc(
+      var(--tabbar-height) + var(--tap-min) + var(--space-4) * 2 + var(--space-6) +
+        env(safe-area-inset-bottom)
+    );
+  }
+}

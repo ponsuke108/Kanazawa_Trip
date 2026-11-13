@@ -38,7 +38,24 @@
   color: var(--color-primary);
 }
 
+/* （v18）番号の札：経路順の地図のピンと同じ、金の縁と白い地に墨の番号（7.5） */
+.number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--space-1);
+  border: 2px solid var(--color-route-line);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
 .name {
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-lg);
   font-weight: 700;
   line-height: 1.4;

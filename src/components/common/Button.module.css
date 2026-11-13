@@ -43,6 +43,36 @@
   color: var(--color-surface);
 }
 
+/* （v18）しおりの見た目（7.9）：明朝の文字。メインのボタンは加賀藍のグラデーションに、
+   内側の金の細い枠（額縁）と四隅の金箔の点 */
+:global(:root[data-theme='shiori']) .button {
+  font-family: var(--font-family-mincho);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+:global(:root[data-theme='shiori']) .primary {
+  --frame: 5px;
+
+  background:
+    radial-gradient(circle, var(--color-shiori-gold) 0 1.5px, transparent 2px) top
+      calc(var(--frame) - 3px) left calc(var(--frame) - 3px) / 6px 6px no-repeat,
+    radial-gradient(circle, var(--color-shiori-gold) 0 1.5px, transparent 2px) top
+      calc(var(--frame) - 3px) right calc(var(--frame) - 3px) / 6px 6px no-repeat,
+    radial-gradient(circle, var(--color-shiori-gold) 0 1.5px, transparent 2px) bottom
+      calc(var(--frame) - 3px) left calc(var(--frame) - 3px) / 6px 6px no-repeat,
+    radial-gradient(circle, var(--color-shiori-gold) 0 1.5px, transparent 2px) bottom
+      calc(var(--frame) - 3px) right calc(var(--frame) - 3px) / 6px 6px no-repeat,
+    linear-gradient(180deg, var(--color-shiori-ai-1), var(--color-shiori-ai-2));
+  outline: 1px solid var(--color-shiori-gold);
+  outline-offset: calc(var(--frame) * -1);
+}
+
+:global(:root[data-theme='shiori']) .primary:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .spinner {
   animation: spin 0.8s linear infinite;
 }

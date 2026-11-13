@@ -76,15 +76,24 @@ export function ConfirmStep({
       )}
 
       <section className={styles.preview} aria-label="プレビュー">
-        <PlanHeading
-          plan={{
-            title: state.title.trim(),
-            status: 'published',
-            author: { id: user.id, displayName: user.displayName },
-            publishedAt: null,
-            tags: (tags.data ?? []).filter((t) => state.tagIds.includes(t.id)),
-          }}
-        />
+        {/* （v18）旅のしおりの表紙：明朝の題名、金の細い線、朱の判子（7.9） */}
+        <div className={styles.shiori}>
+          <p className={styles.shioriCaption}>旅のしおり</p>
+          <div className={styles.shioriHead}>
+            <PlanHeading
+              plan={{
+                title: state.title.trim(),
+                status: 'published',
+                author: { id: user.id, displayName: user.displayName },
+                publishedAt: null,
+                tags: (tags.data ?? []).filter((t) => state.tagIds.includes(t.id)),
+              }}
+            />
+            <span className={styles.seal} aria-hidden="true">
+              金沢
+            </span>
+          </div>
+        </div>
         <BlockList blocks={editorBlocksToBlocks(state.blocks)} mode="view" />
       </section>
 

@@ -1,0 +1,100 @@
+/* （v18）名所の写真のスライドショー（7.9）。画面全体の背面に固定する */
+.show {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--color-shiori-backdrop);
+}
+
+/* 写真は重ねておき、今の1枚だけを浮かび上がらせる（クロスフェード）。出ているあいだ少しずつ寄る */
+.photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1);
+  transition:
+    opacity 1.2s ease,
+    transform 4.2s linear;
+}
+
+.on {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+/* 右下：スポットの名前、出典、切り替えのボタン。列（420px）の右の余白に収める */
+.caption {
+  position: absolute;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  max-width: calc((100vw - var(--shiori-width)) / 2 - var(--space-5) * 2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-shiori);
+  background: var(--color-shiori-caption);
+  color: var(--color-shiori-caption-text);
+  text-align: right;
+}
+
+.name {
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.credit {
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+}
+
+.credit a {
+  color: inherit;
+}
+
+.controls {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 1px solid var(--color-shiori-gold);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-shiori-caption-text);
+}
+
+.control:focus-visible {
+  outline: 2px solid var(--color-shiori-caption-text);
+  outline-offset: 2px;
+}
+
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo {
+    transition: none;
+    transform: none;
+  }
+}

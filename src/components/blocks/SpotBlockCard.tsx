@@ -7,21 +7,28 @@ import styles from './SpotBlockCard.module.css';
 type Props = {
   block: SpotBlock;
   mode: 'view' | 'edit';
+  number?: number; // （v18）スポットだけを数えた順番。経路順の地図のピンの番号と同じ（BR-22）
   controls?: BlockControlProps; // 編集モードのとき
 };
 
-// スポットブロック（7.5）：通常のカード、MapPin のバッジとスポット名、写真はカード下部
-export function SpotBlockCard({ block, mode, controls }: Props) {
+// スポットブロック（7.5）：通常のカード、番号の札（番号がなければ MapPin のバッジ）とスポット名、写真はカード下部
+export function SpotBlockCard({ block, mode, number, controls }: Props) {
   const Pin = BlockIcons.spot;
   const Ticket = ShopIcons.campaign;
   return (
     <div className={styles.card}>
       <div className={styles.top}>
         <span className={styles.kind}>
-          <span className={styles.badge}>
-            <Pin size={16} aria-hidden="true" />
-          </span>
-          スポット
+          {number === undefined ? (
+            <span className={styles.badge}>
+              <Pin size={16} aria-hidden="true" />
+            </span>
+          ) : (
+            <span className={styles.number} aria-hidden="true">
+              {number}
+            </span>
+          )}
+          {number === undefined ? 'スポット' : `スポット ${number}`}
         </span>
         {mode === 'edit' && controls && <BlockControls {...controls} />}
       </div>

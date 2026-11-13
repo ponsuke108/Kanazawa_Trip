@@ -14,6 +14,7 @@
 .big {
   min-height: calc(var(--tap-min) + var(--space-4));
   font-size: var(--font-size-lg);
+  letter-spacing: 0.1em;
 }
 
 .note {
@@ -21,25 +22,42 @@
   font-size: var(--font-size-sm);
 }
 
+/* （v18）ほかの始め方（7.9） */
+.othersSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.othersHeading {
+  color: var(--color-text-sub);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
 .others {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  border-top: 1px dashed var(--color-shiori-dash);
+}
+
+.others li {
+  border-bottom: 1px dashed var(--color-shiori-dash);
 }
 
 .others a {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  min-height: var(--tap-min);
-  font-size: var(--font-size-sm);
+  gap: var(--space-3);
+  min-height: calc(var(--tap-min) + var(--space-2));
+  padding: 0 var(--space-2);
+  color: var(--color-primary);
+  font-size: var(--font-size-md);
   font-weight: 600;
+  text-decoration: none;
 }
 
-/* PC：中央に幅640pxの列（7.8） */
-@media (min-width: 1024px) {
-  .main {
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-  }
+.others a:hover {
+  background: var(--color-primary-weak);
 }

@@ -375,6 +375,7 @@ function SpotRow({ spot, saved, highlight, disabled, sameAsPrevious, onClick }: 
   const sub = spot.description ?? spot.address;
   const Ticket = ShopIcons.campaign;
   const Saved = ListIcons.list;
+  const Add = ActionIcons.add;
   return (
     <button
       type="button"
@@ -407,6 +408,9 @@ function SpotRow({ spot, saved, highlight, disabled, sameAsPrevious, onClick }: 
           </span>
         )}
         {sameAsPrevious && <span className={styles.note}>{UiMessages.sameSpotAdjacent}</span>}
+      </span>
+      <span className={styles.addMark} aria-hidden="true">
+        <Add size={18} />
       </span>
     </button>
   );
