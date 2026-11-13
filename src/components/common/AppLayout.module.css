@@ -80,6 +80,17 @@
     190px 190px;
 }
 
+/* （v21）タブレットと PC は、地を半透明の和紙にして、背面の名所の写真を透かして見せる */
+@media (min-width: 768px) {
+  .column.shiori {
+    background-color: var(--color-shiori-veil);
+    /* 写真の暗いところでも文字が読めるよう、文字のまわりに和紙の色をうっすら重ねる */
+    text-shadow:
+      0 0 2px var(--color-washi),
+      0 0 6px var(--color-washi);
+  }
+}
+
 /* （v20）PC は、ほかの画面と同じ幅（最大1200px）に戻す */
 @media (min-width: 1024px) {
   .column.shiori {

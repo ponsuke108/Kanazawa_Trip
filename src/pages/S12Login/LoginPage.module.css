@@ -104,24 +104,37 @@
   padding-top: var(--space-5);
 }
 
-/* マスコット「ちょうちんねこ」：ひとことの左下に、ちょこんと座る。
-   48×48 のドット絵が横に5コマ並んだ画像（まん中、まん中、しっぽ左、しっぽ右、目を開けた）を、
-   ドットがにじまないように2倍（96×96）で出す */
+/* （v21）マスコット「おちゃねこ」：ひとことの左下に、ちょこんと座る。上に名前と役割（K73） */
 .mascot {
-  display: block;
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
   align-self: flex-end;
+  align-items: center;
+  gap: var(--space-1);
   width: calc(var(--space-6) * 3);
-  height: calc(var(--space-6) * 3);
+  margin: 0;
 }
 
-.mascotSprite {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: url('../../assets/mascot/chochin-neko-sheet.png') 0 0 / calc(var(--space-6) * 15) 100%
-    no-repeat;
-  image-rendering: pixelated;
+.mascotCaption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-surface);
+  font-family: var(--font-family-mincho);
+  text-align: center;
+  text-shadow: var(--shadow-snow-text);
+}
+
+.mascotName {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.mascotRole {
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
 }
 
 /* ---- すりガラスの箱：切り替えと入力欄。中の共通部品の色を箱の中だけ変える ---- */
@@ -328,15 +341,7 @@
   animation: stamp 0.35s 1.8s ease-out both;
 }
 
-/* ちょうちんねこ：顔を出したあとは、お茶の中でふわふわ浮かびながら、
-   しっぽのちょうちんを左右にゆらし、ときどき目をぱちっと開ける（雪のほかに、ずっと動くのはこれだけ。K68） */
-.mascotSprite {
-  animation:
-    sway 4.8s 2.7s step-end infinite,
-    bob 1.2s 2.7s step-end infinite;
-}
-
-/* 落款を押したあと、ちょうちんねこがぴょこっと顔を出す（一度だけ） */
+/* 落款を押したあと、おちゃねこがぴょこっと顔を出す（一度だけ）。そのあとの動きは MascotSprite（K68） */
 .mascot {
   animation: peek 0.5s 2.2s cubic-bezier(0.3, 1.5, 0.5, 1) both;
 }
@@ -435,82 +440,6 @@
   }
 }
 
-@keyframes sway {
-  0% {
-    background-position-x: 0;
-  }
-
-  6.25% {
-    background-position-x: calc(var(--space-6) * -9);
-  }
-
-  12.5% {
-    background-position-x: 0;
-  }
-
-  18.75% {
-    background-position-x: calc(var(--space-6) * -6);
-  }
-
-  25% {
-    background-position-x: 0;
-  }
-
-  31.25% {
-    background-position-x: calc(var(--space-6) * -9);
-  }
-
-  37.5% {
-    background-position-x: 0;
-  }
-
-  43.75% {
-    background-position-x: calc(var(--space-6) * -6);
-  }
-
-  50% {
-    background-position-x: 0;
-  }
-
-  56.25% {
-    background-position-x: calc(var(--space-6) * -9);
-  }
-
-  62.5% {
-    background-position-x: 0;
-  }
-
-  68.75% {
-    background-position-x: calc(var(--space-6) * -6);
-  }
-
-  75% {
-    background-position-x: 0;
-  }
-
-  81.25% {
-    background-position-x: 0;
-  }
-
-  87.5% {
-    background-position-x: calc(var(--space-6) * -12);
-  }
-
-  93.75% {
-    background-position-x: 0;
-  }
-}
-
-@keyframes bob {
-  0% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-2px);
-  }
-}
-
 @keyframes peek {
   from {
     opacity: 0;
@@ -562,8 +491,7 @@
   .form [id$='-error'],
   .shakeA,
   .shakeB,
-  .mascot,
-  .mascotSprite {
+  .mascot {
     animation: none;
   }
 

@@ -63,7 +63,7 @@ img {
   outline-offset: 2px;
 }
 
-/* （v18）旅のしおりの見た目（7.9）：見出しは明朝。列の外は和紙の色、タブレットは写真のスライドショーの下地 */
+/* （v18）旅のしおりの見た目（7.9）：見出しは明朝。列の外は和紙の色、タブレットと PC は写真のスライドショーの下地 */
 :root[data-theme='shiori'] body {
   background: var(--color-washi);
 }
@@ -71,12 +71,6 @@ img {
 @media (min-width: 768px) {
   :root[data-theme='shiori'] body {
     background: var(--color-shiori-backdrop);
-  }
-}
-
-@media (min-width: 1024px) {
-  :root[data-theme='shiori'] body {
-    background: var(--color-washi);
   }
 }
 

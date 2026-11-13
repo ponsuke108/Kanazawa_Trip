@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router';
 import { AppLayout } from '@/components/common/AppLayout';
 import { Button } from '@/components/common/Button';
 import { PageHeader } from '@/components/common/PageHeader';
-import { SceneryShow } from '@/components/common/SceneryShow';
 import { ActionIcons, StatusIcons } from '@/lib/icons';
 import { ListsSection } from '@/pages/S14Create/ListsSection';
 import { TeaHero } from '@/pages/S14Create/TeaHero';
@@ -17,9 +16,6 @@ export function CreatePage() {
     <AppLayout showTabBar shiori>
       <PageHeader title="作る" showSiteName />
       <main className={styles.main}>
-        {/* （v20）PC だけ、上に名所の写真の帯（7.9） */}
-        <SceneryShow variant="banner" />
-
         {/* PC は左に「新しく作る」、右に「リストから作る」と「ほかの始め方」の2列（v20、7.8） */}
         <div className={styles.columns}>
           <div className={styles.start}>
