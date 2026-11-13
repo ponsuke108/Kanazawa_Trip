@@ -9,7 +9,8 @@ type Props = {
   showTabBar: boolean; // 下部タブを出す画面（6.1）：S-02、S-03、S-04、S-10、S-11。PC では左の縦のメニューになる（7.8）
   bottomBar?: boolean; // 画面下部に固定のボタンがある画面（BottomActionBar を使う）
   // （v18）旅のしおりの見た目（S-14、S-06〜S-09。7.9）。どの幅でも幅420pxの列を中央に置き、
-  // 背面に名所の写真のスライドショーを出す。PC でも左のメニューにせず、下部タブのままにする
+  // 背面に名所の写真のスライドショーを出す。（v19、K72）下部タブを出す画面（S-14）は、PC ではほかの画面と同じく
+  // 左のメニューを出し、その右の部分の中で写真と列を見せる
   shiori?: boolean;
   children: ReactNode;
 };
@@ -44,8 +45,9 @@ export function AppLayout({ showTabBar, bottomBar = false, shiori = false, child
 
   if (shiori) {
     return (
-      <div className={styles.shioriRoot}>
-        <SceneryShow />
+      <div className={`${styles.shioriRoot} ${showTabBar ? styles.withSideMenu : ''}`}>
+        {showTabBar && <SideMenu />}
+        <SceneryShow besideMenu={showTabBar} />
         <div className={classes}>
           {children}
           {showTabBar && <BottomTabBar />}

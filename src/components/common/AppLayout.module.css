@@ -79,17 +79,3 @@
     260px 260px,
     190px 190px;
 }
-
-/* PC でも下部タブの高さの分をあけたままにする（左のメニューにしないため） */
-@media (min-width: 1024px) {
-  .column.shiori.withTabBar {
-    padding-bottom: calc(var(--tabbar-height) + var(--space-6) + env(safe-area-inset-bottom));
-  }
-
-  .column.shiori.withTabBar.withBottomBar {
-    padding-bottom: calc(
-      var(--tabbar-height) + var(--tap-min) + var(--space-4) * 2 + var(--space-6) +
-        env(safe-area-inset-bottom)
-    );
-  }
-}

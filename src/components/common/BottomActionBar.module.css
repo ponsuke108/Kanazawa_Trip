@@ -46,15 +46,9 @@
   }
 }
 
-/* （v18）しおりの見た目の画面では、どの幅でも列（420px）に合わせ、PC でも下部タブの上に出す（7.9） */
+/* （v18）しおりの見た目の画面では、どの幅でも列（420px）に合わせる（7.9） */
 :global(:root[data-theme='shiori']) .bar {
-  left: 50%;
   max-width: var(--shiori-width);
   border-right: 0;
   border-left: 0;
-}
-
-:global(:root[data-theme='shiori']) .aboveTabBar {
-  bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
-  padding-bottom: var(--space-4);
 }

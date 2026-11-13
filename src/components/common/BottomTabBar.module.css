@@ -62,8 +62,7 @@
   }
 }
 
-/* （v18）しおりの見た目の画面では、PC でも下部タブを列（420px）の幅で出す（7.9） */
+/* （v18）しおりの見た目の画面では、下部タブを列（420px）の幅で出す。PC はほかの画面と同じく左のメニュー（v19、7.9） */
 :global(:root[data-theme='shiori']) .bar {
-  display: flex;
   max-width: var(--shiori-width);
 }

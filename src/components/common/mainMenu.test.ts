@@ -17,7 +17,13 @@ describe('下部タブの選択状態（6.1）', () => {
   });
 
   it('（K71）タブは5つで、ランキングは探すの隣', () => {
-    expect(MainMenuItems.map((i) => i.label)).toEqual(['地図', '探す', 'ランキング', '作る', 'マイページ']);
+    expect(MainMenuItems.map((i) => i.label)).toEqual([
+      '地図',
+      '探す',
+      'ランキング',
+      '作る',
+      'マイページ',
+    ]);
     expect(MainMenuItems.find((i) => i.label === 'ランキング')?.to).toBe('/ranking');
   });
 

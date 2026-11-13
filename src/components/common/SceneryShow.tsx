@@ -27,7 +27,8 @@ function useMedia(query: string): boolean {
   return matches;
 }
 
-export function SceneryShow() {
+// besideMenu：PC で左のメニュー（幅220px）を出す画面では、その右の部分にだけ出す（v19）
+export function SceneryShow({ besideMenu = false }: { besideMenu?: boolean }) {
   const wide = useMedia(MEDIA);
   const reduce = useMedia('(prefers-reduced-motion: reduce)');
   const [index, setIndex] = useState(0);
@@ -50,7 +51,10 @@ export function SceneryShow() {
   const go = (step: number) => setIndex((i) => (i + step + SCENES.length) % SCENES.length);
 
   return (
-    <section className={styles.show} aria-label="金沢の名所の写真">
+    <section
+      className={`${styles.show} ${besideMenu ? styles.besideMenu : ''}`}
+      aria-label="金沢の名所の写真"
+    >
       {SCENES.map((s, i) => (
         <img
           key={s.spotId}
