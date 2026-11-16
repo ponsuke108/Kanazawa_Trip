@@ -1,0 +1,119 @@
+/* サイトのヘッダー（6.1、7.8、v23）。PC（1024px 以上）は全画面の上に固定する。
+   スマホ・タブレットは S-01 だけ（onPhone）で、ロゴだけを出す */
+.header {
+  display: none;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-header);
+}
+
+.onPhone {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: block;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: var(--header-height);
+  padding: 0 var(--space-2) 0 var(--space-4);
+}
+
+.site {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  text-decoration: none;
+}
+
+.nav {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: var(--z-tabbar);
+    display: block;
+  }
+
+  .inner {
+    max-width: var(--content-max);
+    height: var(--site-header-height);
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  .nav {
+    display: block;
+  }
+
+  .phoneRight {
+    display: none;
+  }
+
+  .items {
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-1);
+  }
+
+  .item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: var(--site-header-height);
+    padding: 0 var(--space-4);
+    color: var(--color-text);
+    font-family: var(--font-family-mincho);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .item svg {
+    color: var(--color-accent-text);
+  }
+
+  /* 下の金の線：マウスを乗せたときと、選んでいるメニュー */
+  .item::after {
+    content: '';
+    position: absolute;
+    right: var(--space-4);
+    bottom: 0;
+    left: var(--space-4);
+    height: 3px;
+    background: var(--color-accent);
+    scale: 0 1;
+    transition: scale 0.2s ease-out;
+  }
+
+  .item:hover::after,
+  .active::after {
+    scale: 1 1;
+  }
+
+  .active {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .item:focus-visible {
+    outline-offset: -4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item::after {
+    transition: none;
+  }
+}

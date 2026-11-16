@@ -40,11 +40,10 @@
   background: var(--color-text);
 }
 
-/* PC：下部タブはなく、左の縦のメニュー（幅220px）がある画面では、残りの幅の中央に出す（7.8） */
+/* PC：下部タブはない（7.8） */
 @media (min-width: 1024px) {
   .aboveTabBar {
     bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
-    left: calc(50% + 220px / 2);
   }
 }
 

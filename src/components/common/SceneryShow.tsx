@@ -3,7 +3,7 @@ import { SpotPhotos, spotPhotoUrl } from '@/constants/spotPhotos';
 import { SceneryIcons } from '@/lib/icons';
 import styles from './SceneryShow.module.css';
 
-// （v18）旅のしおりの見た目の背面に出す、金沢の名所の写真のスライドショー（7.9）。
+// 金沢の名所の写真のスライドショー（v23：S-01 ホームの大きな写真。7.9）。
 // 写真は K65 の、再利用が許された写真（public/spot-photos）。右下に名前と出典を出す
 const SCENES: { spotId: number; name: string }[] = [
   { spotId: 7, name: 'ひがし茶屋街' },
@@ -12,10 +12,7 @@ const SCENES: { spotId: number; name: string }[] = [
   { spotId: 3, name: '長町武家屋敷跡' },
 ];
 
-const INTERVAL_MS = 3000;
-// タブレットと PC（768px 以上）で、画面の背面に出す。地を半透明にして写真を透かして見せる（v21）。
-// スマホでは写真を読み込まない
-const MEDIA = '(min-width: 768px)';
+const INTERVAL_MS = 5000;
 
 function useMedia(query: string): boolean {
   const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
@@ -28,21 +25,17 @@ function useMedia(query: string): boolean {
   return matches;
 }
 
-// besideMenu：PC で左のメニュー（幅220px）を出す画面では、その右の部分にだけ出す（v19）
-export function SceneryShow({ besideMenu = false }: { besideMenu?: boolean }) {
-  const wide = useMedia(MEDIA);
+export function SceneryShow() {
   const reduce = useMedia('(prefers-reduced-motion: reduce)');
   const [index, setIndex] = useState(0);
   // 動きを減らす設定のときは、初めから止めておく（ボタンで切り替えはできる）
   const [paused, setPaused] = useState(reduce);
 
   useEffect(() => {
-    if (!wide || paused) return;
+    if (paused) return;
     const id = window.setInterval(() => setIndex((i) => (i + 1) % SCENES.length), INTERVAL_MS);
     return () => window.clearInterval(id);
-  }, [wide, paused]);
-
-  if (!wide) return null;
+  }, [paused]);
 
   const scene = SCENES[index];
   const credit = SpotPhotos[scene.spotId];
@@ -52,9 +45,8 @@ export function SceneryShow({ besideMenu = false }: { besideMenu?: boolean }) {
   const go = (step: number) => setIndex((i) => (i + step + SCENES.length) % SCENES.length);
 
   return (
-    // 写真は画面のいちばん後ろ、右下の箱は内容（半透明の和紙）より前に出して押せるようにする（v21）
     <section className={styles.wrap} aria-label="金沢の名所の写真">
-      <div className={`${styles.show} ${besideMenu ? styles.besideMenu : ''}`}>
+      <div className={styles.show}>
         {SCENES.map((s, i) => (
           <img
             key={s.spotId}

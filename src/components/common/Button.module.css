@@ -7,9 +7,11 @@
   padding: 0 var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-md);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
+  letter-spacing: 0.08em;
   white-space: nowrap;
 }
 
@@ -43,16 +45,9 @@
   color: var(--color-surface);
 }
 
-/* （v18）しおりの見た目（7.9）：明朝の文字。メインのボタンは加賀藍のグラデーションに、
-   内側の金の細い枠（額縁）と四隅の金箔の点 */
-:global(:root[data-theme='shiori']) .button {
-  font-family: var(--font-family-mincho);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-}
-
-:global(:root[data-theme='shiori']) .primary {
-  --frame: 5px;
+/* （v23）メインのボタン：加賀藍の地に、内側の金の細い枠（額縁）と四隅の金箔の点（7.6） */
+.primary {
+  --frame: 4px;
 
   background:
     radial-gradient(circle, var(--color-shiori-gold) 0 1.5px, transparent 2px) top
@@ -68,9 +63,44 @@
   outline-offset: calc(var(--frame) * -1);
 }
 
-:global(:root[data-theme='shiori']) .primary:focus-visible {
+.primary:focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* マウスを乗せたとき、押したときの手ごたえ */
+.button {
+  transition:
+    filter 0.15s ease-out,
+    background-color 0.15s ease-out,
+    border-color 0.15s ease-out,
+    translate 0.1s ease-out;
+}
+
+@media (hover: hover) {
+  .primary:hover:not(:disabled),
+  .danger:hover:not(:disabled) {
+    filter: brightness(1.15);
+  }
+
+  .secondary:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    background: var(--color-bg);
+  }
+
+  .ghost:hover:not(:disabled) {
+    background: var(--color-primary-weak);
+  }
+}
+
+.button:active:not(:disabled) {
+  translate: 0 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
 }
 
 .spinner {

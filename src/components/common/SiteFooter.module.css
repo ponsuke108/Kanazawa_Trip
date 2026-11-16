@@ -1,0 +1,99 @@
+/* サイトのフッター（6.1、v23）：加賀臙脂の地、上に金箔の線 */
+.footer {
+  margin-top: auto;
+  border-top: 3px solid var(--color-accent);
+  background: linear-gradient(180deg, var(--color-brand), var(--color-brand-dark));
+  color: var(--color-on-brand);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-5);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.lead {
+  color: var(--color-on-brand-sub);
+  font-size: var(--font-size-sm);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  color: var(--color-on-brand);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer :focus-visible {
+  outline-color: var(--color-on-brand);
+}
+
+.sources {
+  padding-top: var(--space-4);
+  border-top: 1px solid color-mix(in srgb, var(--color-on-brand) 25%, transparent);
+  color: var(--color-on-brand-sub);
+  font-size: var(--font-size-xs);
+  line-height: 1.8;
+}
+
+.sourcesTitle {
+  color: var(--color-on-brand);
+  font-family: var(--font-family-mincho);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.sources a {
+  color: inherit;
+}
+
+.copy {
+  color: var(--color-on-brand-sub);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.2em;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding: var(--space-6) var(--space-5) var(--space-5);
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: var(--space-6);
+  }
+
+  .sources,
+  .copy {
+    grid-column: 1 / -1;
+  }
+}

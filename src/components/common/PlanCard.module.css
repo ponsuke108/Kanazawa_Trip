@@ -1,9 +1,24 @@
-/* 7.4 の通常のカード：四辺同じ1pxの枠線、角丸12px、白い背景、影なし */
+/* 7.4 の通常のカード：四辺同じ1pxの枠線、角丸、白い背景。マウスを乗せると金の枠と影（v23） */
 .card {
   position: relative;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  overflow: hidden;
+  transition:
+    border-color 0.15s ease-out,
+    box-shadow 0.15s ease-out;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-card);
+  }
+
+  .card:hover .image {
+    scale: 1.05;
+  }
 }
 
 .link {
@@ -20,8 +35,8 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   border-radius: var(--radius-sm);
   background: var(--color-primary-weak);
   color: var(--color-primary);
@@ -32,21 +47,24 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: scale 0.4s ease-out;
 }
 
 .rank {
   position: absolute;
-  top: var(--space-1);
-  left: var(--space-1);
+  top: 0;
+  left: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
-  height: 24px;
+  min-width: 28px;
+  height: 28px;
   padding: 0 var(--space-1);
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
-  color: var(--color-text);
+  border: 1px solid var(--color-accent);
+  border-radius: calc(var(--radius-sm) / 2);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-sm);
   font-weight: 700;
 }
@@ -65,6 +83,7 @@
 
 .title {
   font-size: var(--font-size-md);
+  letter-spacing: 0.04em;
   font-weight: 700;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -113,11 +132,12 @@
   align-items: center;
   gap: var(--space-1);
   padding: calc(var(--space-1) / 2) var(--space-2);
-  border-radius: var(--radius-full);
-  background: var(--color-primary-weak);
-  color: var(--color-primary);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  border: 1px solid var(--color-accent);
+  border-radius: calc(var(--radius-sm) / 2);
+  background: var(--color-surface);
+  color: var(--color-accent-text);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -127,4 +147,55 @@
   right: var(--space-1);
   display: flex;
   align-items: center;
+}
+
+/* タブレットと PC：写真を上に大きく出すカード（一覧は2列・3列。7.8、v23） */
+@media (min-width: 768px) {
+  .link {
+    flex-direction: column;
+    gap: 0;
+    height: 100%;
+    padding: 0;
+  }
+
+  .thumb {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    border-radius: 0;
+  }
+
+  .rank {
+    min-width: 36px;
+    height: 36px;
+    font-size: var(--font-size-lg);
+  }
+
+  .body {
+    gap: var(--space-2);
+    padding: var(--space-4);
+  }
+
+  .bodyWithActions {
+    padding-right: var(--space-4);
+  }
+
+  .title {
+    font-size: var(--font-size-lg);
+  }
+
+  /* 写真の上に重なるので、白い丸い地を敷く */
+  .actions {
+    top: var(--space-2);
+    right: var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .image {
+    transition: none;
+  }
 }
