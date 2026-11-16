@@ -52,7 +52,7 @@ type Confirm =
   | { kind: 'deletePost'; post: SpotPost }
   | null;
 
-// S-11 マイページ（6.4、F-24、F-32、BR-09、BR-10）。見た目は雪の茶屋街（7.7、I-22）
+// S-11 マイページ（6.4、F-24、F-32、BR-09、BR-10）。見た目は 7.11
 export function MyPage() {
   const [params, setParams] = useSearchParams();
   const tab: Tab = toTab(params.get('tab'));
@@ -164,6 +164,8 @@ export function MyPage() {
 
   const current = tab === 'posts' ? posts : tab === 'mine' ? mine : liked;
   const foodTag = tags.data?.find((t) => t.slug === 'food');
+  // 自分のプランが0件：0件の表示が「プランを作る」を出す。同じボタンを2つ並べない（K75）
+  const emptyMine = tab === 'mine' && mine.data?.length === 0;
   const Search = ActionIcons.search;
   const Create = ActionIcons.create;
   const initial = Array.from(user.displayName)[0] ?? '';
@@ -212,15 +214,25 @@ export function MyPage() {
               {user.displayName}さん
             </h1>
             <span className={styles.bubble}>{greeting(new Date().getHours())}</span>
+            {/* タブレットと PC の「プランを作る」。スマホは下の浮かぶボタン。どの幅でも1つだけ出す（K75） */}
+            {!emptyMine && (
+              <div className={styles.profileAction}>
+                <Button icon={ActionIcons.create} onClick={() => navigate('/create')}>
+                  プランを作る
+                </Button>
+              </div>
+            )}
           </section>
 
-          {/* （v11）お店・管理者の入口 */}
-          <RoleEntry role={user.role} />
+          <div className={styles.links}>
+            {/* （v11）お店・管理者の入口 */}
+            <RoleEntry role={user.role} />
 
-          <button type="button" className={styles.search} onClick={() => navigate('/search')}>
-            <Search size={20} aria-hidden="true" />
-            探す
-          </button>
+            <button type="button" className={styles.search} onClick={() => navigate('/search')}>
+              <Search size={20} aria-hidden="true" />
+              探す
+            </button>
+          </div>
 
           {/* 切り替えは共通部品（7.6 SegmentedControl）。見た目だけ MyPage.module.css で整える */}
           <div className={styles.tabs}>
@@ -286,7 +298,7 @@ export function MyPage() {
               )}
             </div>
           ) : tab === 'posts' ? (
-            <ol className={styles.grid}>
+            <ol className={styles.grid} data-stagger>
               {posts.data?.map((post, i, all) => {
                 const wide = i === 0 || (i === all.length - 1 && all.length % 2 === 0);
                 return (
@@ -317,7 +329,7 @@ export function MyPage() {
               })}
             </ol>
           ) : (
-            <ol className={styles.grid}>
+            <ol className={styles.grid} data-stagger>
               {(mine.data && tab === 'mine' ? mine.data : (liked.data ?? [])).map(
                 (plan, i, all) => {
                   // 1枚目は大きく。残りが奇数のときは、最後の1枚も横いっぱいにする
@@ -340,10 +352,13 @@ export function MyPage() {
         </main>
 
         <div className={styles.floating}>
-          <button type="button" className={styles.create} onClick={() => navigate('/create')}>
-            <Create size={22} aria-hidden="true" />
-            プランを作る
-          </button>
+          {/* 自分のプランが0件のときは、0件の表示の中に「プランを作る」があるので、ここには出さない（K75） */}
+          {!emptyMine && (
+            <button type="button" className={styles.create} onClick={() => navigate('/create')}>
+              <Create size={22} aria-hidden="true" />
+              プランを作る
+            </button>
+          )}
           {foodTag && (
             <Link className={styles.sticker} to={`/search/results${tagsQuery([foodTag.id])}`}>
               {renderTagIcon('food', { size: 22, 'aria-hidden': true })}

@@ -44,10 +44,16 @@ export function PlanCard({ plan, rank, showStatus = false, menu, trailing, to }:
           {plan.coverImageUrl ? (
             <img src={plan.coverImageUrl} alt="" loading="lazy" className={styles.image} />
           ) : (
-            <NoImage size={24} aria-hidden="true" />
+            // 写真がないとき：加賀藍の地に七宝の和柄、最初のスポット名を縦書きで（7.4、K75）
+            <span className={styles.placeholder} aria-hidden="true">
+              {plan.spotNames[0] ?? <NoImage size={24} />}
+            </span>
           )}
           {rank !== undefined && (
-            <span className={styles.rank} aria-label={`${rank}位`}>
+            <span
+              className={`${styles.rank} ${rank === 1 ? styles.rankTop : ''}`}
+              aria-label={`${rank}位`}
+            >
               {rank}
             </span>
           )}

@@ -117,3 +117,44 @@
     transition: none;
   }
 }
+
+/* （K75）いちばん上に、金箔の細い線 */
+.header::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: url('../../assets/art/kinpaku.svg') center / 160px;
+}
+
+.onPhone .inner {
+  height: calc(var(--header-height) - 3px);
+}
+
+.site {
+  transition: opacity var(--dur-fast) ease-out;
+}
+
+@media (hover: hover) {
+  .site:hover {
+    opacity: 0.75;
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    height: calc(var(--site-header-height) - 3px);
+  }
+
+  .item {
+    height: calc(var(--site-header-height) - 3px);
+    transition: color var(--dur-fast) ease-out;
+  }
+
+  .item:hover {
+    color: var(--color-primary);
+  }
+
+  .item::after {
+    transition: scale var(--dur) var(--ease-out);
+  }
+}

@@ -57,25 +57,16 @@ export function SceneryShow() {
         ))}
       </div>
       <div className={styles.caption}>
-        <p className={styles.name} aria-live={paused ? 'polite' : 'off'}>
-          {scene.name}
-        </p>
-        {credit && (
-          <p className={styles.credit}>
-            写真：
-            <a href={credit.sourceUrl} target="_blank" rel="noopener noreferrer">
-              {credit.author}（Wikimedia Commons）
-            </a>
-            {' / '}
-            {credit.licenseUrl ? (
-              <a href={credit.licenseUrl} target="_blank" rel="noopener noreferrer">
-                {credit.license}
-              </a>
-            ) : (
-              credit.license
-            )}
+        <div>
+          <p className={styles.name} aria-live={paused ? 'polite' : 'off'}>
+            {scene.name}
           </p>
-        )}
+          <div className={styles.dots} aria-hidden="true">
+            {SCENES.map((s, i) => (
+              <span key={s.spotId} className={`${styles.dot} ${i === index ? styles.dotOn : ''}`} />
+            ))}
+          </div>
+        </div>
         <div className={styles.controls}>
           <button type="button" className={styles.control} onClick={() => go(-1)}>
             <Prev size={18} aria-hidden="true" />
@@ -97,6 +88,22 @@ export function SceneryShow() {
             <span className={styles.hidden}>次の写真</span>
           </button>
         </div>
+        {credit && (
+          <p className={styles.credit}>
+            写真：
+            <a href={credit.sourceUrl} target="_blank" rel="noopener noreferrer">
+              {credit.author}（Wikimedia Commons）
+            </a>
+            {' / '}
+            {credit.licenseUrl ? (
+              <a href={credit.licenseUrl} target="_blank" rel="noopener noreferrer">
+                {credit.license}
+              </a>
+            ) : (
+              credit.license
+            )}
+          </p>
+        )}
       </div>
     </section>
   );

@@ -1,51 +1,139 @@
-/* S-01 ホーム（6.4、v23）。スマホは写真の上にひとことを重ね、PC は左にひとこと、右に写真 */
+/* S-01 ホーム（6.4、7.11）。どの幅でも、左に縦書きのひとこと、右にアーチ形の写真を並べる */
 .main {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: calc(var(--space-6) + var(--space-4));
 }
 
-/* ---- 大きな見出し：名所の写真と、ひとこと ---- */
+/* ---- 大きな見出し：縦書きのひとことと、アーチ形の名所の写真。金箔が舞う ---- */
 .hero {
   position: relative;
+  padding: var(--space-5) var(--space-4) 0;
+}
+
+.heroInner {
+  position: relative;
   display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
 }
 
-.heroPhoto {
-  grid-area: 1 / 1;
-  aspect-ratio: 1 / 1;
-  max-height: 70dvh;
-}
-
-/* スマホ：写真の上、左下にひとことを重ねる。下に暗い下敷きを敷いて読みやすくする */
-.heroText {
-  z-index: 1;
-  grid-area: 1 / 1;
+.heroCopy {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  /* 下は、写真の名前と出典（2行）の分をあける */
-  padding: var(--space-6) var(--space-4) calc(var(--tap-min) + var(--space-6) + var(--space-4));
-  background: linear-gradient(to top, var(--color-photo-veil-strong), transparent 70%);
-  color: var(--color-on-brand);
-  pointer-events: none;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
 }
 
+/* 小さな英字：縦に流して、ひとことの上に添える。下に短い金の線 */
 .heroLatin {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-accent-text);
   font-family: var(--font-family-mincho);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-2xs);
   letter-spacing: 0.4em;
+  writing-mode: vertical-rl;
+}
+
+.heroLatin::after {
+  content: '';
+  width: 1px;
+  height: var(--space-5);
+  background: var(--color-accent);
 }
 
 .lead {
-  max-width: 14em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   font-family: var(--font-family-mincho);
   font-size: var(--font-size-xl);
   font-weight: 700;
-  line-height: 1.6;
-  letter-spacing: 0.08em;
-  text-wrap: balance;
+  line-height: 1.5;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+}
+
+/* 開いたとき、筆で書くように上から現す（1行ずつ、右の行から） */
+.lead > span {
+  animation: write 1.1s 0.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) both;
+}
+
+.lead > span + span {
+  padding-top: 1.2em;
+  animation-delay: 0.9s;
+}
+
+@keyframes write {
+  from {
+    clip-path: inset(-10% -30% 100% -30%);
+  }
+
+  to {
+    clip-path: inset(-10% -30% -10% -30%);
+  }
+}
+
+/* 写真：上が丸いアーチ（火灯窓のような形）。外側に金の細い枠 */
+.heroPhoto {
+  position: relative;
+  justify-self: end;
+  width: 100%;
+  max-width: 460px;
+  animation: photo-in 1.2s var(--ease-out) both;
+}
+
+@keyframes photo-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--space-5);
+  }
+}
+
+.frame {
+  --scenery-aspect: 3 / 4;
+  --scenery-radius: 999px 999px var(--radius-sm) var(--radius-sm);
+
+  position: relative;
+}
+
+.frame::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--space-2) * -1);
+  right: calc(var(--space-2) * -1);
+  left: calc(var(--space-2) * -1);
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--color-accent);
+  border-radius: 999px 999px var(--radius-md) var(--radius-md);
+  pointer-events: none;
+}
+
+/* 写真の後ろ：町家の格子（木虫籠）のような細い縦の線 */
+.lattice {
+  position: absolute;
+  top: 26%;
+  right: calc(var(--space-3) * -1);
+  bottom: 24%;
+  left: 40%;
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-brand) 34%, transparent) 0 2px,
+    transparent 2px 9px
+  );
+}
+
+/* 雪吊りの絵：写真の左下に、薄く重ねる */
+.heroArt {
+  display: none;
 }
 
 /* ---- 3つの入口 ---- */
@@ -58,7 +146,12 @@
   padding: 0 var(--space-4);
 }
 
+.entrySlot {
+  display: grid;
+}
+
 .entry {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -69,9 +162,25 @@
   background: var(--color-surface);
   color: var(--color-text);
   text-decoration: none;
+  overflow: hidden;
   transition:
-    border-color 0.15s ease-out,
-    box-shadow 0.15s ease-out;
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    translate var(--dur) var(--ease-out);
+}
+
+/* 下の金箔の線：マウスを乗せると左からのびる */
+.entry::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: url('../../assets/art/kinpaku.svg') center / 120px;
+  scale: 0 1;
+  transform-origin: left;
+  transition: scale 0.5s var(--ease-out);
 }
 
 .entryIcon {
@@ -84,6 +193,9 @@
   border: 1px solid var(--color-accent);
   border-radius: var(--radius-full);
   color: var(--color-primary);
+  transition:
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
 }
 
 .entryWords {
@@ -108,18 +220,113 @@
 .entryArrow {
   flex-shrink: 0;
   color: var(--color-accent-text);
-  transition: translate 0.15s ease-out;
+  transition: translate var(--dur) var(--ease-out);
 }
 
 @media (hover: hover) {
   .entry:hover {
     border-color: var(--color-accent);
     box-shadow: var(--shadow-card);
+    translate: 0 -2px;
+  }
+
+  .entry:hover::after {
+    scale: 1 1;
+  }
+
+  .entry:hover .entryIcon {
+    background: var(--color-primary);
+    color: var(--color-surface);
   }
 
   .entry:hover .entryArrow {
     translate: 4px 0;
   }
+}
+
+/* ---- 旅ノートの使い方：白い帯に、七宝の和柄を薄く敷く ---- */
+.band {
+  position: relative;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('../../assets/art/shippo-gold.svg');
+  opacity: 0.14;
+  mask-image: linear-gradient(100deg, transparent 30%, #000);
+  pointer-events: none;
+}
+
+.bandInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: calc(var(--space-6) + var(--space-2)) var(--space-4);
+}
+
+.steps {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* スマホ：左に番号と線、右に内容。番号を縦の金の線でつなぐ */
+.stepSlot {
+  position: relative;
+}
+
+.stepSlot:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--tap-min) + var(--space-2));
+  bottom: calc(var(--space-5) * -1 + var(--space-2));
+  left: calc(var(--tap-min) / 2);
+  width: 1px;
+  background: var(--color-accent);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: var(--tap-min) minmax(0, 1fr);
+  gap: 0 var(--space-4);
+  align-items: center;
+}
+
+.stepNo {
+  grid-row: span 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: calc(var(--radius-sm) / 2);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.stepIcon {
+  display: none;
+}
+
+.stepTitle {
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.12em;
+}
+
+.stepNote {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
 }
 
 /* ---- ランキング ---- */
@@ -146,9 +353,12 @@
   text-decoration: none;
 }
 
-.more:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+.more svg {
+  transition: translate var(--dur) var(--ease-out);
+}
+
+.more:hover svg {
+  translate: 4px 0;
 }
 
 .list {
@@ -157,37 +367,80 @@
   gap: var(--space-3);
 }
 
-/* タブレット：写真を横長に。入口は3つ横に並べ、説明は下に。一覧は2列（7.8） */
+.cardSlot {
+  display: grid;
+}
+
+/* タブレット：ひとことと写真を大きく。入口は横に3つ、使い方は2列、一覧は2列（7.8） */
 @media (min-width: 768px) {
-  .heroPhoto {
-    aspect-ratio: 16 / 9;
+  .hero {
+    padding: var(--space-6) var(--space-5) 0;
   }
 
-  .heroText {
-    padding: var(--space-6) var(--space-5) calc(var(--tap-min) + var(--space-5));
+  .heroInner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .heroCopy {
+    gap: var(--space-4);
+  }
+
+  .heroLatin {
+    font-size: var(--font-size-xs);
   }
 
   .lead {
-    max-width: none;
-  }
-
-  .lead {
+    gap: var(--space-4);
     font-size: var(--font-size-2xl);
+    letter-spacing: 0.22em;
+  }
+
+  .heroPhoto {
+    justify-self: center;
+    max-width: 380px;
+  }
+
+  .heroArt {
+    position: absolute;
+    bottom: calc(var(--tap-min) + var(--space-5));
+    left: calc(var(--space-6) * -3);
+    display: block;
+    width: 200px;
+    color: var(--color-accent-text);
+    opacity: 0.6;
+    pointer-events: none;
   }
 
   .entries {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
     padding: 0 var(--space-5);
   }
 
   .entry {
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
     padding: var(--space-5) var(--space-4);
   }
 
   .entryArrow {
     align-self: flex-end;
+  }
+
+  .bandInner {
+    padding: calc(var(--space-6) * 2) var(--space-5);
+  }
+
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-5);
+  }
+
+  .stepSlot:not(:last-child)::before {
+    display: none;
   }
 
   .ranking {
@@ -206,56 +459,81 @@
   }
 }
 
-/* PC：左に縦書きのひとこと、右に写真。一覧は3列（7.8） */
+/* PC：ひとことをさらに大きく。使い方は横に4つ、金の線でつなぐ。一覧は3列（7.8） */
 @media (min-width: 1024px) {
   .main {
-    gap: calc(var(--space-6) * 2);
+    gap: calc(var(--space-6) * 3);
   }
 
   .hero {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    align-items: stretch;
-    width: 100%;
-    max-width: var(--content-max);
-    margin: 0 auto;
-    padding: var(--space-6) var(--space-5) 0;
+    padding-top: calc(var(--space-6) * 2);
   }
 
-  .heroText {
-    grid-area: auto;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-5);
-    padding: var(--space-6) var(--space-5);
-    border: 1px solid var(--color-border);
-    border-right: none;
-    background: var(--color-surface);
-    color: var(--color-text);
-    pointer-events: auto;
+  .heroInner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   }
 
   .heroLatin {
-    color: var(--color-accent-text);
     font-size: var(--font-size-sm);
   }
 
-  /* 縦書き（右から左へ読む）。行の区切りは文の「、」に合わせる */
   .lead {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    max-width: none;
-    font-size: var(--font-size-2xl);
-    line-height: 2;
-    letter-spacing: 0.2em;
-    writing-mode: vertical-rl;
-    text-wrap: nowrap;
+    gap: var(--space-5);
+    font-size: calc(var(--font-size-2xl) + var(--space-3));
+    line-height: 1.4;
   }
 
   .heroPhoto {
-    grid-area: auto;
-    aspect-ratio: 3 / 2;
-    max-height: none;
+    max-width: 440px;
+  }
+
+  .heroArt {
+    left: calc(var(--space-6) * -5);
+    width: 260px;
+  }
+
+  .entry {
+    padding: var(--space-6) var(--space-5) var(--space-5);
+  }
+
+  .entryLabel {
+    font-size: var(--font-size-xl);
+  }
+
+  .steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  /* 番号から次の番号へ、横の金の線 */
+  .stepSlot:not(:last-child)::before {
+    top: calc(var(--tap-min) / 2);
+    right: calc(var(--space-5) * -1);
+    bottom: auto;
+    left: calc(var(--tap-min) + var(--space-3));
+    display: block;
+    width: auto;
+    height: 1px;
+  }
+
+  .step {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+    justify-items: start;
+  }
+
+  .stepNo {
+    grid-row: auto;
+    margin-bottom: var(--space-3);
+  }
+
+  .stepIcon {
+    display: inline-flex;
+    color: var(--color-accent-text);
+  }
+
+  .stepTitle {
+    font-size: var(--font-size-xl);
   }
 
   .list {
@@ -264,8 +542,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .lead > span,
+  .heroPhoto {
+    animation: none;
+  }
+
   .entry,
-  .entryArrow {
+  .entry::after,
+  .entryIcon,
+  .entryArrow,
+  .more svg {
     transition: none;
   }
 }

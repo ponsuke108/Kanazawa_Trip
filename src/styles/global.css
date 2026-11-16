@@ -7,6 +7,7 @@
 }
 
 html {
+  scrollbar-color: var(--color-accent) transparent;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -20,7 +21,8 @@ body {
   color: var(--color-text);
   font-feature-settings: 'palt';
   -webkit-font-smoothing: antialiased;
-  background: var(--color-bg);
+  /* （K75）和紙の地：繊維と細かな粒の絵（assets/art/washi.svg）を、和紙の白の上に敷く */
+  background: var(--color-bg) url('../assets/art/washi.svg');
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -77,4 +79,46 @@ h3 {
 ::selection {
   background: var(--color-accent);
   color: var(--color-text);
+}
+
+/* （K75）一覧を、上から順にそっと出す。使う側は、並べる要素の親に data-stagger を付ける */
+[data-stagger] > * {
+  animation: stagger-rise var(--dur-slow) var(--ease-out) both;
+}
+
+[data-stagger] > :nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+[data-stagger] > :nth-child(3) {
+  animation-delay: 0.12s;
+}
+
+[data-stagger] > :nth-child(4) {
+  animation-delay: 0.18s;
+}
+
+[data-stagger] > :nth-child(5) {
+  animation-delay: 0.24s;
+}
+
+[data-stagger] > :nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+[data-stagger] > :nth-child(n + 7) {
+  animation-delay: 0.36s;
+}
+
+@keyframes stagger-rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-stagger] > * {
+    animation: none;
+  }
 }
