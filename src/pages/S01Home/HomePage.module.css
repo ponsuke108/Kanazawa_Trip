@@ -1,55 +1,154 @@
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: var(--header-height);
-  padding: 0 var(--space-2) 0 var(--space-4);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-}
-
+/* S-01 ホーム（6.4、v23）。スマホは写真の上にひとことを重ね、PC は左にひとこと、右に写真 */
 .main {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  padding: var(--space-5) var(--space-4);
+  gap: var(--space-6);
+}
+
+/* ---- 大きな見出し：名所の写真と、ひとこと ---- */
+.hero {
+  position: relative;
+  display: grid;
+}
+
+.heroPhoto {
+  grid-area: 1 / 1;
+  aspect-ratio: 1 / 1;
+  max-height: 70dvh;
+}
+
+/* スマホ：写真の上、左下にひとことを重ねる。下に暗い下敷きを敷いて読みやすくする */
+.heroText {
+  z-index: 1;
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  /* 下は、写真の名前と出典（2行）の分をあける */
+  padding: var(--space-6) var(--space-4) calc(var(--tap-min) + var(--space-6) + var(--space-4));
+  background: linear-gradient(to top, var(--color-photo-veil-strong), transparent 70%);
+  color: var(--color-on-brand);
+  pointer-events: none;
+}
+
+.heroLatin {
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.4em;
 }
 
 .lead {
+  max-width: 14em;
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  text-wrap: balance;
+}
+
+/* ---- 3つの入口 ---- */
+.entries {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: calc(var(--tap-min) + var(--space-5));
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease-out,
+    box-shadow 0.15s ease-out;
+}
+
+.entryIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--tap-min) + var(--space-1));
+  height: calc(var(--tap-min) + var(--space-1));
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-full);
+  color: var(--color-primary);
+}
+
+.entryWords {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.entryLabel {
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-lg);
   font-weight: 700;
-  line-height: 1.5;
+  letter-spacing: 0.08em;
 }
 
-.entries {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+.entryNote {
+  color: var(--color-text-sub);
+  font-size: var(--font-size-sm);
 }
 
+.entryArrow {
+  flex-shrink: 0;
+  color: var(--color-accent-text);
+  transition: translate 0.15s ease-out;
+}
+
+@media (hover: hover) {
+  .entry:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-card);
+  }
+
+  .entry:hover .entryArrow {
+    translate: 4px 0;
+  }
+}
+
+/* ---- ランキング ---- */
 .ranking {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-}
-
-.sectionHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.heading {
-  font-size: var(--font-size-lg);
+  gap: var(--space-4);
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
 }
 
 .more {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
+  gap: var(--space-1);
   min-height: var(--tap-min);
-  padding: 0 var(--space-2);
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.more:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .list {
@@ -58,21 +157,47 @@
   gap: var(--space-3);
 }
 
-.sources {
-  padding: var(--space-4);
-  color: var(--color-text-sub);
-  font-size: var(--font-size-xs);
-}
-
-.sourcesTitle {
-  font-weight: 700;
-}
-
-/* 一覧のカード：タブレットは2列、PC は3列（7.8） */
+/* タブレット：写真を横長に。入口は3つ横に並べ、説明は下に。一覧は2列（7.8） */
 @media (min-width: 768px) {
+  .heroPhoto {
+    aspect-ratio: 16 / 9;
+  }
+
+  .heroText {
+    padding: var(--space-6) var(--space-5) calc(var(--tap-min) + var(--space-5));
+  }
+
+  .lead {
+    max-width: none;
+  }
+
+  .lead {
+    font-size: var(--font-size-2xl);
+  }
+
+  .entries {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0 var(--space-5);
+  }
+
+  .entry {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .entryArrow {
+    align-self: flex-end;
+  }
+
+  .ranking {
+    padding: 0 var(--space-5);
+  }
+
   .list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
   }
 
   /* 同じ行のカードの高さをそろえる */
@@ -81,19 +206,66 @@
   }
 }
 
+/* PC：左に縦書きのひとこと、右に写真。一覧は3列（7.8） */
 @media (min-width: 1024px) {
+  .main {
+    gap: calc(var(--space-6) * 2);
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: stretch;
+    width: 100%;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-5) 0;
+  }
+
+  .heroText {
+    grid-area: auto;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-5);
+    padding: var(--space-6) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-right: none;
+    background: var(--color-surface);
+    color: var(--color-text);
+    pointer-events: auto;
+  }
+
+  .heroLatin {
+    color: var(--color-accent-text);
+    font-size: var(--font-size-sm);
+  }
+
+  /* 縦書き（右から左へ読む）。行の区切りは文の「、」に合わせる */
+  .lead {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: none;
+    font-size: var(--font-size-2xl);
+    line-height: 2;
+    letter-spacing: 0.2em;
+    writing-mode: vertical-rl;
+    text-wrap: nowrap;
+  }
+
+  .heroPhoto {
+    grid-area: auto;
+    aspect-ratio: 3 / 2;
+    max-height: none;
+  }
+
   .list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-/* タブレットと PC：2つの入口を横に並べる */
-@media (min-width: 768px) {
-  .entries {
-    flex-direction: row;
-  }
-
-  .entries > * {
-    flex: 1;
+@media (prefers-reduced-motion: reduce) {
+  .entry,
+  .entryArrow {
+    transition: none;
   }
 }

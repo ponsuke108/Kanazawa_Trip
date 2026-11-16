@@ -10,8 +10,8 @@ import { Button } from '@/components/common/Button';
 import { IconButton } from '@/components/common/IconButton';
 import { Logo } from '@/components/common/Logo';
 import { PageHeader } from '@/components/common/PageHeader';
+import { PhotoBackdrop, PhotoBackdropCredit } from '@/components/common/PhotoBackdrop';
 import { SegmentedControl } from '@/components/common/SegmentedControl';
-import { SnowScene } from '@/components/common/SnowScene';
 import { TextField } from '@/components/common/TextField';
 import { useToast } from '@/components/common/useToast';
 import { AuthMessages, Toasts, UiMessages } from '@/constants/messages';
@@ -190,8 +190,8 @@ export function LoginPage() {
 
   return (
     <div className={styles.theme}>
-      <SnowScene />
-      <AppLayout showTabBar={false}>
+      <PhotoBackdrop />
+      <AppLayout showTabBar={false} site={false}>
         <PageHeader title={title} backTo={null} />
         <main className={styles.main}>
           {/* 縦書きの題字。右にサイト名と落款、左にひとことを2行で（7.7） */}
@@ -300,6 +300,7 @@ export function LoginPage() {
             </form>
           </div>
           <p className={styles.notice}>{AuthMessages.forgotPassword}</p>
+          <PhotoBackdropCredit />
         </main>
         {tea && <TeaScene state={tea} onSkip={skipTea} />}
       </AppLayout>

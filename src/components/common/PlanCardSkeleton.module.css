@@ -15,8 +15,8 @@
 
 .thumb {
   flex-shrink: 0;
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   border-radius: var(--radius-sm);
   background: var(--color-bg);
   animation: pulse 1.2s ease-in-out infinite;

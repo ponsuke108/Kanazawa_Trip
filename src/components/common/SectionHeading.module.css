@@ -1,0 +1,43 @@
+/* 区切りの見出し（7.6、v23） */
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.words {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.latin {
+  color: var(--color-accent-text);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.28em;
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+}
+
+/* 見出しの下の短い金の線 */
+.title::after {
+  content: '';
+  display: block;
+  width: var(--space-6);
+  height: 2px;
+  margin-top: var(--space-2);
+  background: var(--color-accent);
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: var(--font-size-2xl);
+  }
+}

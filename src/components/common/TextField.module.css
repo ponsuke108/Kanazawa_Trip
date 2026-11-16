@@ -35,9 +35,16 @@
   font-size: var(--font-size-md);
 }
 
+.input {
+  transition:
+    border-color 0.15s ease-out,
+    box-shadow 0.15s ease-out;
+}
+
 .input:focus {
   border-color: var(--color-primary);
   outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-weak);
 }
 
 .invalid {
