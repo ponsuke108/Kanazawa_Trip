@@ -10,8 +10,21 @@
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  background: var(--color-bg);
   padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  /* （K75）画面を開いたとき、内容をそっと出す。位置は動かさない（下部に固定するボタンがずれないように） */
+  animation: page-in 0.45s var(--ease-out) both;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .column {
+    animation: none;
+  }
 }
 
 /* 内容を画面の幅いっぱいにする（S-01 の写真、S-13 の地図） */

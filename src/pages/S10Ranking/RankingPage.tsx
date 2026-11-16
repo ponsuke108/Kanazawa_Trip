@@ -48,7 +48,7 @@ export function RankingPage() {
         ) : ranking.data.length === 0 ? (
           <EmptyState icon={StateIcons.trophy} title={UiMessages.noRanking} />
         ) : (
-          <ol className={styles.list}>
+          <ol className={styles.list} data-stagger>
             {ranking.data.map((plan, i) => (
               <li key={plan.id}>
                 <PlanCard plan={plan} rank={i + 1} />

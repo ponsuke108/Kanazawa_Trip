@@ -26,6 +26,21 @@
   color: var(--color-surface);
   font-size: var(--font-size-sm);
   font-weight: 600;
+  box-shadow: var(--shadow-float);
+  animation: toast-in 0.35s var(--ease-spring) both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
 }
 
 .success {

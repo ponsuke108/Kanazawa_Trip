@@ -1,0 +1,8 @@
+/* 存在しないURL（6.1）。上に雪吊りの絵（7.11、K75） */
+.art {
+  display: block;
+  width: 180px;
+  margin: var(--space-6) auto 0;
+  color: var(--color-accent-text);
+  opacity: 0.8;
+}

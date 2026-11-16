@@ -34,3 +34,16 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* （K75）PC：切り替えは横に広げすぎず、左に寄せる */
+@media (min-width: 1024px) {
+  .main > [role='tablist'] {
+    align-self: flex-start;
+    width: 400px;
+  }
+
+  .main {
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-4);
+  }
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SpotPhotos, spotPhotoUrl } from '@/constants/spotPhotos';
+import { SpotPhotos, spotPhotoSrcSet, spotPhotoUrl } from '@/constants/spotPhotos';
 import { SceneryIcons } from '@/lib/icons';
 import styles from './SceneryShow.module.css';
 
@@ -27,13 +27,27 @@ function useMedia(query: string): boolean {
 
 export function SceneryShow() {
   const reduce = useMedia('(prefers-reduced-motion: reduce)');
-  const [index, setIndex] = useState(0);
+  // いまの写真（index）と、読み込んだ写真（loaded）。写真は、今の1枚と次の1枚だけを先に読み込む
+  // （大きな写真を一度に4枚読み込まない）
+  const [{ index, loaded }, setShow] = useState<{ index: number; loaded: ReadonlySet<number> }>(
+    () => ({ index: 0, loaded: new Set([0, 1]) }),
+  );
   // 動きを減らす設定のときは、初めから止めておく（ボタンで切り替えはできる）
   const [paused, setPaused] = useState(reduce);
+  const go = (step: number) =>
+    setShow((prev) => {
+      const index = (prev.index + step + SCENES.length) % SCENES.length;
+      const next = (index + 1) % SCENES.length;
+      const loaded =
+        prev.loaded.has(index) && prev.loaded.has(next)
+          ? prev.loaded
+          : new Set([...prev.loaded, index, next]);
+      return { index, loaded };
+    });
 
   useEffect(() => {
     if (paused) return;
-    const id = window.setInterval(() => setIndex((i) => (i + 1) % SCENES.length), INTERVAL_MS);
+    const id = window.setInterval(() => go(1), INTERVAL_MS);
     return () => window.clearInterval(id);
   }, [paused]);
 
@@ -42,40 +56,35 @@ export function SceneryShow() {
   const Prev = SceneryIcons.prev;
   const Next = SceneryIcons.next;
   const Toggle = paused ? SceneryIcons.play : SceneryIcons.pause;
-  const go = (step: number) => setIndex((i) => (i + step + SCENES.length) % SCENES.length);
 
   return (
     <section className={styles.wrap} aria-label="金沢の名所の写真">
       <div className={styles.show}>
-        {SCENES.map((s, i) => (
-          <img
-            key={s.spotId}
-            src={spotPhotoUrl(s.spotId) ?? ''}
-            alt=""
-            className={`${styles.photo} ${i === index ? styles.on : ''}`}
-          />
-        ))}
+        {SCENES.map((s, i) =>
+          loaded.has(i) ? (
+            <img
+              key={s.spotId}
+              src={spotPhotoUrl(s.spotId) ?? ''}
+              srcSet={spotPhotoSrcSet(s.spotId)}
+              // 横長の写真を縦長の枠に切り出すので、枠の幅の2倍ほどの大きさが要る
+              sizes="(min-width: 768px) 960px, 130vw"
+              alt=""
+              className={`${styles.photo} ${i === index ? styles.on : ''}`}
+            />
+          ) : null,
+        )}
       </div>
       <div className={styles.caption}>
-        <p className={styles.name} aria-live={paused ? 'polite' : 'off'}>
-          {scene.name}
-        </p>
-        {credit && (
-          <p className={styles.credit}>
-            写真：
-            <a href={credit.sourceUrl} target="_blank" rel="noopener noreferrer">
-              {credit.author}（Wikimedia Commons）
-            </a>
-            {' / '}
-            {credit.licenseUrl ? (
-              <a href={credit.licenseUrl} target="_blank" rel="noopener noreferrer">
-                {credit.license}
-              </a>
-            ) : (
-              credit.license
-            )}
+        <div>
+          <p className={styles.name} aria-live={paused ? 'polite' : 'off'}>
+            {scene.name}
           </p>
-        )}
+          <div className={styles.dots} aria-hidden="true">
+            {SCENES.map((s, i) => (
+              <span key={s.spotId} className={`${styles.dot} ${i === index ? styles.dotOn : ''}`} />
+            ))}
+          </div>
+        </div>
         <div className={styles.controls}>
           <button type="button" className={styles.control} onClick={() => go(-1)}>
             <Prev size={18} aria-hidden="true" />
@@ -97,6 +106,22 @@ export function SceneryShow() {
             <span className={styles.hidden}>次の写真</span>
           </button>
         </div>
+        {credit && (
+          <p className={styles.credit}>
+            写真：
+            <a href={credit.sourceUrl} target="_blank" rel="noopener noreferrer">
+              {credit.author}（Wikimedia Commons）
+            </a>
+            {' / '}
+            {credit.licenseUrl ? (
+              <a href={credit.licenseUrl} target="_blank" rel="noopener noreferrer">
+                {credit.license}
+              </a>
+            ) : (
+              credit.license
+            )}
+          </p>
+        )}
       </div>
     </section>
   );
