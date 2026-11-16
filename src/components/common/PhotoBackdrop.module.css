@@ -36,11 +36,3 @@
 .credit a {
   color: inherit;
 }
-
-/* タブレットと PC：写真を大きく引きのばすので、少しぼかして背景になじませる */
-@media (min-width: 768px) {
-  .photo {
-    filter: blur(var(--space-1));
-    scale: 1.04;
-  }
-}
