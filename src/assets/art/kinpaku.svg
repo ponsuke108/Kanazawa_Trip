@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <filter id="leaf" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.018 0.042" numOctaves="5" seed="8" stitchTiles="stitch" result="noise"/>
+    <feDiffuseLighting in="noise" surfaceScale="3.2" diffuseConstant="1.15" lighting-color="#fff0bd" result="lit">
+      <feDistantLight azimuth="232" elevation="60"/>
+    </feDiffuseLighting>
+    <feComposite in="lit" in2="SourceGraphic" operator="arithmetic" k1="1.12" k2="0" k3="0.08" k4="0"/>
+  </filter>
+  <rect width="240" height="240" fill="#cfa650" filter="url(#leaf)"/>
+</svg>

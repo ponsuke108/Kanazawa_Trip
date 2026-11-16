@@ -1,4 +1,4 @@
-import { SpotPhotos, spotPhotoUrl } from '@/constants/spotPhotos';
+import { SpotPhotos, spotPhotoSrcSet, spotPhotoUrl } from '@/constants/spotPhotos';
 import styles from './PhotoBackdrop.module.css';
 
 // 画面の背面いっぱいに出す名所の写真（S-12 ログイン。7.7、v23）。暗い下敷きを重ねて、上の文字を読みやすくする。
@@ -8,7 +8,14 @@ const SCENE = { spotId: 7, name: 'ひがし茶屋街' };
 export function PhotoBackdrop() {
   return (
     <div className={styles.backdrop} aria-hidden="true">
-      <img src={spotPhotoUrl(SCENE.spotId) ?? ''} alt="" className={styles.photo} />
+      {/* 写真は画面いっぱいに切り出すので、縦長の画面では高さに合わせた大きさが要る */}
+      <img
+        src={spotPhotoUrl(SCENE.spotId) ?? ''}
+        srcSet={spotPhotoSrcSet(SCENE.spotId)}
+        sizes="(orientation: portrait) 150vh, 100vw"
+        alt=""
+        className={styles.photo}
+      />
     </div>
   );
 }

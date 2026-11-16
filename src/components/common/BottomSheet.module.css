@@ -5,7 +5,10 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: color-mix(in srgb, var(--color-text) 45%, transparent);
+  background: var(--color-backdrop);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: veil var(--dur) ease-out both;
 }
 
 .sheet {
@@ -17,6 +20,47 @@
   border-radius: var(--radius-md) var(--radius-md) 0 0;
   background: var(--color-surface);
   padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: var(--shadow-float);
+  animation: slide-up 0.42s var(--ease-out) both;
+}
+
+/* 上の金の線と、つまみのしるし */
+.sheet::before {
+  content: '';
+  flex-shrink: 0;
+  align-self: center;
+  width: var(--space-6);
+  height: 3px;
+  margin-top: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+@keyframes veil {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.96;
+    translate: 0 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .sheet {
+    animation: none;
+  }
 }
 
 .header {
@@ -58,5 +102,10 @@
     border-radius: var(--radius-md);
     padding-bottom: 0;
     overflow: hidden;
+    animation-name: pop;
+  }
+
+  .sheet::before {
+    display: none;
   }
 }

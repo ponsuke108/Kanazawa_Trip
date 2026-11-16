@@ -1,0 +1,21 @@
+/* 画面に入ったときの出かた（7.11、K75）：下から少し浮かび上がる */
+.reveal {
+  opacity: 0;
+  translate: 0 var(--space-5);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    translate var(--dur-slow) var(--ease-out);
+}
+
+.shown {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    translate: 0 0;
+    transition: none;
+  }
+}

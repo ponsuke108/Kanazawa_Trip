@@ -22,3 +22,9 @@
 .title {
   color: var(--color-text-sub);
 }
+
+/* （K75）外側にもうひとつ、薄い金の輪 */
+.badge {
+  outline: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  outline-offset: var(--space-1);
+}

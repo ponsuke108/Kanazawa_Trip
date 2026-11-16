@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { Logo } from '@/components/common/Logo';
 import { MainMenuItems } from '@/components/common/mainMenu';
+import { YukitsuriArt } from '@/components/common/YukitsuriArt';
 import { MapMessages, UiMessages } from '@/constants/messages';
 import { DataSources } from '@/constants/sources';
 import styles from './SiteFooter.module.css';
@@ -14,6 +15,8 @@ type Props = {
 export function SiteFooter({ sources = false, links = true }: Props) {
   return (
     <footer className={styles.footer}>
+      {/* 飾り：雪吊りの絵（7.11、K75） */}
+      <YukitsuriArt className={styles.art} />
       <div className={styles.inner}>
         <div className={styles.brand}>
           <Logo size="lg" seal tone="onBrand" />

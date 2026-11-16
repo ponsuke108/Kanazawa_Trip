@@ -25,6 +25,15 @@
   --site-header-height: 0px; /* PC の上部のサイトのヘッダーの高さ（スマホ・タブレットは出さないので 0） */
   --content-max: 1200px;
 
+  /* （K75）動き：速さと、ゆるやかに止まる動き方 */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.3, 1.35, 0.5, 1); /* 少し行きすぎて戻る */
+  --dur-fast: 0.15s;
+  --dur: 0.3s;
+  --dur-slow: 0.8s;
+  --shadow-float: 0 12px 32px rgb(43 43 43 / 0.16); /* メニュー、ダイアログ、シート */
+  --color-backdrop: rgb(27 26 23 / 0.5); /* ダイアログやシートの後ろの幕 */
+
   /* タグのアイコンの色（TagChip）。背景に対してコントラスト比3:1以上 */
   --color-tag-food: #c4553a;
   --color-tag-scenery: #3f7d4e;

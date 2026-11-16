@@ -199,3 +199,63 @@
     transition: none;
   }
 }
+
+/* （K75）写真がないとき：加賀藍の地に七宝の和柄を薄く敷き、最初のスポット名を縦書きで入れる */
+.placeholder {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-2);
+  background:
+    url('../../assets/art/shippo-light.svg') center / 44px,
+    linear-gradient(160deg, var(--color-shiori-ai-1), var(--color-shiori-ai-2) 75%);
+  color: color-mix(in srgb, var(--color-on-brand) 62%, transparent);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  overflow: hidden;
+  writing-mode: vertical-rl;
+  transition: scale 0.4s ease-out;
+}
+
+/* 1位の札は金箔 */
+.rankTop {
+  border-color: var(--color-shiori-gold);
+  background: url('../../assets/art/kinpaku.svg') center / 120px;
+  color: var(--color-brand-dark);
+}
+
+@media (hover: hover) {
+  .card:hover .placeholder {
+    scale: 1.05;
+  }
+
+  .card:hover {
+    translate: 0 -2px;
+  }
+}
+
+.card {
+  transition:
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    translate var(--dur) var(--ease-out);
+}
+
+@media (min-width: 768px) {
+  .placeholder {
+    padding: var(--space-4);
+    font-size: var(--font-size-xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placeholder {
+    transition: none;
+  }
+}
