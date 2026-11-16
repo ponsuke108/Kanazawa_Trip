@@ -1,28 +1,25 @@
-/* S-12 ログイン・登録の雪の茶屋街の見た目（要件定義書 7.7）。背景は SnowScene。
-   その上に白い明朝のロゴと、すりガラスの入力の箱を重ねる */
+/* S-12 ログイン・登録（要件定義書 7.7、v23）。背景は名所の写真（PhotoBackdrop）。
+   その上に白い明朝の題字と、白い入力の箱を重ねる */
 .theme {
-  /* 外側のレイアウト（AppLayout）の地を透明にして、後ろの雪景色を見せる */
+  /* 外側のレイアウト（AppLayout）の地を透明にして、後ろの写真を見せる */
   --color-bg: transparent;
 
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
-  background: var(--color-snow-page);
-  color: var(--color-surface);
+  color: var(--color-on-brand);
 }
 
-/* ヘッダー：薄いすりガラスに、白い明朝の見出し */
+/* ヘッダー：写真の上に、白い明朝の見出しだけ */
 .theme header {
   border-bottom: none;
-  background: var(--color-snow-bar);
-  backdrop-filter: blur(var(--blur-snow));
-  -webkit-backdrop-filter: blur(var(--blur-snow));
+  background: transparent;
 }
 
 .theme header h1 {
-  color: var(--color-surface);
-  font-family: var(--font-family-mincho);
-  letter-spacing: 0.04em;
+  color: var(--color-on-brand);
+  letter-spacing: 0.2em;
+  text-shadow: var(--shadow-snow-text);
 }
 
 .main {
@@ -73,8 +70,8 @@
   width: calc(var(--tap-min) - var(--space-2));
   height: calc(var(--tap-min) - var(--space-2));
   border-radius: calc(var(--radius-sm) / 2);
-  background: var(--color-snow-sticker);
-  color: var(--color-surface);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
   font-family: var(--font-family-mincho);
   font-size: var(--font-size-xs);
   font-weight: 700;
@@ -137,38 +134,20 @@
   line-height: 1.4;
 }
 
-/* ---- すりガラスの箱：切り替えと入力欄。中の共通部品の色を箱の中だけ変える ---- */
+/* ---- 入力の箱：白い地に、上に金箔の線。切り替えと入力欄 ---- */
 .card {
-  --color-primary: var(--color-snow-accent);
-  --color-primary-weak: var(--color-snow-avatar);
-  --color-text: var(--color-snow-ink);
-  --color-text-sub: var(--color-snow-ink-sub);
-  /* すりガラスの上でも 4.5:1 を保つため、誤りの赤を少し濃くする */
-  --color-danger: var(--color-snow-danger);
-
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
   padding: var(--space-5) var(--space-4);
-  border: 1px solid var(--color-snow-glass-line);
-  border-radius: var(--radius-lg);
-  background: var(--color-snow-glass);
-  backdrop-filter: blur(var(--blur-snow));
-  -webkit-backdrop-filter: blur(var(--blur-snow));
-  color: var(--color-snow-ink);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  background-image: linear-gradient(var(--color-accent), var(--color-accent));
+  background-repeat: no-repeat;
+  background-size: 100% 3px;
+  color: var(--color-text);
   box-shadow: var(--shadow-snow-raised);
-}
-
-.card [role='tablist'] {
-  border-radius: var(--radius-full);
-}
-
-.card [role='tab'] {
-  border-radius: var(--radius-full);
-}
-
-.card [role='tab'][aria-selected='true'] {
-  color: var(--color-snow-ink);
 }
 
 .form {
@@ -180,11 +159,8 @@
 /* 送るボタン：明朝で少し大きく */
 .form button[type='submit'] {
   min-height: calc(var(--tap-min) + var(--space-1));
-  border-radius: var(--radius-full);
-  font-family: var(--font-family-mincho);
   font-size: var(--font-size-lg);
-  letter-spacing: 0.08em;
-  box-shadow: var(--shadow-snow-soft);
+  letter-spacing: 0.2em;
 }
 
 .formError {
@@ -198,7 +174,7 @@
 
 /* 案内：箱の下に、背景の上の白い文字で */
 .notice {
-  color: var(--color-surface);
+  color: var(--color-on-brand);
   font-size: var(--font-size-sm);
   text-align: center;
   text-wrap: balance;
@@ -215,7 +191,7 @@
 
 /* キーボードで動かしている人には、いまどこにいるかを枠で見せる */
 .card button:focus-visible {
-  outline: 2px solid var(--color-snow-accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
@@ -233,7 +209,7 @@
   left: var(--space-1);
   z-index: -1;
   width: calc(50% - var(--space-1));
-  border-radius: var(--radius-full);
+  border-radius: calc(var(--radius-sm) - 1px);
   background: var(--color-surface);
   box-shadow: var(--shadow-snow-soft);
   transition: translate 0.38s cubic-bezier(0.3, 1.35, 0.5, 1);
@@ -258,13 +234,13 @@
 }
 
 .card input:focus {
-  border-color: var(--color-snow-accent);
-  box-shadow: 0 0 0 4px var(--color-snow-ring);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-weak);
 }
 
 .card input[aria-invalid='true']:focus {
-  border-color: var(--color-snow-danger);
-  box-shadow: 0 0 0 4px var(--color-snow-danger-ring);
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-danger) 18%, transparent);
 }
 
 /* パスワード：右端に目のボタン。文字がボタンの下に入らないよう、右をあける */
@@ -281,7 +257,7 @@
   /* ラベル1行ぶん（文字の大きさ × 行の高さ）と、ラベルと入力欄のあいだを下げる */
   top: calc(var(--font-size-sm) * 1.6 + var(--space-1));
   right: 0;
-  color: var(--color-snow-ink-sub);
+  color: var(--color-text-sub);
   transition:
     color 0.15s ease-out,
     scale 0.12s ease-out;
@@ -292,7 +268,7 @@
 }
 
 .reveal[aria-pressed='true'] {
-  color: var(--color-snow-accent);
+  color: var(--color-primary);
 }
 
 /* 送るボタン：指を置くと少し浮き、押すと沈む */
@@ -505,11 +481,51 @@
   }
 }
 
-/* PC：入力の画面は中央に幅640pxの列（7.8） */
-@media (min-width: 1024px) {
+/* タブレット：中央に幅480pxの列 */
+@media (min-width: 768px) {
   .main {
     width: 100%;
-    max-width: 640px;
+    max-width: 480px;
     margin: 0 auto;
+  }
+}
+
+/* PC：左に題字、右に入力の箱を並べ、画面の高さの中央に置く（7.8、v23） */
+@media (min-width: 1024px) {
+  .theme header {
+    display: none;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+    align-items: center;
+    gap: var(--space-5) calc(var(--space-6) * 2);
+    max-width: 960px;
+    min-height: 100dvh;
+    padding: var(--space-6) var(--space-5);
+    align-content: center;
+  }
+
+  .logo {
+    grid-row: span 2;
+    padding: 0;
+  }
+
+  .title > span:not(.seal) {
+    font-size: calc(var(--font-size-2xl) + var(--space-2));
+  }
+
+  .lead {
+    font-size: var(--font-size-md);
+  }
+
+  .card {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .notice,
+  .main > p {
+    grid-column: 2;
   }
 }

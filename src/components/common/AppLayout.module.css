@@ -1,10 +1,22 @@
+/* 全画面の共通の枠（6.1、7.8、v23） */
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
 .column {
+  flex: 1;
   width: 100%;
   max-width: 480px;
-  min-height: 100dvh;
   margin: 0 auto;
   background: var(--color-bg);
   padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+/* 内容を画面の幅いっぱいにする（S-01 の写真、S-13 の地図） */
+.column.wide {
+  max-width: none;
 }
 
 .withTabBar {
@@ -25,6 +37,22 @@
   );
 }
 
+/* スマホ・タブレットでは S-01 だけにフッターを出す */
+.footerPcOnly {
+  display: none;
+}
+
+/* フッターがある画面：下の余白はフッターの側で取る。列は内容の分だけ */
+.root:has(> .footer:not(.footerPcOnly)) > .column {
+  padding-bottom: var(--space-6);
+}
+
+/* スマホ・タブレット：フッターが下部タブに隠れないようにする */
+.footerAboveTabBar {
+  padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+  background: var(--color-brand-dark);
+}
+
 /* タブレット：中央に最大幅720pxの1列。下部タブのまま（7.8） */
 @media (min-width: 768px) {
   .column {
@@ -32,10 +60,15 @@
   }
 }
 
-/* PC：内容の最大幅は1200px。下部タブはないので、その分の余白もいらない（7.8） */
+/* PC：内容の最大幅は1200px。上にサイトのヘッダーを固定するので、その高さの分だけ下げる。
+   下部タブはないので、その分の余白もいらない（7.8） */
 @media (min-width: 1024px) {
+  .withSite {
+    padding-top: var(--site-header-height);
+  }
+
   .column {
-    max-width: 1200px;
+    max-width: var(--content-max);
   }
 
   .withTabBar {
@@ -48,52 +81,15 @@
     );
   }
 
-  /* 左の縦のメニュー（幅220px）の分だけ右に寄せる */
-  .withSideMenu {
-    padding-left: 220px;
+  .footerPcOnly {
+    display: block;
   }
-}
 
-/* （v18）旅のしおりの見た目（7.9）。スマホ・タブレットは幅420pxの列を中央に置く（PC は v20 でいつもの幅）。
-   地は和紙の色に、金箔を散らした細かな点を重ねる（画像は使わない） */
-.shioriRoot {
-  position: relative;
-  min-height: 100dvh;
-}
-
-.column.shiori {
-  position: relative;
-  z-index: 1;
-  max-width: var(--shiori-width);
-  background-color: var(--color-washi);
-  background-image:
-    radial-gradient(circle at 18% 22%, var(--color-shiori-fleck) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 63% 9%, var(--color-shiori-fleck) 0 1.5px, transparent 2px),
-    radial-gradient(circle at 82% 58%, var(--color-shiori-fleck) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 37% 74%, var(--color-shiori-fleck) 0 2px, transparent 2.5px),
-    radial-gradient(circle at 8% 91%, var(--color-shiori-fleck) 0 1px, transparent 1.5px);
-  background-size:
-    150px 150px,
-    210px 210px,
-    170px 170px,
-    260px 260px,
-    190px 190px;
-}
-
-/* （v21）タブレットと PC は、地を半透明の和紙にして、背面の名所の写真を透かして見せる */
-@media (min-width: 768px) {
-  .column.shiori {
-    background-color: var(--color-shiori-veil);
-    /* 写真の暗いところでも文字が読めるよう、文字のまわりに和紙の色をうっすら重ねる */
-    text-shadow:
-      0 0 2px var(--color-washi),
-      0 0 6px var(--color-washi);
+  .root:has(> .footer) > .column {
+    padding-bottom: var(--space-6);
   }
-}
 
-/* （v20）PC は、ほかの画面と同じ幅（最大1200px）に戻す */
-@media (min-width: 1024px) {
-  .column.shiori {
-    max-width: 1200px;
+  .footerAboveTabBar {
+    padding-bottom: 0;
   }
 }

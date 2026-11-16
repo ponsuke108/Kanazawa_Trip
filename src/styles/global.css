@@ -16,8 +16,10 @@ body {
   min-height: 100dvh;
   font-family: var(--font-family);
   font-size: var(--font-size-md);
-  line-height: 1.6;
+  line-height: 1.7;
   color: var(--color-text);
+  font-feature-settings: 'palt';
+  -webkit-font-smoothing: antialiased;
   background: var(--color-bg);
   -webkit-tap-highlight-color: transparent;
 }
@@ -63,17 +65,16 @@ img {
   outline-offset: 2px;
 }
 
-/* （v18）旅のしおりの見た目（7.9）：見出しは明朝。列の外は和紙の色、タブレットと PC は写真のスライドショーの下地 */
-:root[data-theme='shiori'] body {
-  background: var(--color-washi);
-}
-
-@media (min-width: 768px) {
-  :root[data-theme='shiori'] body {
-    background: var(--color-shiori-backdrop);
-  }
-}
-
-:root[data-theme='shiori'] :is(h1, h2, h3) {
+/* （v23）見出しは明朝（7.2）。字間を少しあけて、落ち着いた見た目にする */
+h1,
+h2,
+h3 {
   font-family: var(--font-family-mincho);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-text);
 }

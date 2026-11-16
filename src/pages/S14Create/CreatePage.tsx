@@ -13,7 +13,7 @@ export function CreatePage() {
   const Copy = ActionIcons.copy;
   const Draft = StatusIcons.draft;
   return (
-    <AppLayout showTabBar shiori>
+    <AppLayout showTabBar>
       <PageHeader title="作る" showSiteName />
       <main className={styles.main}>
         {/* PC は左に「新しく作る」、右に「リストから作る」と「ほかの始め方」の2列（v20、7.8） */}

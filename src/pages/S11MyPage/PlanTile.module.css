@@ -1,10 +1,20 @@
-/* S-11 の写真のカード（要件定義書 7.7）：すりガラスの縁、写真の下に暗い下敷きを敷いて白い文字を読みやすくする */
+/* S-11 の写真のカード（要件定義書 7.7、v23）：写真の下に暗い下敷きを敷いて白い文字を読みやすくする */
 .tile {
   position: relative;
-  border: 1px solid var(--color-snow-glass-line);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: var(--shadow-snow-raised);
+  transition: box-shadow 0.15s ease-out;
+}
+
+@media (hover: hover) {
+  .tile:hover {
+    box-shadow: var(--shadow-card);
+  }
+
+  .tile:hover .photo img {
+    scale: 1.05;
+  }
 }
 
 .link {
@@ -22,16 +32,17 @@
 .photo {
   position: absolute;
   inset: 0;
-  background-color: var(--color-snow-photo);
+  background-color: var(--color-primary);
 }
 
 .photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: scale 0.4s ease-out;
 }
 
-/* 写真がまだないとき：夕暮れ色の地に、最初のスポット名を縦書きで大きく薄く */
+/* 写真がまだないとき：加賀藍の地に、最初のスポット名を縦書きで大きく薄く */
 .placeholder {
   display: flex;
   align-items: flex-start;
@@ -39,9 +50,7 @@
   width: 100%;
   height: 100%;
   padding: var(--space-3) var(--space-3) 0 0;
-  background:
-    radial-gradient(70% 60% at 80% 20%, var(--color-snow-lantern), transparent 70%),
-    linear-gradient(160deg, var(--color-snow-sky-3), var(--color-snow-placeholder) 70%);
+  background: linear-gradient(160deg, var(--color-shiori-ai-1), var(--color-shiori-ai-2) 70%);
   color: var(--color-snow-placeholder-text);
   font-family: var(--font-family-mincho);
   font-size: var(--font-size-2xl);
@@ -76,7 +85,7 @@
 }
 
 .large .title {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xl);
   letter-spacing: 0.04em;
 }
 
@@ -85,7 +94,7 @@
 }
 
 .status {
-  /* マイページでは --color-bg を透明にしているので、下書きのラベルの地を白に戻す */
+  /* 写真の上に出すので、下書きのラベルの地を白にする */
   --color-bg: var(--color-surface);
 
   position: absolute;
@@ -147,4 +156,11 @@
   font-size: var(--font-size-xs);
   font-weight: 700;
   text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .photo img {
+    transition: none;
+  }
 }

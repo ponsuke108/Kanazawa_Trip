@@ -30,8 +30,7 @@
   }
 }
 
-/* PC：入力の画面の列（640px）に合わせる。下部タブはないので画面の一番下に出し、
-   左の縦のメニュー（幅220px）がある画面では、残りの幅の中央に出す（7.8） */
+/* PC：入力の画面の列（640px）に合わせる。下部タブはないので画面の一番下に出す（7.8） */
 @media (min-width: 1024px) {
   .bar {
     max-width: 640px;
@@ -41,18 +40,6 @@
 
   .aboveTabBar {
     bottom: 0;
-    left: calc(50% + 220px / 2);
     padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
-  }
-}
-
-/* （v18）しおりの見た目の画面では、スマホ・タブレットは列（420px）に合わせる（7.9）。PC はいつもの幅（640px） */
-:global(:root[data-theme='shiori']) .bar {
-  max-width: var(--shiori-width);
-}
-
-@media (min-width: 1024px) {
-  :global(:root[data-theme='shiori']) .bar {
-    max-width: 640px;
   }
 }

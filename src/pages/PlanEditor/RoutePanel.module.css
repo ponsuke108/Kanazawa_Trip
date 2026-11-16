@@ -1,7 +1,7 @@
 /* S-06 の地図の部分（6.4、K54）。開いているときは画面の上に固定し、ブロック一覧だけがスクロールする */
 .route {
   position: sticky;
-  top: var(--header-height);
+  top: calc(var(--site-header-height) + var(--header-height));
   z-index: var(--z-header);
   margin: calc(var(--space-4) * -1) calc(var(--space-4) * -1) 0;
   border-bottom: 1px solid var(--color-border);
@@ -113,7 +113,7 @@
 /* PC：右の列に、上に固定して出す。地図を閉じる操作は出さない（7.8） */
 @media (min-width: 1024px) {
   .route {
-    top: calc(var(--header-height) + var(--space-4));
+    top: calc(var(--site-header-height) + var(--header-height) + var(--space-5));
     margin: 0;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -123,7 +123,7 @@
   .panel,
   .route[data-open='false'] .panel {
     display: block;
-    height: calc(100dvh - var(--header-height) - var(--space-6) * 3);
+    height: calc(100dvh - var(--site-header-height) - var(--header-height) - var(--space-6) * 3);
   }
 
   .strip,

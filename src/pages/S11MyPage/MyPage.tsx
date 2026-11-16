@@ -24,7 +24,6 @@ import { ActionIcons, PostIcons, renderTagIcon, StateIcons } from '@/lib/icons';
 import { tagsQuery } from '@/lib/tagParams';
 import type { PlanSummary, SpotPost } from '@/types/models';
 import { PlanTile } from './PlanTile';
-import { SnowScene } from '@/components/common/SnowScene';
 import { PostTile } from './PostTile';
 import { RoleEntry } from './RoleEntry';
 import styles from './MyPage.module.css';
@@ -189,7 +188,6 @@ export function MyPage() {
 
   return (
     <div className={styles.theme}>
-      <SnowScene />
       <AppLayout showTabBar>
         <PageHeader
           title="マイページ"

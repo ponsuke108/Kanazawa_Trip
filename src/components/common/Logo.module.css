@@ -1,7 +1,9 @@
+/* サイトのロゴ（7.6、v23）：落款と、明朝のサイト名、小さな英字 */
 .logo {
-  font-weight: 700;
   color: var(--color-primary);
-  letter-spacing: 0.04em;
+  font-family: var(--font-family-mincho);
+  font-weight: 700;
+  letter-spacing: 0.12em;
   white-space: nowrap;
 }
 
@@ -11,4 +13,69 @@
 
 .sm {
   font-size: var(--font-size-md);
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* 落款：臙脂の四角に白抜きの「金沢」を縦書きで */
+.seal {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--space-6) + var(--space-1));
+  height: calc(var(--space-6) + var(--space-1));
+  border-radius: calc(var(--radius-sm) / 2);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0;
+  writing-mode: vertical-rl;
+}
+
+.words {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.mark .logo {
+  color: var(--color-text);
+}
+
+.latin {
+  color: var(--color-accent-text);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-2xs);
+  letter-spacing: 0.28em;
+}
+
+.sm .seal {
+  width: calc(var(--space-5) + var(--space-1));
+  height: calc(var(--space-5) + var(--space-1));
+  font-size: var(--font-size-2xs);
+}
+
+.sm .latin {
+  display: none;
+}
+
+.onBrand .logo {
+  color: var(--color-on-brand);
+}
+
+.onBrand .latin {
+  color: var(--color-on-brand-sub);
+}
+
+.onBrand .seal {
+  background: var(--color-on-brand);
+  color: var(--color-brand);
 }
