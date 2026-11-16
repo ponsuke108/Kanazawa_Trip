@@ -1,12 +1,15 @@
-/* （v18）名所の写真のスライドショー（7.9）。写真は画面全体の背面に固定する */
+/* 金沢の名所の写真のスライドショー（7.9、7.11）。写真の形は、置く側が --scenery-aspect と --scenery-radius で決める */
 .wrap {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
 }
 
 .show {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
+  position: relative;
+  aspect-ratio: var(--scenery-aspect, 4 / 3);
+  border-radius: var(--scenery-radius, var(--radius-md));
   overflow: hidden;
   background: var(--color-shiori-backdrop);
 }
@@ -22,42 +25,53 @@
   opacity: 0;
   transform: scale(1);
   transition:
-    opacity 1.2s ease,
-    transform 4.2s linear;
+    opacity 1.4s ease,
+    transform 6.4s linear;
 }
 
 .on {
   opacity: 1;
-  transform: scale(1.08);
+  transform: scale(1.07);
 }
 
-/* 右下：スポットの名前、出典、切り替えのボタン。列（420px）の右の余白に収める */
+/* 写真の下：スポットの名前と出典、切り替えのボタン */
 .caption {
-  position: fixed;
-  z-index: var(--z-header);
-  right: var(--space-5);
-  bottom: var(--space-5);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-1);
-  max-width: calc((100vw - var(--shiori-width)) / 2 - var(--space-5) * 2);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-shiori);
-  background: var(--color-shiori-caption);
-  color: var(--color-shiori-caption-text);
-  text-align: right;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0 var(--space-2);
 }
 
 .name {
   font-family: var(--font-family-mincho);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+/* 今の写真が何枚目かのしるし（金の短い線） */
+.dots {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.dot {
+  width: var(--space-4);
+  height: 2px;
+  background: var(--color-border);
+  transition: background-color var(--dur) ease;
+}
+
+.dotOn {
+  background: var(--color-accent);
 }
 
 .credit {
-  font-size: var(--font-size-xs);
+  grid-column: 1 / -1;
+  color: var(--color-text-sub);
+  font-size: var(--font-size-2xs);
   line-height: 1.5;
 }
 
@@ -67,8 +81,6 @@
 
 .controls {
   display: flex;
-  gap: var(--space-1);
-  margin-top: var(--space-1);
 }
 
 .control {
@@ -77,15 +89,20 @@
   justify-content: center;
   width: var(--tap-min);
   height: var(--tap-min);
-  border: 1px solid var(--color-shiori-gold);
+  border: none;
   border-radius: var(--radius-full);
   background: transparent;
-  color: var(--color-shiori-caption-text);
+  color: var(--color-text);
+  transition:
+    background-color var(--dur-fast) ease-out,
+    color var(--dur-fast) ease-out;
 }
 
-.control:focus-visible {
-  outline: 2px solid var(--color-shiori-caption-text);
-  outline-offset: 2px;
+@media (hover: hover) {
+  .control:hover {
+    background: var(--color-primary-weak);
+    color: var(--color-primary);
+  }
 }
 
 .hidden {
@@ -97,26 +114,19 @@
   white-space: nowrap;
 }
 
-/* （v21）PC：左のメニューの右の部分にだけ出す。右下の箱は小さくまとめる（内容に重なるため） */
-@media (min-width: 1024px) {
-  .besideMenu {
-    left: 220px;
-  }
-
-  .caption {
-    right: var(--space-4);
-    bottom: var(--space-4);
-    max-width: 320px;
-    padding: var(--space-2) var(--space-3);
-  }
-
+@media (min-width: 768px) {
   .name {
     font-size: var(--font-size-md);
+  }
+
+  .credit {
+    font-size: var(--font-size-xs);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .photo {
+  .photo,
+  .dot {
     transition: none;
     transform: none;
   }

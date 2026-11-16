@@ -1,49 +1,6 @@
-/* S-11 マイページの雪の茶屋街の見た目（要件定義書 7.7）。色・影・ぼかしは variables.css の --color-snow-* などを使う。
-   背景は SnowScene。その上に白い文字とすりガラスの部品を重ねる */
+/* S-11 マイページ（要件定義書 7.7、7.11）。和紙の白の地に、名前の箱、入口、切り替え、写真のカードを並べる */
 .theme {
-  /* 外側のレイアウト（AppLayout）の地を透明にして、後ろの雪景色を見せる */
-  --color-bg: transparent;
-
-  position: relative;
-  isolation: isolate;
   min-height: 100dvh;
-  background: var(--color-snow-page);
-  color: var(--color-surface);
-}
-
-/* ヘッダー：背景の上に、文字だけ白く。スクロールしたときは薄いすりガラス */
-.theme header {
-  border-bottom: none;
-  background: var(--color-snow-bar);
-  backdrop-filter: blur(var(--blur-snow));
-  -webkit-backdrop-filter: blur(var(--blur-snow));
-}
-
-.theme header a,
-.theme header button,
-.theme header h1 {
-  color: var(--color-surface);
-  font-family: var(--font-family-mincho);
-  letter-spacing: 0.04em;
-}
-
-/* 下部タブ：明るいすりガラス、選んでいるタブは角丸の枠 */
-.theme nav {
-  border-top: 1px solid var(--color-snow-glass-line);
-  background: var(--color-snow-tabbar);
-  backdrop-filter: blur(var(--blur-snow));
-  -webkit-backdrop-filter: blur(var(--blur-snow));
-}
-
-.theme nav a {
-  color: var(--color-snow-ink-sub);
-}
-
-.theme nav a[aria-current='page'] {
-  margin: var(--space-1);
-  border: 2px solid var(--color-snow-accent);
-  border-radius: var(--radius-md);
-  color: var(--color-snow-accent);
 }
 
 .main {
@@ -53,86 +10,126 @@
   padding: var(--space-4) var(--space-4) calc(var(--space-6) * 3);
 }
 
-/* ---- 名前とあいさつ ---- */
+/* ---- 名前とあいさつ：白い箱。上に金箔の線、右に七宝の和柄を薄く敷く ---- */
 .profile {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2) 0;
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  overflow: hidden;
 }
 
+.profile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('../../assets/art/shippo-gold.svg');
+  opacity: 0.16;
+  mask-image: linear-gradient(110deg, transparent 45%, #000);
+  pointer-events: none;
+}
+
+.profile::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: url('../../assets/art/kinpaku.svg') center / 120px;
+}
+
+.profile > * {
+  position: relative;
+}
+
+/* 顔：金の縁の丸に、明朝の頭文字 */
 .avatar {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: calc(var(--tap-min) + var(--space-5));
-  height: calc(var(--tap-min) + var(--space-5));
-  border: 3px solid var(--color-surface);
+  width: calc(var(--tap-min) + var(--space-4));
+  height: calc(var(--tap-min) + var(--space-4));
+  border: 2px solid var(--color-accent);
   border-radius: var(--radius-full);
-  background: var(--color-snow-avatar);
-  color: var(--color-snow-accent);
+  background: var(--color-bg);
+  color: var(--color-primary);
   font-family: var(--font-family-mincho);
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xl);
   font-weight: 700;
-  box-shadow: var(--shadow-snow-soft);
 }
 
 .name {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
-  font-family: var(--font-family-mincho);
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: var(--font-size-xl);
+  letter-spacing: 0.06em;
   text-overflow: ellipsis;
-  text-shadow: var(--shadow-snow-text);
   white-space: nowrap;
 }
 
-/* 吹き出し：名前の右上に少し重ねる */
+/* あいさつ：箱の右上に、臙脂の小さな札 */
 .bubble {
   position: absolute;
-  top: calc(var(--space-1) * -1);
-  right: 0;
+  top: var(--space-3);
+  right: var(--space-3);
   padding: calc(var(--space-1) / 2) var(--space-2);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  color: var(--color-snow-ink);
+  border-radius: calc(var(--radius-sm) / 2);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-xs);
   font-weight: 700;
-  rotate: 6deg;
-  box-shadow: var(--shadow-snow-soft);
+  letter-spacing: 0.08em;
 }
 
-.bubble::after {
-  content: '';
-  position: absolute;
-  bottom: calc(var(--space-1) * -1);
-  left: var(--space-3);
-  border: 6px solid transparent;
-  border-top-color: var(--color-surface);
-  border-bottom: 0;
+/* 「プランを作る」：スマホでは下の浮かぶボタンを使うので、ここには出さない */
+.profileAction {
+  display: none;
 }
 
-/* ---- 検索の入口（押すと S-02 へ） ---- */
+/* ---- 入口（お店・管理者、探す） ---- */
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 .search {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: calc(var(--tap-min) + var(--space-2));
+  min-height: calc(var(--tap-min) + var(--space-1));
   padding: 0 var(--space-4);
-  border: 1px solid var(--color-snow-glass-line);
-  border-radius: var(--radius-lg);
-  background: var(--color-snow-glass);
-  backdrop-filter: blur(var(--blur-snow));
-  -webkit-backdrop-filter: blur(var(--blur-snow));
-  color: var(--color-snow-ink);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: var(--font-size-md);
   text-align: left;
-  text-decoration: none; /* （v11）お店・管理者の入口のリンクにも使う */
-  box-shadow: var(--shadow-snow-soft);
+  text-decoration: none;
+  transition:
+    border-color var(--dur-fast) ease-out,
+    box-shadow var(--dur-fast) ease-out;
+}
+
+.search svg {
+  color: var(--color-accent-text);
+}
+
+@media (hover: hover) {
+  a.search:hover,
+  button.search:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-card);
+  }
 }
 
 /* （v11）お店・管理者の入口。却下されたときは理由を上に出す */
@@ -148,31 +145,50 @@
   font-weight: 700;
 }
 
-/* ---- 切り替え（SegmentedControl）を、すりガラスの札に見せる ---- */
+/* ---- 切り替え（SegmentedControl）：下に線のあるタブに見せる ---- */
+.tabs {
+  margin-top: var(--space-2);
+}
+
 .tabs [role='tablist'] {
-  /* （v11）3つになったので、幅が足りないときは折り返す */
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-1);
   padding: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
   background: transparent;
 }
 
 .tabs [role='tab'] {
-  flex: 0 0 auto;
-  min-height: calc(var(--tap-min) - var(--space-1));
-  padding: 0 var(--space-4);
-  border: 1px solid var(--color-snow-glass-line);
-  border-radius: var(--radius-full);
-  background: var(--color-snow-glass-dark);
-  backdrop-filter: blur(var(--blur-snow));
-  -webkit-backdrop-filter: blur(var(--blur-snow));
-  color: var(--color-surface);
-  font-weight: 700;
+  position: relative;
+  min-height: var(--tap-min);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+/* 選んでいるタブの下に、金の線が中央からのびる */
+.tabs [role='tab']::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 3px;
+  background: var(--color-accent);
+  scale: 0 1;
+  transition: scale var(--dur) var(--ease-out);
 }
 
 .tabs [role='tab'][aria-selected='true'] {
-  background: var(--color-surface);
-  color: var(--color-snow-ink);
+  color: var(--color-primary);
+}
+
+.tabs [role='tab'][aria-selected='true']::after {
+  scale: 1 1;
 }
 
 /* ---- 写真の格子：1枚目は大きく、ほかは2列 ---- */
@@ -188,30 +204,32 @@
 
 .skeleton {
   aspect-ratio: 5 / 4;
-  border: 1px solid var(--color-snow-glass-line);
-  border-radius: var(--radius-lg);
-  background: var(--color-snow-glass-dark);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-weak);
+  animation: pulse 1.4s ease-in-out infinite;
 }
 
 .skeleton.wide {
   aspect-ratio: 16 / 10;
 }
 
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* 写真の上の、いいね済みのハート */
 .liked {
   color: var(--color-snow-like);
 }
 
-/* ---- すりガラスの箱（0件・エラー）。中は共通部品なので文字の色をすりガラス用にする ---- */
+/* ---- 0件・エラーの箱 ---- */
 .glass {
-  --color-text: var(--color-snow-ink);
-  --color-text-sub: var(--color-snow-ink-sub);
-
-  border: 1px solid var(--color-snow-glass-line);
-  border-radius: var(--radius-lg);
-  background: var(--color-snow-glass);
-  backdrop-filter: blur(var(--blur-snow));
-  -webkit-backdrop-filter: blur(var(--blur-snow));
-  color: var(--color-snow-ink);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
 }
 
 /* ---- 浮かぶボタンとステッカー：下部タブの上に固定 ---- */
@@ -223,25 +241,30 @@
   display: flex;
   justify-content: center;
   width: min(100%, 480px);
+  min-height: calc(var(--tap-min) + var(--space-5));
   pointer-events: none;
   transform: translateX(-50%);
 }
 
+/* 「プランを作る」（スマホだけ）：加賀藍の地に金の縁 */
 .create {
   display: inline-flex;
   align-items: center;
+  align-self: center;
   gap: var(--space-2);
-  min-height: calc(var(--tap-min) + var(--space-3));
-  padding: 0 var(--space-6);
-  border: 1px solid var(--color-surface);
+  min-height: calc(var(--tap-min) + var(--space-2));
+  padding: 0 var(--space-5);
+  border: 1px solid var(--color-accent);
   border-radius: var(--radius-full);
-  background: var(--color-surface);
-  color: var(--color-snow-ink);
+  background: linear-gradient(180deg, var(--color-shiori-ai-1), var(--color-shiori-ai-2));
+  color: var(--color-surface);
   font-family: var(--font-family-mincho);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-md);
   font-weight: 700;
-  box-shadow: var(--shadow-snow-raised);
+  letter-spacing: 0.1em;
+  box-shadow: var(--shadow-snow-soft);
   pointer-events: auto;
+  transition: translate var(--dur-fast) ease-out;
 }
 
 .create:active {
@@ -252,7 +275,7 @@
 .sticker {
   position: absolute;
   right: var(--space-3);
-  bottom: var(--space-1);
+  bottom: 0;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -262,22 +285,82 @@
   height: calc(var(--tap-min) + var(--space-5));
   border: 3px solid var(--color-surface);
   border-radius: var(--radius-full);
-  background: var(--color-snow-sticker);
+  background: var(--color-shu);
   color: var(--color-surface);
   font-size: var(--font-size-xs);
   font-weight: 700;
   text-decoration: none;
   rotate: 10deg;
-  box-shadow: var(--shadow-snow-raised);
+  box-shadow: var(--shadow-snow-soft);
   pointer-events: auto;
+  transition:
+    rotate var(--dur) var(--ease-spring),
+    scale var(--dur) var(--ease-spring);
 }
 
-/* ---- タブレットと PC（7.8）：背景は画面いっぱい（SnowScene）、内容は中央 ---- */
+@media (hover: hover) {
+  .sticker:hover {
+    rotate: -4deg;
+    scale: 1.06;
+  }
+}
+
+/* ---- タブレットと PC（7.8） ---- */
 @media (min-width: 768px) {
-  /* 吹き出しが名前から離れないように、名前の幅に合わせる */
+  .main {
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-5) calc(var(--space-6) * 3);
+  }
+
   .profile {
+    gap: var(--space-4);
+    padding: var(--space-5);
+  }
+
+  .avatar {
+    width: calc(var(--tap-min) + var(--space-6));
+    height: calc(var(--tap-min) + var(--space-6));
+    font-size: var(--font-size-2xl);
+  }
+
+  .name {
+    flex: 0 1 auto;
+    font-size: var(--font-size-2xl);
+  }
+
+  /* あいさつの札は、名前のすぐ右に置く */
+  .bubble {
+    position: relative;
+    top: auto;
+    right: auto;
     align-self: flex-start;
-    padding-right: var(--space-6);
+  }
+
+  /* 「プランを作る」は箱の右に出し、浮かぶボタンは出さない */
+  .profileAction {
+    display: block;
+    margin-left: auto;
+  }
+
+  .create {
+    display: none;
+  }
+
+  .links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .links > * {
+    flex: 0 1 280px;
+  }
+
+  .tabs [role='tab'] {
+    flex: 0 0 auto;
+    padding: 0 var(--space-5);
+    font-size: var(--font-size-md);
+    letter-spacing: 0.06em;
   }
 
   .floating {
@@ -289,26 +372,29 @@
   /* 写真のカードは3列。1枚目を大きくする並べ方はスマホ・タブレットだけ */
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
   }
 
   .wide {
     grid-column: auto;
   }
 
-  /* 下部タブはないので画面の一番下に。左の縦のメニュー（幅220px）の分だけ右に寄せる */
+  /* 下部タブはないので画面の一番下に */
   .floating {
     bottom: calc(env(safe-area-inset-bottom) + var(--space-5));
-    left: calc(50% + 220px / 2);
-    width: min(100% - 220px, 1200px);
+    width: min(100%, var(--content-max));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search,
+  .create,
+  .sticker,
+  .tabs [role='tab']::after {
+    transition: none;
   }
 
-  /* 左の縦のメニュー：すりガラスの地に合わせる */
-  .theme nav {
-    border-top: none;
-    border-right: 1px solid var(--color-snow-glass-line);
-  }
-
-  .theme nav a[aria-current='page'] {
-    margin: 0;
+  .skeleton {
+    animation: none;
   }
 }

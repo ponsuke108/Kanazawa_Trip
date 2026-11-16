@@ -1,6 +1,6 @@
 .header {
   position: sticky;
-  top: 0;
+  top: var(--site-header-height);
   z-index: var(--z-header);
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -28,6 +28,7 @@
 .title {
   font-size: var(--font-size-md);
   font-weight: 700;
+  letter-spacing: 0.08em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -39,14 +40,57 @@
   min-height: var(--tap-min);
   padding: 0 var(--space-3);
   color: var(--color-primary);
+  font-family: var(--font-family-mincho);
   font-size: var(--font-size-sm);
   font-weight: 700;
+  letter-spacing: 0.08em;
   text-decoration: none;
   white-space: nowrap;
 }
 
-/* （v18）しおりの見た目（7.9）：明朝の見出しとサイト名 */
-:global(:root[data-theme='shiori']) :is(.title, .siteName) {
-  font-family: var(--font-family-mincho);
-  letter-spacing: 0.06em;
+/* PC：サイト名は上のサイトのヘッダーにあるので、ここには出さない。見出しを大きくし、内容の幅にそろえる（v23） */
+@media (min-width: 1024px) {
+  .siteName {
+    display: none;
+  }
+
+  .header {
+    height: calc(var(--header-height) + var(--space-2));
+    padding: 0 var(--space-4);
+    border-bottom-color: color-mix(in srgb, var(--color-border) 70%, transparent);
+    /* 後ろの和紙の地が透けるすりガラス。下を流れる内容はぼかす */
+    background: color-mix(in srgb, var(--color-bg) 78%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .title {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* （K75）タブレットと PC：画面名の両わきに、短い金の線と小さな金の点 */
+@media (min-width: 768px) {
+  .title::before,
+  .title::after {
+    content: '';
+    display: inline-block;
+    width: var(--space-6);
+    height: var(--space-1);
+    vertical-align: middle;
+    background:
+      radial-gradient(circle, var(--color-accent) 0 2px, transparent 2.5px) left center /
+        var(--space-1) var(--space-1) no-repeat,
+      linear-gradient(var(--color-accent), var(--color-accent)) right center / calc(100% - 10px) 1px
+        no-repeat;
+  }
+
+  .title::before {
+    margin-right: var(--space-3);
+    scale: -1 1;
+  }
+
+  .title::after {
+    margin-left: var(--space-3);
+  }
 }

@@ -1,0 +1,118 @@
+/* 舞う金箔（7.11、K75）。箔の絵は assets/art/kinpaku.svg */
+.flakes {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* 落ちる長さを、置いた場所の高さ（cqh）で決める */
+  container-type: size;
+}
+
+.flake {
+  position: absolute;
+  top: -5%;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  background: url('../../assets/art/kinpaku.svg') center / 80px;
+  opacity: 0;
+  animation: fall var(--time) linear var(--wait) infinite;
+}
+
+/* 大きさ、位置、速さをばらばらにする */
+.flake:nth-child(1) {
+  --x: 6%;
+  --size: 7px;
+  --time: 19s;
+  --wait: 0s;
+  --sway: 40px;
+}
+
+.flake:nth-child(2) {
+  --x: 19%;
+  --size: 11px;
+  --time: 24s;
+  --wait: -9s;
+  --sway: -56px;
+}
+
+.flake:nth-child(3) {
+  --x: 33%;
+  --size: 5px;
+  --time: 16s;
+  --wait: -4s;
+  --sway: 30px;
+}
+
+.flake:nth-child(4) {
+  --x: 47%;
+  --size: 9px;
+  --time: 27s;
+  --wait: -15s;
+  --sway: -34px;
+}
+
+.flake:nth-child(5) {
+  --x: 61%;
+  --size: 6px;
+  --time: 21s;
+  --wait: -11s;
+  --sway: 52px;
+}
+
+.flake:nth-child(6) {
+  --x: 74%;
+  --size: 12px;
+  --time: 29s;
+  --wait: -21s;
+  --sway: -44px;
+}
+
+.flake:nth-child(7) {
+  --x: 86%;
+  --size: 5px;
+  --time: 18s;
+  --wait: -7s;
+  --sway: 26px;
+}
+
+.flake:nth-child(8) {
+  --x: 94%;
+  --size: 8px;
+  --time: 23s;
+  --wait: -17s;
+  --sway: -30px;
+}
+
+/* ひらひら回りながら、左右に流れて落ちる */
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) rotateY(0deg);
+  }
+
+  8% {
+    opacity: 0.85;
+  }
+
+  50% {
+    transform: translate3d(var(--sway), 55cqh, 0) rotate(160deg) rotateY(180deg);
+  }
+
+  92% {
+    opacity: 0.85;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 112cqh, 0) rotate(330deg) rotateY(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flake {
+    top: calc(var(--size) * 9);
+    opacity: 0.7;
+    animation: none;
+  }
+}

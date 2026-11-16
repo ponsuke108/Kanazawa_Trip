@@ -38,15 +38,50 @@
 
 .label {
   padding-bottom: 2px;
-  border-bottom: 2px solid transparent;
+  position: relative;
   font-family: var(--font-family-mincho);
   font-size: var(--font-size-xs);
   line-height: 1.2;
 }
 
-/* 選んでいるタブの名前の下に、金箔の線 */
-.active .label {
-  border-bottom-color: var(--color-shiori-gold);
+/* 選んでいるタブ：アイコンが少し浮き、名前の下に金箔の線が中央からのびる（K75） */
+.label::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  background: var(--color-shiori-gold);
+  scale: 0 1;
+  transition: scale var(--dur) var(--ease-out);
+}
+
+.active .label::after {
+  scale: 1 1;
+}
+
+.tab svg {
+  transition: translate var(--dur) var(--ease-spring);
+}
+
+.active svg {
+  translate: 0 -2px;
+}
+
+.tab:active svg {
+  translate: 0 1px;
+}
+
+.tab {
+  transition: color var(--dur-fast) ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .label::after,
+  .tab svg {
+    transition: none;
+  }
 }
 
 /* タブレットは内容の幅（720px）に合わせる。PC は左の縦のメニュー（SideMenu）に替える（7.8） */
@@ -60,9 +95,4 @@
   .bar {
     display: none;
   }
-}
-
-/* （v18）しおりの見た目の画面では、下部タブを列（420px）の幅で出す。PC はほかの画面と同じく左のメニュー（v19、7.9） */
-:global(:root[data-theme='shiori']) .bar {
-  max-width: var(--shiori-width);
 }

@@ -146,6 +146,7 @@ export const StatusIcons: Record<PlanStatus, LucideIcon> = {
 
 // 操作
 export const ActionIcons = {
+  forward: ArrowRight, // （v23）先へ進むリンクのしるし（S-01 の入口、「もっと見る」）
   like: Heart, // いいね済みは塗りつぶす
   copy: Copy,
   edit: Pencil,

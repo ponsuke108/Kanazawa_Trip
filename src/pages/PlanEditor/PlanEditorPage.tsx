@@ -120,7 +120,7 @@ export function PlanEditorPage() {
   }
 
   return (
-    <AppLayout showTabBar={false} bottomBar={phase === 'ready'} shiori>
+    <AppLayout showTabBar={false} bottomBar={phase === 'ready'} footer={false}>
       <PageHeader title={title} onBack={onBack} right={counter} />
       <main className={styles.main}>
         {phase === 'ready' && <StepMarks current={step} />}

@@ -195,6 +195,17 @@ export function spotPhotoUrl(spotId: number): string | null {
   return SpotPhotos[spotId] ? `/spot-photos/${spotId}.jpg` : null;
 }
 
+// （K75）大きな写真（横1600px。public/spot-photos/large）。S-01 の大きな見出しと S-12 の背面で使う名所の写真だけに用意している。
+// 元の写真、作者、ライセンスは SpotPhotos と同じ
+const LARGE_PHOTO_IDS: ReadonlySet<number> = new Set([1, 3, 5, 7]);
+
+// 画面の大きさに合わせて選ばせる写真の一覧（img の srcSet）。大きな写真がないスポットは undefined
+export function spotPhotoSrcSet(spotId: number): string | undefined {
+  return LARGE_PHOTO_IDS.has(spotId)
+    ? `/spot-photos/${spotId}.jpg 800w, /spot-photos/large/${spotId}.jpg 1600w`
+    : undefined;
+}
+
 // いま表示している写真が、このファイルの写真なら出典を返す（投稿の写真には作者の表示をしない）
 export function spotPhotoCredit(spot: {
   id: number;

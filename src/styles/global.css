@@ -7,6 +7,7 @@
 }
 
 html {
+  scrollbar-color: var(--color-accent) transparent;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -16,9 +17,12 @@ body {
   min-height: 100dvh;
   font-family: var(--font-family);
   font-size: var(--font-size-md);
-  line-height: 1.6;
+  line-height: 1.7;
   color: var(--color-text);
-  background: var(--color-bg);
+  font-feature-settings: 'palt';
+  -webkit-font-smoothing: antialiased;
+  /* （K75）和紙の地：繊維と細かな粒の絵（assets/art/washi.svg）を、和紙の白の上に敷く */
+  background: var(--color-bg) url('../assets/art/washi.svg');
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -63,17 +67,58 @@ img {
   outline-offset: 2px;
 }
 
-/* （v18）旅のしおりの見た目（7.9）：見出しは明朝。列の外は和紙の色、タブレットと PC は写真のスライドショーの下地 */
-:root[data-theme='shiori'] body {
-  background: var(--color-washi);
+/* （v23）見出しは明朝（7.2）。字間を少しあけて、落ち着いた見た目にする */
+h1,
+h2,
+h3 {
+  font-family: var(--font-family-mincho);
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
-@media (min-width: 768px) {
-  :root[data-theme='shiori'] body {
-    background: var(--color-shiori-backdrop);
+::selection {
+  background: var(--color-accent);
+  color: var(--color-text);
+}
+
+/* （K75）一覧を、上から順にそっと出す。使う側は、並べる要素の親に data-stagger を付ける */
+[data-stagger] > * {
+  animation: stagger-rise var(--dur-slow) var(--ease-out) both;
+}
+
+[data-stagger] > :nth-child(2) {
+  animation-delay: 0.06s;
+}
+
+[data-stagger] > :nth-child(3) {
+  animation-delay: 0.12s;
+}
+
+[data-stagger] > :nth-child(4) {
+  animation-delay: 0.18s;
+}
+
+[data-stagger] > :nth-child(5) {
+  animation-delay: 0.24s;
+}
+
+[data-stagger] > :nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+[data-stagger] > :nth-child(n + 7) {
+  animation-delay: 0.36s;
+}
+
+@keyframes stagger-rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
   }
 }
 
-:root[data-theme='shiori'] :is(h1, h2, h3) {
-  font-family: var(--font-family-mincho);
+@media (prefers-reduced-motion: reduce) {
+  [data-stagger] > * {
+    animation: none;
+  }
 }

@@ -1,23 +1,43 @@
 /* デザイントークン（要件定義書 7.2）。色・余白・文字サイズ・角丸はここの変数だけを使う */
 :root {
-  /* 色（K15：加賀五彩の藍と金） */
-  --color-primary: #2b4c7e;
-  --color-primary-weak: #e8eef6;
-  --color-accent: #b8892b;
-  --color-text: #1f2a37;
-  --color-text-sub: #5b6675;
-  --color-border: #d5dce4;
-  --color-bg: #f7f8fa;
-  --color-surface: #ffffff;
-  --color-comment-bg: #f6f1e7;
+  /* 色（v23、K74：全画面を「金沢の見た目」1つにそろえる。加賀五彩の藍・臙脂と、金箔、和紙の白） */
+  --color-primary: #1e3a5f; /* 加賀藍：主ボタン、リンク、選択中 */
+  --color-primary-weak: #edf1f5;
+  --color-accent: #c5a059; /* 金箔：線と飾りだけ。文字は --color-accent-text */
+  --color-text: #2b2b2b; /* 墨 */
+  --color-text-sub: #66625b; /* 利休鼠 */
+  --color-border: #e2ddd2;
+  --color-bg: #faf8f3; /* 白練：画面の地（和紙の白） */
+  --color-surface: #ffffff; /* カードの地 */
+  --color-comment-bg: #f3ecdd;
   --color-like: #d64545;
-  --color-danger: #c0392b;
+  --color-danger: #b3261e;
   --color-success: #2e7d4f;
+  --color-brand: #7a1c1c; /* 加賀臙脂：落款、フッター、下部タブ */
+  --color-brand-dark: #591212;
+  --color-on-brand: #fbf3e4; /* 臙脂の上の文字 */
+  --color-on-brand-sub: #e9d9c0;
+  --color-photo-veil: rgb(20 18 14 / 0.46); /* 写真の上に文字をのせるときの暗い下敷き */
+  --color-photo-veil-strong: rgb(20 18 14 / 0.72);
+  --shadow-card:
+    0 1px 2px rgb(43 43 43 / 0.05), 0 10px 28px rgb(43 43 43 / 0.08); /* マウスを乗せたカード、浮かぶ部品 */
+  --shadow-header: 0 1px 0 var(--color-border), 0 6px 18px rgb(43 43 43 / 0.04);
+  --site-header-height: 0px; /* PC の上部のサイトのヘッダーの高さ（スマホ・タブレットは出さないので 0） */
+  --content-max: 1200px;
+
+  /* （K75）動き：速さと、ゆるやかに止まる動き方 */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.3, 1.35, 0.5, 1); /* 少し行きすぎて戻る */
+  --dur-fast: 0.15s;
+  --dur: 0.3s;
+  --dur-slow: 0.8s;
+  --shadow-float: 0 12px 32px rgb(43 43 43 / 0.16); /* メニュー、ダイアログ、シート */
+  --color-backdrop: rgb(27 26 23 / 0.5); /* ダイアログやシートの後ろの幕 */
 
   /* タグのアイコンの色（TagChip）。背景に対してコントラスト比3:1以上 */
   --color-tag-food: #c4553a;
   --color-tag-scenery: #3f7d4e;
-  --color-tag-history: #2b4c7e;
+  --color-tag-history: #1e3a5f;
   --color-tag-photo: #a0457a;
   --color-tag-relaxed: #2f8a7e;
   --color-tag-quick: #6b5ca5;
@@ -29,25 +49,20 @@
   --color-tag-rainy: #2f7fc1;
 
   /* （v11）地図・キャンペーン・リスト（要件定義書 7.2） */
-  --color-pin-minor: #2b4c7e; /* 地図の定番以外のピン（藍） */
+  --color-pin-minor: #1e3a5f; /* 地図の定番以外のピン（藍） */
   --color-pin-major: #8a94a3; /* 地図の定番のピン（灰） */
-  --color-pin-hub: #1f2a37; /* 地図の起点のピン（墨） */
-  --color-route-line: #b8892b; /* 経路順の地図の直線と番号のピン（金） */
+  --color-pin-hub: #2b2b2b; /* 地図の起点のピン（墨） */
+  --color-route-line: #c5a059; /* 経路順の地図の直線と番号のピン（金） */
   --color-campaign: #c4553a; /* キャンペーンの札とラベル（朱） */
   --color-list-highlight: #fff6e0; /* S-07 の「すべて」タブで、リストに保存したスポットの行の背景（薄い金） */
 
-  /* （v18）旅のしおりの見た目（要件定義書 7.2、7.9）。加賀五彩をもとにした色 */
-  --color-washi: #f7f4ec; /* 和紙の地 */
+  /* 加賀五彩をもとにした飾りの色（要件定義書 7.2、7.9）。名前は v22 までのまま */
+  --color-washi: #faf8f3; /* 和紙の地 */
   --color-shu: #b5452f; /* 朱：コメントのしるし、S-09 の判子 */
   --color-accent-text: #86661c; /* 金の文字（金の地の色は文字には薄いので、文字はこちら。4.5:1 以上） */
-  --color-shiori-kaishi: #fffefa; /* 懐紙：カードの地 */
   --color-shiori-ai-1: #254670; /* 加賀藍のボタンのグラデーション（上） */
   --color-shiori-ai-2: #162b47; /* 同（下） */
   --color-shiori-gold: #c5a059; /* 金箔：枠、しおりライン、下部タブの線 */
-  --color-shiori-gold-light: #e6cf98; /* しおりラインの明るいところ */
-  --color-shiori-gold-dark: #9c7a3a; /* しおりラインの暗いところ */
-  --color-shiori-fleck: rgb(197 160 89 / 0.35); /* 和紙に散らした金箔 */
-  --color-shiori-veil: rgb(247 244 236 / 0.76); /* （v21）背面の写真を透かす、半透明の和紙 */
   --color-shiori-enji-1: #7a1c1c; /* 加賀臙脂：下部タブのグラデーション（上） */
   --color-shiori-enji-2: #591212; /* 同（下） */
   --color-shiori-on-enji: #fbf3e4; /* 臙脂の上の文字 */
@@ -56,8 +71,7 @@
   --color-shiori-backdrop: #1b1a17; /* 写真の読み込み前の、画面の背面 */
   --color-shiori-caption: rgb(20 18 14 / 0.72); /* 写真の上の文字の下敷き */
   --color-shiori-caption-text: #fbf3e4;
-  --radius-shiori: 6px; /* 障子や漆器のような控えめな角丸 */
-  --shiori-width: 420px; /* しおりの見た目の画面の列の幅 */
+  --sheet-width: 480px; /* スマホ・タブレットで画面いっぱいに出すシート（S-07）の列の幅 */
   --color-tea-ohi: #9b5524; /* S-14 の茶碗（大樋焼の飴色の釉薬） */
   --color-tea-ohi-dark: #4f2412; /* 茶碗の口の中と高台 */
   --color-tea-ohi-rim: #c27a3a; /* 茶碗の口と、釉薬が流れたすじ */
@@ -66,38 +80,18 @@
   --color-tea-gold: #d4a944; /* 金箔 */
   --color-tea-steam: rgb(91 102 117 / 0.45); /* 湯気の線 */
 
-  /* マイページ（S-11）の雪の茶屋街の見た目（要件定義書 7.2、7.7） */
-  --color-snow-sky-1: #2c2e5c; /* 夕暮れの空（上） */
-  --color-snow-sky-2: #4c4c86;
-  --color-snow-sky-3: #8577ab;
-  --color-snow-sky-4: #a48f9f;
-  --color-snow-sky-5: #6d5148;
-  --color-snow-sky-6: #3a2a24; /* 町家の足もと */
+  /* 写真の上に重ねる部品と、S-12 のお茶の絵（TeaScene）の色（要件定義書 7.2、7.7）。名前は v22 までのまま */
   --color-snow-page: #241f33; /* 列の外側 */
-  --color-snow-wood: #5a3a2c; /* 町家の壁 */
-  --color-snow-wood-dark: #2b1b15;
-  --color-snow-lattice: rgb(25 14 10 / 0.75); /* 木の格子 */
   --color-snow-lantern: rgb(255 190 120 / 0.35); /* 提灯の灯り */
   --color-snow-flake: rgb(255 255 255 / 0.55); /* 雪の結晶の飾り */
   --color-snow-glass: rgb(255 255 255 / 0.86); /* 明るいすりガラス */
   --color-snow-glass-dark: rgb(255 255 255 / 0.16); /* 暗い地の上のすりガラス */
   --color-snow-glass-line: rgb(255 255 255 / 0.5); /* すりガラスの縁 */
-  --color-snow-bar: rgb(36 31 51 / 0.25); /* ヘッダーのすりガラス */
-  --color-snow-tabbar: rgb(250 247 252 / 0.8); /* 下部タブのすりガラス */
-  --color-snow-ink: #2e2a3d; /* すりガラスの上の文字 */
-  --color-snow-ink-sub: #4a4560;
-  --color-snow-accent: #3f3b78; /* 選択中の下部タブ、顔の文字 */
-  --color-snow-avatar: #d9cfe8; /* 顔の地 */
-  --color-snow-photo: #5a4a6e; /* 写真の読み込み前 */
   --color-snow-placeholder: #4d4470; /* 写真がないプランの札 */
   --color-snow-placeholder-text: rgb(255 255 255 / 0.28);
   --color-snow-caption: rgb(20 14 26 / 0.82); /* 写真の上の文字の下敷き */
   --color-snow-chip: rgb(30 22 40 / 0.45); /* 写真の上のラベルとボタン */
   --color-snow-like: #ff8fa3; /* 暗い地の上のいいね済みのハート */
-  --color-snow-sticker: #c2462b; /* 食べ歩きのステッカー */
-  --color-snow-danger: #a12d22; /* S-12 のすりガラスの上の、入力の誤り */
-  --color-snow-ring: rgb(63 59 120 / 0.2); /* S-12 の入力欄を押したときの光 */
-  --color-snow-danger-ring: rgb(161 45 34 / 0.18); /* S-12 の誤りのある入力欄を押したときの光 */
   --color-snow-ohi: #9b5524; /* S-12 の茶碗（大樋焼の飴色の釉薬） */
   --color-snow-ohi-dark: #4f2412; /* 茶碗の影と高台 */
   --color-snow-ohi-rim: #c27a3a; /* 茶碗の口（釉薬が薄くかかったところ） */
@@ -110,7 +104,6 @@
   --shadow-snow-soft: 0 6px 16px rgb(20 12 30 / 0.3); /* 顔、検索の入口 */
   --shadow-snow-text: 0 2px 8px rgb(20 12 30 / 0.45); /* 暗い地の上の白い文字 */
   --blur-snow: 12px; /* すりガラスのぼかし */
-  --radius-lg: 16px; /* 写真のカード、すりガラスの箱 */
   --font-size-2xl: 28px; /* 名前、大きい写真のタイトル */
   --font-family-mincho:
     'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'BIZ UDPMincho',
@@ -125,21 +118,21 @@
   --space-6: 32px;
 
   /* 角丸（小さい部品 / カード / 丸いラベル） */
-  --radius-sm: 8px;
-  --radius-md: 12px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
   --radius-full: 9999px;
 
   /* 文字 */
+  --font-size-2xs: 10px; /* ロゴの英字、落款 */
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-md: 16px;
   --font-size-lg: 18px;
   --font-size-xl: 22px;
-  /* Windows の system-ui は細い游ゴシックUIになり読みにくいため、端末ごとに読みやすい書体を先に指定する（要件定義書 7.2）。
-     Mac・iPhone はヒラギノ角ゴ、Windows は BIZ UDPゴシック（なければメイリオ）、Android は Noto Sans。Webフォントは読み込まない */
+  /* 本文は Noto Sans JP、見出しは Shippori Mincho（どちらも同梱。v23 で全画面にそろえた） */
   --font-family:
-    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, 'Noto Sans JP',
-    'Noto Sans CJK JP', sans-serif;
+    'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo,
+    sans-serif;
 
   /* 大きさ */
   --tap-min: 44px;
@@ -154,42 +147,9 @@
   --z-toast: 50;
 }
 
-/* （v18）旅のしおりの見た目（要件定義書 7.9）。S-14 と S-06〜S-09 を開いているあいだ、
-   AppLayout が <html data-theme="shiori"> にし、共通の変数を加賀五彩の値に置きかえる */
-:root[data-theme='shiori'] {
-  --color-primary: #1e3a5f; /* 加賀藍 */
-  --color-primary-weak: #ecf0f4; /* 利休鼠の文字が 4.5:1 以上になる薄い藍 */
-  --color-accent: #c5a059; /* 金箔（線と飾りだけ。文字は --color-accent-text） */
-  --color-accent-text: #86661c;
-  --color-text: #2b2b2b; /* 墨 */
-  --color-text-sub: #6e6a63; /* 利休鼠 */
-  --color-border: #e2ddd2;
-  --color-bg: #f7f4ec;
-  --color-surface: #fffefa; /* 懐紙 */
-  --color-comment-bg: #f3ecdd;
-  --color-route-line: #c5a059;
-  --radius-sm: var(--radius-shiori);
-  --radius-md: var(--radius-shiori);
-  --font-family:
-    'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo,
-    sans-serif;
-}
-
-/* （v19）しおりの見た目の画面でも、PC の左のメニュー（data-theme="default"）は、ほかの画面と同じ色と書体のままにする */
-:root[data-theme='shiori'] [data-theme='default'] {
-  --color-primary: #2b4c7e;
-  --color-primary-weak: #e8eef6;
-  --color-accent: #b8892b;
-  --color-text: #1f2a37;
-  --color-text-sub: #5b6675;
-  --color-border: #d5dce4;
-  --color-bg: #f7f8fa;
-  --color-surface: #ffffff;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --font-family:
-    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', Meiryo, 'Noto Sans JP',
-    'Noto Sans CJK JP', sans-serif;
-
-  font-family: var(--font-family);
+/* PC：上部にサイトのヘッダー（SiteHeader）を出す。その下に固定するものは、この高さの分だけ下げる */
+@media (min-width: 1024px) {
+  :root {
+    --site-header-height: 72px;
+  }
 }

@@ -15,11 +15,17 @@
 
 .thumb {
   flex-shrink: 0;
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   border-radius: var(--radius-sm);
-  background: var(--color-bg);
-  animation: pulse 1.2s ease-in-out infinite;
+  background: linear-gradient(
+      100deg,
+      var(--color-primary-weak) 40%,
+      var(--color-surface) 50%,
+      var(--color-primary-weak) 60%
+    )
+    0 0 / 300% 100%;
+  animation: shimmer 1.6s linear infinite;
 }
 
 .lines {
@@ -34,8 +40,14 @@
   width: 70%;
   height: var(--space-3);
   border-radius: var(--radius-full);
-  background: var(--color-bg);
-  animation: pulse 1.2s ease-in-out infinite;
+  background: linear-gradient(
+      100deg,
+      var(--color-primary-weak) 40%,
+      var(--color-surface) 50%,
+      var(--color-primary-weak) 60%
+    )
+    0 0 / 300% 100%;
+  animation: shimmer 1.6s linear infinite;
 }
 
 .wide {
@@ -47,9 +59,21 @@
   width: 40%;
 }
 
-@keyframes pulse {
-  50% {
-    opacity: 0.5;
+/* （K75）光が左から右へ流れる */
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thumb,
+  .line {
+    animation: none;
   }
 }
 

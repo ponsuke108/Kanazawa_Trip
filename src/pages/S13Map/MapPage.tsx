@@ -86,7 +86,7 @@ export function MapPage() {
     update((p) => (minorOnly ? p.delete('minor') : p.set('minor', '1')), true);
 
   return (
-    <AppLayout showTabBar>
+    <AppLayout showTabBar footer={false} wide>
       <PageHeader title="地図" showSiteName />
       <div className={styles.stage}>
         <LazyMapView

@@ -1,0 +1,129 @@
+/* サイトのフッター（6.1、v23）：加賀臙脂の地、上に金箔の線 */
+.footer {
+  position: relative;
+  margin-top: auto;
+  background:
+    url('../../assets/art/shippo-light.svg') center / 44px,
+    linear-gradient(180deg, var(--color-brand), var(--color-brand-dark));
+  color: var(--color-on-brand);
+  overflow: hidden;
+}
+
+/* 上の金箔の線（K75） */
+.footer::before {
+  content: '';
+  display: block;
+  height: 4px;
+  background: url('../../assets/art/kinpaku.svg') center / 160px;
+}
+
+/* 雪吊りの絵：右下に薄く */
+.art {
+  position: absolute;
+  right: calc(var(--space-5) * -1);
+  bottom: calc(var(--space-6) * -1);
+  width: 220px;
+  color: var(--color-on-brand);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-5);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.lead {
+  color: var(--color-on-brand-sub);
+  font-size: var(--font-size-sm);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  color: var(--color-on-brand);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.links a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer :focus-visible {
+  outline-color: var(--color-on-brand);
+}
+
+.sources {
+  padding-top: var(--space-4);
+  border-top: 1px solid color-mix(in srgb, var(--color-on-brand) 25%, transparent);
+  color: var(--color-on-brand-sub);
+  font-size: var(--font-size-xs);
+  line-height: 1.8;
+}
+
+.sourcesTitle {
+  color: var(--color-on-brand);
+  font-family: var(--font-family-mincho);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.sources a {
+  color: inherit;
+}
+
+.copy {
+  color: var(--color-on-brand-sub);
+  font-family: var(--font-family-mincho);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.2em;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding: var(--space-6) var(--space-5) var(--space-5);
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: var(--space-6);
+  }
+
+  .sources,
+  .copy {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .art {
+    right: var(--space-6);
+    width: 300px;
+  }
+}

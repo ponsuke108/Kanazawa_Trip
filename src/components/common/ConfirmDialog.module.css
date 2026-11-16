@@ -6,7 +6,10 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
-  background: color-mix(in srgb, var(--color-text) 45%, transparent);
+  background: var(--color-backdrop);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: veil var(--dur) ease-out both;
 }
 
 .dialog {
@@ -17,7 +20,31 @@
   max-width: 400px;
   padding: var(--space-5);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-surface) linear-gradient(var(--color-accent), var(--color-accent)) top /
+    100% 3px no-repeat;
+  box-shadow: var(--shadow-float);
+  animation: pop var(--dur) var(--ease-spring) both;
+}
+
+@keyframes veil {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.94;
+    translate: 0 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .dialog {
+    animation: none;
+  }
 }
 
 .title {

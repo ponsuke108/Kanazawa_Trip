@@ -75,7 +75,7 @@ export function SearchResultsPage() {
         ) : (
           <>
             <p className={styles.count}>{total}件のプラン</p>
-            <ol className={styles.list}>
+            <ol className={styles.list} data-stagger>
               {items.map((plan) => (
                 <li key={plan.id}>
                   <PlanCard plan={plan} />

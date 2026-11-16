@@ -26,6 +26,21 @@
   color: var(--color-surface);
   font-size: var(--font-size-sm);
   font-weight: 600;
+  box-shadow: var(--shadow-float);
+  animation: toast-in 0.35s var(--ease-spring) both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
 }
 
 .success {
@@ -40,11 +55,10 @@
   background: var(--color-text);
 }
 
-/* PC：下部タブはなく、左の縦のメニュー（幅220px）がある画面では、残りの幅の中央に出す（7.8） */
+/* PC：下部タブはない（7.8） */
 @media (min-width: 1024px) {
   .aboveTabBar {
     bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
-    left: calc(50% + 220px / 2);
   }
 }
 

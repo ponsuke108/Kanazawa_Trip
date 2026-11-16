@@ -12,9 +12,6 @@ export const Breakpoints = {
   pc: 1024,
 } as const;
 
-// PC の左の縦のメニューの幅（7.8）。トーストや下部の固定ボタンをずらすときもこの幅を使う
-export const SideMenuWidth = 220;
-
 // 画面の幅に合わせた、内容の最大幅（7.8）
 export const ContentMaxWidth = {
   phone: 480,
